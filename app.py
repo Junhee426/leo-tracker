@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import zipfile
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -14,7 +15,7 @@ DATA_DIR = BASE_DIR / "data"
 VERSION = "1.1.0"
 
 app = Flask(__name__)
-app.config["JSON_AS_ASCII"] = False
+app.json.ensure_ascii = False
 
 
 def load_json(name: str, default):
@@ -186,4 +187,5 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    debug = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(host="0.0.0.0", port=5000, debug=debug)
