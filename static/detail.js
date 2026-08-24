@@ -8,6 +8,36 @@ function trendBadge(item) {
   return `<span class="trend ${escapeHtml(item.trend)}">${escapeHtml(label)}</span>`;
 }
 
+const METRIC_LABELS = { tracked: '카탈로그 추적', deployed: '배치 완료', authorized: '규제 승인', planned: '계획' };
+
+function renderCrossCheck(points, sourcesById) {
+  const target = $('#detailCrosscheck');
+  if (!points || !points.length) {
+    target.innerHTML = '<div class="empty">교차검증할 날짜 명시 수치 출처가 아직 없습니다.</div>';
+    return;
+  }
+  const groups = {};
+  points.forEach(p => { (groups[p.metric] ||= []).push(p); });
+  target.innerHTML = Object.entries(groups).map(([metric, items]) => {
+    const values = items.map(i => i.value).filter(v => v != null);
+    let status = 'single', label = '단일 출처 · 교차검증 대기';
+    if (values.length >= 2) {
+      const max = Math.max(...values), min = Math.min(...values);
+      const diffPct = max ? ((max - min) / max) * 100 : 0;
+      const tolerance = Math.max(2, 5 / max * 100);
+      if (diffPct <= tolerance) { status = 'match'; label = `일치 · 교차검증됨 (차이 ${diffPct.toFixed(1)}%)`; }
+      else { status = 'conflict'; label = `수치 상이 (차이 ${diffPct.toFixed(1)}%) · 확인 필요`; }
+    }
+    const rows = items.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(it => {
+      const src = sourcesById[it.source_id];
+      const val = it.value == null ? '—' : `${it.approx ? '~' : ''}${fmt.format(it.value)}`;
+      const label2 = src ? `<a href="${escapeHtml(src.url)}" target="_blank" rel="noopener">${escapeHtml(src.publisher)} ↗</a>` : escapeHtml(it.source_id);
+      return `<div class="xcheck-row"><div class="xcheck-src">${label2}<small>${escapeHtml(it.date || '날짜 미상')}</small></div><div class="xcheck-val">${val}</div></div>`;
+    }).join('');
+    return `<article class="xcheck-group"><div class="xcheck-head"><h4>${escapeHtml(METRIC_LABELS[metric] || metric)}</h4><span class="xcheck-status ${status}">${escapeHtml(label)}</span></div>${rows}</article>`;
+  }).join('');
+}
+
 async function init() {
   const id = document.body.dataset.constellationId;
   const res = await fetch(`/api/constellation/${encodeURIComponent(id)}`);
@@ -30,11 +60,10 @@ async function init() {
   $('#detailMilestone').textContent = r.next_milestone || '—';
   $('#detailService').textContent = r.target_service || '—';
   $('#detailCountry').textContent = r.country || '—';
-  const check = r.crosscheck;
-  $('#detailCrosscheck').textContent = !check || check.status === 'not_compared'
-    ? '비교 대기 — 자동 카탈로그와 날짜가 명시된 독립 수치가 모두 필요합니다.'
-    : `${check.status.toUpperCase()} · 카탈로그 ${fmt.format(check.catalog_count)} / 레퍼런스 ${fmt.format(check.reference_count)} (${check.reference_date}) · 차이 ${check.delta > 0 ? '+' : ''}${fmt.format(check.delta)}`;
   $('#detailNote').textContent = r.note || '—';
+
+  const sourcesById = Object.fromEntries(data.sources.map(s => [s.id, s]));
+  renderCrossCheck(r.crosscheck_points, sourcesById);
 
   $('#detailRoadmap').innerHTML = data.roadmap.map(x => `<div class="mini-roadmap-item"><div><strong>${escapeHtml(x.milestone)}</strong><small>${escapeHtml(x.category)}</small></div>${trendBadge(x)}<div class="mini-compare"><span>${escapeHtml(x.baseline)}</span><b>→</b><span>${escapeHtml(x.current)}</span></div></div>`).join('') || '<div class="empty">비교 가능한 공개 기준선이 아직 없습니다.</div>';
   $('#detailLaunches').innerHTML = data.launches.sort((a,b)=>b.date.localeCompare(a.date)).map(x => `<tr><td>${escapeHtml(x.date)}</td><td><strong>${escapeHtml(x.mission)}</strong><br><small>${escapeHtml(x.note || '')}</small></td><td><span class="mission-status ${escapeHtml(x.status)}">${escapeHtml(x.status)}</span></td><td>${escapeHtml(x.vehicle || '—')}</td><td class="num">${x.satellites == null ? '—' : fmt.format(x.satellites)}</td><td>${escapeHtml(x.site || '—')}</td></tr>`).join('') || '<tr><td colspan="6" class="empty">임무 단위 발사기록이 아직 등록되지 않았습니다.</td></tr>';

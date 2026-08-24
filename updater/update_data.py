@@ -139,6 +139,52 @@ def build_crosscheck(plan: dict, live: dict | None):
     }
 
 
+def build_crosscheck_points(plan: dict, live: dict | None):
+    """Collect every dated, independent numeric claim for this constellation.
+
+    Each point keeps its reported metric (tracked/deployed/authorized/planned)
+    so the UI only compares figures that measure the same thing. A CelesTrak
+    catalog point is included automatically whenever a live fetch succeeded.
+    """
+    points = []
+    if live is not None:
+        points.append({
+            "source_id": "celestrak_groups",
+            "metric": "tracked",
+            "value": live["tracked_in_orbit"],
+            "date": live["last_data_date"],
+            "approx": False,
+        })
+
+    raw_reference_count = plan.get("manual_reference_count")
+    try:
+        reference_count = int(raw_reference_count) if raw_reference_count is not None else None
+    except (TypeError, ValueError):
+        reference_count = None
+    reference_source_id = plan.get("manual_reference_source_id")
+    if reference_count and reference_source_id:
+        points.append({
+            "source_id": reference_source_id,
+            "metric": plan.get("manual_reference_metric", "deployed"),
+            "value": reference_count,
+            "date": plan.get("manual_reference_date"),
+            "approx": bool(plan.get("manual_reference_approx", False)),
+        })
+
+    for extra in plan.get("crosscheck_references", []):
+        if extra.get("value") is None or not extra.get("source_id"):
+            continue
+        points.append({
+            "source_id": extra["source_id"],
+            "metric": extra.get("metric", "deployed"),
+            "value": extra["value"],
+            "date": extra.get("date"),
+            "approx": bool(extra.get("approx", False)),
+        })
+
+    return points
+
+
 def build_entry(plan: dict, live: dict | None):
     count = live["tracked_in_orbit"] if live else int(plan.get("manual_reference_count") or 0)
     planned = plan.get("planned_satellites")
@@ -167,6 +213,7 @@ def build_entry(plan: dict, live: dict | None):
         "last_data_date": live.get("last_data_date") if live else plan.get("manual_reference_date"),
         "source_ids": source_ids,
         "crosscheck": build_crosscheck(plan, live),
+        "crosscheck_points": build_crosscheck_points(plan, live),
         "note": plan.get("note", ""),
     }
 

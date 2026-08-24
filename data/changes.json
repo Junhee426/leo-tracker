@@ -1,65 +1,101 @@
 [
-  {
-    "date": "2026-08-07",
-    "constellation": "IRIS²",
-    "type": "plan_update",
-    "field": "Architecture",
-    "previous": "Earlier public baseline: 290+ satellites",
-    "current": "348 satellites: 330 LEO + 18 MEO",
-    "source_id": "eu_iris2_2026"
-  },
-  {
-    "date": "2026-08-04",
-    "constellation": "Telesat Lightspeed",
-    "type": "schedule_update",
-    "field": "Global service",
-    "previous": "Late 2027",
-    "current": "Q1 2028",
-    "source_id": "telesat_aug_2026"
-  },
-  {
-    "date": "2026-08-04",
-    "constellation": "Telesat Lightspeed",
-    "type": "plan_update",
-    "field": "Initial constellation",
-    "previous": "156 satellites",
-    "current": "225 satellites; global service target Q1 2028",
-    "source_id": "telesat_aug_2026"
-  },
-  {
-    "date": "2026-07-30",
-    "constellation": "Amazon Leo",
-    "type": "deployment",
-    "field": "Constellation status",
-    "previous": "Deployment ramp-up",
-    "current": "Nearly 400 satellites in orbit; initial service planned in 2026",
-    "source_id": "amazon_q2_2026"
-  },
-  {
-    "date": "2026-07-04",
-    "constellation": "Qianfan / Spacesail",
-    "type": "launch",
-    "field": "Launched satellites",
-    "previous": "200",
-    "current": "218",
-    "source_id": "miit_qianfan_2026"
-  },
-  {
-    "date": "2026-03-17",
-    "constellation": "Telesat Lightspeed",
-    "type": "schedule_update",
-    "field": "First production launch",
-    "previous": "Mid-2026",
-    "current": "December 2026",
-    "source_id": "telesat_milka_2026"
-  },
-  {
-    "date": "2026-01-09",
-    "constellation": "Starlink",
-    "type": "regulatory",
-    "field": "Authorized satellites",
-    "previous": "Prior authorization baseline",
-    "current": "15,000 total referenced by FCC authorization",
-    "source_id": "fcc_starlink_2026"
-  }
+    {
+        "date":  "2026-08-24",
+        "constellation":  "Eutelsat OneWeb",
+        "type":  "tracking_update",
+        "field":  "Tracked in orbit",
+        "previous":  "600",
+        "current":  "651",
+        "source_id":  "celestrak_groups"
+    },
+    {
+        "date":  "2026-08-24",
+        "constellation":  "Amazon Leo",
+        "type":  "tracking_update",
+        "field":  "Tracked in orbit",
+        "previous":  "396",
+        "current":  "391",
+        "source_id":  "celestrak_groups"
+    },
+    {
+        "date":  "2026-08-24",
+        "constellation":  "Guowang / SatNet",
+        "type":  "tracking_update",
+        "field":  "Tracked in orbit",
+        "previous":  "186",
+        "current":  "199",
+        "source_id":  "celestrak_groups"
+    },
+    {
+        "date":  "2026-08-24",
+        "constellation":  "Qianfan / Spacesail",
+        "type":  "tracking_update",
+        "field":  "Tracked in orbit",
+        "previous":  "218",
+        "current":  "238",
+        "source_id":  "celestrak_groups"
+    },
+    {
+        "date":  "2026-08-07",
+        "constellation":  "IRIS²",
+        "type":  "plan_update",
+        "field":  "Architecture",
+        "previous":  "Earlier public baseline: 290+ satellites",
+        "current":  "348 satellites: 330 LEO + 18 MEO",
+        "source_id":  "eu_iris2_2026"
+    },
+    {
+        "date":  "2026-08-04",
+        "constellation":  "Telesat Lightspeed",
+        "type":  "schedule_update",
+        "field":  "Global service",
+        "previous":  "Late 2027",
+        "current":  "Q1 2028",
+        "source_id":  "telesat_aug_2026"
+    },
+    {
+        "date":  "2026-08-04",
+        "constellation":  "Telesat Lightspeed",
+        "type":  "plan_update",
+        "field":  "Initial constellation",
+        "previous":  "156 satellites",
+        "current":  "225 satellites; global service target Q1 2028",
+        "source_id":  "telesat_aug_2026"
+    },
+    {
+        "date":  "2026-07-30",
+        "constellation":  "Amazon Leo",
+        "type":  "deployment",
+        "field":  "Constellation status",
+        "previous":  "Deployment ramp-up",
+        "current":  "Nearly 400 satellites in orbit; initial service planned in 2026",
+        "source_id":  "amazon_q2_2026"
+    },
+    {
+        "date":  "2026-07-04",
+        "constellation":  "Qianfan / Spacesail",
+        "type":  "launch",
+        "field":  "Launched satellites",
+        "previous":  "200",
+        "current":  "218",
+        "source_id":  "miit_qianfan_2026"
+    },
+    {
+        "date":  "2026-03-17",
+        "constellation":  "Telesat Lightspeed",
+        "type":  "schedule_update",
+        "field":  "First production launch",
+        "previous":  "Mid-2026",
+        "current":  "December 2026",
+        "source_id":  "telesat_milka_2026"
+    },
+    {
+        "date":  "2026-01-09",
+        "constellation":  "Starlink",
+        "type":  "regulatory",
+        "field":  "Authorized satellites",
+        "previous":  "Prior authorization baseline",
+        "current":  "15,000 total referenced by FCC authorization",
+        "source_id":  "fcc_starlink_2026"
+    }
 ]

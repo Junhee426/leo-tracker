@@ -16,6 +16,10 @@ constellations:
     manual_reference_count: 9600
     manual_reference_date: "2026-03-31"
     manual_reference_source_id: spacex_2026_prospectus
+    manual_reference_metric: deployed
+    manual_reference_approx: true
+    crosscheck_references:
+      - {source_id: fcc_starlink_2026, metric: authorized, value: 15000, date: "2026-01-09"}
     note: "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure."
 
   - id: oneweb
@@ -34,6 +38,8 @@ constellations:
     manual_reference_count: 600
     manual_reference_date: "2026-08-01"
     manual_reference_source_id: eutelsat_oneweb
+    manual_reference_metric: deployed
+    manual_reference_approx: true
     note: "Eutelsat describes the operational LEO network as 600+ satellites."
 
   - id: amazon_leo
@@ -52,6 +58,9 @@ constellations:
     manual_reference_count: 396
     manual_reference_date: "2026-07-02"
     manual_reference_source_id: amazon_leo_missions
+    manual_reference_metric: deployed
+    crosscheck_references:
+      - {source_id: amazon_q2_2026, metric: deployed, value: 400, date: "2026-07-30", approx: true}
     note: "Amazon reported 396 satellites deployed after LA-08; tracked count may differ due to cataloging/commissioning."
 
   - id: lightspeed
@@ -70,6 +79,7 @@ constellations:
     manual_reference_count: 0
     manual_reference_date: "2026-08-21"
     manual_reference_source_id: telesat_aug_2026
+    manual_reference_metric: planned
     note: "No operational Lightspeed constellation satellites are counted in V1.1 until cataloged deployment begins."
 
   - id: guowang
@@ -88,6 +98,7 @@ constellations:
     manual_reference_count: 186
     manual_reference_date: "2026-08-16"
     manual_reference_source_id: guowang_group24
+    manual_reference_metric: tracked
     note: "Publicly identified spacecraft count varies by cataloging source; V1.1 shows CelesTrak tracked count when available."
 
   - id: qianfan
@@ -106,6 +117,9 @@ constellations:
     manual_reference_count: 218
     manual_reference_date: "2026-07-04"
     manual_reference_source_id: miit_qianfan_2026
+    manual_reference_metric: deployed
+    crosscheck_references:
+      - {source_id: songjiang_qianfan, metric: planned, value: 15000, date: "2026-04-08", approx: true}
     note: "MIIT reported 218 satellites launched by July 4, 2026."
 
   - id: iris2
@@ -124,4 +138,5 @@ constellations:
     manual_reference_count: 0
     manual_reference_date: "2026-08-21"
     manual_reference_source_id: eu_iris2_2026
+    manual_reference_metric: planned
     note: "IRIS² is multi-orbit; the tracker retains it because it is a major benchmark for sovereign LEO communications."
