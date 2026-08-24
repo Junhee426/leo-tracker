@@ -1,350 +1,352 @@
 {
-    "generated_at":  "2026-08-24T08:51:20Z",
-    "update_mode":  "partial",
-    "failures":  [
-                     "STARLINK : 원격 서버에서 (403) 사용할 수 없음 오류를 반환했습니다."
-                 ],
-    "constellations":  [
-                           {
-                               "id":  "starlink",
-                               "name":  "Starlink",
-                               "operator":  "SpaceX",
-                               "country":  "United States",
-                               "flag":  "🇺🇸",
-                               "status":  "operating_expanding",
-                               "tracked_in_orbit":  9600,
-                               "tracked_source":  "manual_reference",
-                               "planned_satellites":  15000,
-                               "planned_label":  "15,000 authorized",
-                               "deployment_pct":  64,
-                               "launched_this_year":  null,
-                               "avg_altitude_km":  null,
-                               "avg_inclination_deg":  null,
-                               "orbit_label":  "340–485 km Gen2 + existing shells",
-                               "next_milestone":  "Continue Gen2 / mobile-capable deployment",
-                               "target_service":  "Operational",
-                               "last_data_date":  "2026-03-31",
-                               "source_ids":  [
-                                                  "spacex_2026_prospectus",
-                                                  "fcc_starlink_2026"
-                                              ],
-                               "crosscheck":  {
-                                                  "status":  "not_compared",
-                                                  "catalog_count":  null,
-                                                  "reference_count":  9600,
-                                                  "reference_date":  "2026-03-31",
-                                                  "reference_source_id":  "spacex_2026_prospectus",
-                                                  "delta":  null,
-                                                  "delta_pct":  null
-                                              },
-                               "crosscheck_points":  [
-                                                         {
-                                                             "source_id":  "spacex_2026_prospectus",
-                                                             "metric":  "deployed",
-                                                             "value":  9600,
-                                                             "date":  "2026-03-31",
-                                                             "approx":  true
-                                                         },
-                                                         {
-                                                             "source_id":  "fcc_starlink_2026",
-                                                             "metric":  "authorized",
-                                                             "value":  15000,
-                                                             "date":  "2026-01-09",
-                                                             "approx":  false
-                                                         }
-                                                     ],
-                               "note":  "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure."
-                           },
-                           {
-                               "id":  "oneweb",
-                               "name":  "Eutelsat OneWeb",
-                               "operator":  "Eutelsat",
-                               "country":  "Europe / UK",
-                               "flag":  "🇪🇺",
-                               "status":  "operating",
-                               "tracked_in_orbit":  651,
-                               "tracked_source":  "celestrak",
-                               "planned_satellites":  648,
-                               "planned_label":  "Gen 1 nominal: 648",
-                               "deployment_pct":  100.5,
-                               "launched_this_year":  0,
-                               "avg_altitude_km":  1197.4,
-                               "avg_inclination_deg":  87.9,
-                               "orbit_label":  "~1,200 km / 12 planes",
-                               "next_milestone":  "Replenishment / next-generation launches from 2027",
-                               "target_service":  "Operational",
-                               "last_data_date":  "2026-08-23",
-                               "source_ids":  [
-                                                  "eutelsat_oneweb",
-                                                  "eutelsat_maiaspace",
-                                                  "celestrak_groups"
-                                              ],
-                               "crosscheck":  {
-                                                  "status":  "review",
-                                                  "catalog_count":  651,
-                                                  "reference_count":  600,
-                                                  "reference_date":  "2026-08-01",
-                                                  "reference_source_id":  "eutelsat_oneweb",
-                                                  "delta":  51,
-                                                  "delta_pct":  8.5
-                                              },
-                               "crosscheck_points":  [
-                                                         {
-                                                             "source_id":  "celestrak_groups",
-                                                             "metric":  "tracked",
-                                                             "value":  651,
-                                                             "date":  "2026-08-23",
-                                                             "approx":  false
-                                                         },
-                                                         {
-                                                             "source_id":  "eutelsat_oneweb",
-                                                             "metric":  "deployed",
-                                                             "value":  600,
-                                                             "date":  "2026-08-01",
-                                                             "approx":  true
-                                                         }
-                                                     ],
-                               "note":  "Eutelsat describes the operational LEO network as 600+ satellites."
-                           },
-                           {
-                               "id":  "amazon_leo",
-                               "name":  "Amazon Leo",
-                               "operator":  "Amazon",
-                               "country":  "United States",
-                               "flag":  "🇺🇸",
-                               "status":  "deploying",
-                               "tracked_in_orbit":  391,
-                               "tracked_source":  "celestrak",
-                               "planned_satellites":  3236,
-                               "planned_label":  "3,236 initial constellation",
-                               "deployment_pct":  12.1,
-                               "launched_this_year":  216,
-                               "avg_altitude_km":  607.5,
-                               "avg_inclination_deg":  51.9,
-                               "orbit_label":  "Operational altitude incl. ~630 km",
-                               "next_milestone":  "Initial service rollout in 2026; launch cadence increase",
-                               "target_service":  "Initial rollout: 2026",
-                               "last_data_date":  "2026-08-23",
-                               "source_ids":  [
-                                                  "amazon_leo_missions",
-                                                  "amazon_q2_2026",
-                                                  "celestrak_groups"
-                                              ],
-                               "crosscheck":  {
-                                                  "status":  "close",
-                                                  "catalog_count":  391,
-                                                  "reference_count":  396,
-                                                  "reference_date":  "2026-07-02",
-                                                  "reference_source_id":  "amazon_leo_missions",
-                                                  "delta":  -5,
-                                                  "delta_pct":  -1.3
-                                              },
-                               "crosscheck_points":  [
-                                                         {
-                                                             "source_id":  "celestrak_groups",
-                                                             "metric":  "tracked",
-                                                             "value":  391,
-                                                             "date":  "2026-08-23",
-                                                             "approx":  false
-                                                         },
-                                                         {
-                                                             "source_id":  "amazon_leo_missions",
-                                                             "metric":  "deployed",
-                                                             "value":  396,
-                                                             "date":  "2026-07-02",
-                                                             "approx":  false
-                                                         },
-                                                         {
-                                                             "source_id":  "amazon_q2_2026",
-                                                             "metric":  "deployed",
-                                                             "value":  400,
-                                                             "date":  "2026-07-30",
-                                                             "approx":  true
-                                                         }
-                                                     ],
-                               "note":  "Amazon reported 396 satellites deployed after LA-08; tracked count may differ due to cataloging/commissioning."
-                           },
-                           {
-                               "id":  "lightspeed",
-                               "name":  "Telesat Lightspeed",
-                               "operator":  "Telesat",
-                               "country":  "Canada",
-                               "flag":  "🇨🇦",
-                               "status":  "development",
-                               "tracked_in_orbit":  0,
-                               "tracked_source":  "manual_reference",
-                               "planned_satellites":  225,
-                               "planned_label":  "225 satellites (Aug. 2026 plan)",
-                               "deployment_pct":  0,
-                               "launched_this_year":  null,
-                               "avg_altitude_km":  null,
-                               "avg_inclination_deg":  null,
-                               "orbit_label":  "LEO polar + inclined architecture",
-                               "next_milestone":  "First two production satellites planned for December 2026",
-                               "target_service":  "Global service: Q1 2028",
-                               "last_data_date":  "2026-08-21",
-                               "source_ids":  [
-                                                  "telesat_aug_2026",
-                                                  "telesat_2025_results",
-                                                  "telesat_milka_2026"
-                                              ],
-                               "crosscheck":  {
-                                                  "status":  "not_compared",
-                                                  "catalog_count":  null,
-                                                  "reference_count":  0,
-                                                  "reference_date":  "2026-08-21",
-                                                  "reference_source_id":  "telesat_aug_2026",
-                                                  "delta":  null,
-                                                  "delta_pct":  null
-                                              },
-                               "crosscheck_points":  [
-
-                                                     ],
-                               "note":  "No operational Lightspeed constellation satellites are counted in V1.1 until cataloged deployment begins."
-                           },
-                           {
-                               "id":  "guowang",
-                               "name":  "Guowang / SatNet",
-                               "operator":  "China SatNet",
-                               "country":  "China",
-                               "flag":  "🇨🇳",
-                               "status":  "deploying",
-                               "tracked_in_orbit":  199,
-                               "tracked_source":  "celestrak",
-                               "planned_satellites":  13000,
-                               "planned_label":  "~13,000 target",
-                               "deployment_pct":  1.5,
-                               "launched_this_year":  63,
-                               "avg_altitude_km":  1128.7,
-                               "avg_inclination_deg":  61.1,
-                               "orbit_label":  "~1,149–1,168 km; multiple inclinations",
-                               "next_milestone":  "Continue batch deployment",
-                               "target_service":  "Deployment phase",
-                               "last_data_date":  "2026-08-23",
-                               "source_ids":  [
-                                                  "guowang_group24",
-                                                  "celestrak_groups"
-                                              ],
-                               "crosscheck":  {
-                                                  "status":  "review",
-                                                  "catalog_count":  199,
-                                                  "reference_count":  186,
-                                                  "reference_date":  "2026-08-16",
-                                                  "reference_source_id":  "guowang_group24",
-                                                  "delta":  13,
-                                                  "delta_pct":  7
-                                              },
-                               "crosscheck_points":  [
-                                                         {
-                                                             "source_id":  "celestrak_groups",
-                                                             "metric":  "tracked",
-                                                             "value":  199,
-                                                             "date":  "2026-08-23",
-                                                             "approx":  false
-                                                         },
-                                                         {
-                                                             "source_id":  "guowang_group24",
-                                                             "metric":  "tracked",
-                                                             "value":  186,
-                                                             "date":  "2026-08-16",
-                                                             "approx":  false
-                                                         }
-                                                     ],
-                               "note":  "Publicly identified spacecraft count varies by cataloging source; V1.1 shows CelesTrak tracked count when available."
-                           },
-                           {
-                               "id":  "qianfan",
-                               "name":  "Qianfan / Spacesail",
-                               "operator":  "Shanghai Spacesail Technologies",
-                               "country":  "China",
-                               "flag":  "🇨🇳",
-                               "status":  "deploying",
-                               "tracked_in_orbit":  238,
-                               "tracked_source":  "celestrak",
-                               "planned_satellites":  15000,
-                               "planned_label":  ">15,000 long-term target",
-                               "deployment_pct":  1.6,
-                               "launched_this_year":  130,
-                               "avg_altitude_km":  1026.2,
-                               "avg_inclination_deg":  89,
-                               "orbit_label":  "LEO multi-plane deployment",
-                               "next_milestone":  "Continue Phase-1 network deployment",
-                               "target_service":  "Regional → global expansion",
-                               "last_data_date":  "2026-08-23",
-                               "source_ids":  [
-                                                  "miit_qianfan_2026",
-                                                  "songjiang_qianfan",
-                                                  "celestrak_groups"
-                                              ],
-                               "crosscheck":  {
-                                                  "status":  "review",
-                                                  "catalog_count":  238,
-                                                  "reference_count":  218,
-                                                  "reference_date":  "2026-07-04",
-                                                  "reference_source_id":  "miit_qianfan_2026",
-                                                  "delta":  20,
-                                                  "delta_pct":  9.2
-                                              },
-                               "crosscheck_points":  [
-                                                         {
-                                                             "source_id":  "celestrak_groups",
-                                                             "metric":  "tracked",
-                                                             "value":  238,
-                                                             "date":  "2026-08-23",
-                                                             "approx":  false
-                                                         },
-                                                         {
-                                                             "source_id":  "miit_qianfan_2026",
-                                                             "metric":  "deployed",
-                                                             "value":  218,
-                                                             "date":  "2026-07-04",
-                                                             "approx":  false
-                                                         },
-                                                         {
-                                                             "source_id":  "songjiang_qianfan",
-                                                             "metric":  "planned",
-                                                             "value":  15000,
-                                                             "date":  "2026-04-08",
-                                                             "approx":  true
-                                                         }
-                                                     ],
-                               "note":  "MIIT reported 218 satellites launched by July 4, 2026."
-                           },
-                           {
-                               "id":  "iris2",
-                               "name":  "IRIS²",
-                               "operator":  "SpaceRISE / European Union",
-                               "country":  "European Union",
-                               "flag":  "🇪🇺",
-                               "status":  "development",
-                               "tracked_in_orbit":  0,
-                               "tracked_source":  "manual_reference",
-                               "planned_satellites":  348,
-                               "planned_label":  "348 total: 330 LEO + 18 MEO",
-                               "deployment_pct":  0,
-                               "launched_this_year":  null,
-                               "avg_altitude_km":  null,
-                               "avg_inclination_deg":  null,
-                               "orbit_label":  "330 LEO + 18 MEO",
-                               "next_milestone":  "First launches on European launch vehicles in 2029",
-                               "target_service":  "Initial governmental services: 2030",
-                               "last_data_date":  "2026-08-21",
-                               "source_ids":  [
-                                                  "eu_iris2_2026"
-                                              ],
-                               "crosscheck":  {
-                                                  "status":  "not_compared",
-                                                  "catalog_count":  null,
-                                                  "reference_count":  0,
-                                                  "reference_date":  "2026-08-21",
-                                                  "reference_source_id":  "eu_iris2_2026",
-                                                  "delta":  null,
-                                                  "delta_pct":  null
-                                              },
-                               "crosscheck_points":  [
-
-                                                     ],
-                               "note":  "IRIS² is multi-orbit; the tracker retains it because it is a major benchmark for sovereign LEO communications."
-                           }
-                       ]
+  "generated_at": "2026-08-24T21:17:09Z",
+  "update_mode": "live",
+  "failures": [],
+  "constellations": [
+    {
+      "id": "starlink",
+      "name": "Starlink",
+      "operator": "SpaceX",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "status": "operating_expanding",
+      "tracked_in_orbit": 10968,
+      "tracked_source": "celestrak",
+      "planned_satellites": 15000,
+      "planned_label": "15,000 authorized",
+      "deployment_pct": 73.1,
+      "launched_this_year": 1920,
+      "avg_altitude_km": 468.6,
+      "avg_inclination_deg": 57.0,
+      "orbit_label": "340–485 km Gen2 + existing shells",
+      "next_milestone": "Continue Gen2 / mobile-capable deployment",
+      "target_service": "Operational",
+      "last_data_date": "2026-08-24",
+      "source_ids": [
+        "spacex_2026_prospectus",
+        "fcc_starlink_2026",
+        "celestrak_groups"
+      ],
+      "crosscheck": {
+        "status": "review",
+        "catalog_count": 10968,
+        "reference_count": 9600,
+        "reference_date": "2026-03-31",
+        "reference_source_id": "spacex_2026_prospectus",
+        "delta": 1368,
+        "delta_pct": 14.2
+      },
+      "crosscheck_points": [
+        {
+          "source_id": "celestrak_groups",
+          "metric": "tracked",
+          "value": 10968,
+          "date": "2026-08-24",
+          "approx": false
+        },
+        {
+          "source_id": "spacex_2026_prospectus",
+          "metric": "deployed",
+          "value": 9600,
+          "date": "2026-03-31",
+          "approx": true
+        },
+        {
+          "source_id": "fcc_starlink_2026",
+          "metric": "authorized",
+          "value": 15000,
+          "date": "2026-01-09",
+          "approx": false
+        }
+      ],
+      "note": "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure."
+    },
+    {
+      "id": "oneweb",
+      "name": "Eutelsat OneWeb",
+      "operator": "Eutelsat",
+      "country": "Europe / UK",
+      "flag": "🇪🇺",
+      "status": "operating",
+      "tracked_in_orbit": 651,
+      "tracked_source": "celestrak",
+      "planned_satellites": 648,
+      "planned_label": "Gen 1 nominal: 648",
+      "deployment_pct": 100.5,
+      "launched_this_year": 0,
+      "avg_altitude_km": 1197.4,
+      "avg_inclination_deg": 87.9,
+      "orbit_label": "~1,200 km / 12 planes",
+      "next_milestone": "Replenishment / next-generation launches from 2027",
+      "target_service": "Operational",
+      "last_data_date": "2026-08-24",
+      "source_ids": [
+        "eutelsat_oneweb",
+        "eutelsat_maiaspace",
+        "celestrak_groups"
+      ],
+      "crosscheck": {
+        "status": "review",
+        "catalog_count": 651,
+        "reference_count": 600,
+        "reference_date": "2026-08-01",
+        "reference_source_id": "eutelsat_oneweb",
+        "delta": 51,
+        "delta_pct": 8.5
+      },
+      "crosscheck_points": [
+        {
+          "source_id": "celestrak_groups",
+          "metric": "tracked",
+          "value": 651,
+          "date": "2026-08-24",
+          "approx": false
+        },
+        {
+          "source_id": "eutelsat_oneweb",
+          "metric": "deployed",
+          "value": 600,
+          "date": "2026-08-01",
+          "approx": true
+        }
+      ],
+      "note": "Eutelsat describes the operational LEO network as 600+ satellites."
+    },
+    {
+      "id": "amazon_leo",
+      "name": "Amazon Leo",
+      "operator": "Amazon",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "status": "deploying",
+      "tracked_in_orbit": 391,
+      "tracked_source": "celestrak",
+      "planned_satellites": 3236,
+      "planned_label": "3,236 initial constellation",
+      "deployment_pct": 12.1,
+      "launched_this_year": 216,
+      "avg_altitude_km": 608.0,
+      "avg_inclination_deg": 51.9,
+      "orbit_label": "Operational altitude incl. ~630 km",
+      "next_milestone": "Initial service rollout in 2026; launch cadence increase",
+      "target_service": "Initial rollout: 2026",
+      "last_data_date": "2026-08-24",
+      "source_ids": [
+        "amazon_leo_missions",
+        "amazon_q2_2026",
+        "celestrak_groups"
+      ],
+      "crosscheck": {
+        "status": "close",
+        "catalog_count": 391,
+        "reference_count": 396,
+        "reference_date": "2026-07-02",
+        "reference_source_id": "amazon_leo_missions",
+        "delta": -5,
+        "delta_pct": -1.3
+      },
+      "crosscheck_points": [
+        {
+          "source_id": "celestrak_groups",
+          "metric": "tracked",
+          "value": 391,
+          "date": "2026-08-24",
+          "approx": false
+        },
+        {
+          "source_id": "amazon_leo_missions",
+          "metric": "deployed",
+          "value": 396,
+          "date": "2026-07-02",
+          "approx": false
+        },
+        {
+          "source_id": "amazon_q2_2026",
+          "metric": "deployed",
+          "value": 400,
+          "date": "2026-07-30",
+          "approx": true
+        }
+      ],
+      "note": "Amazon reported 396 satellites deployed after LA-08; tracked count may differ due to cataloging/commissioning."
+    },
+    {
+      "id": "lightspeed",
+      "name": "Telesat Lightspeed",
+      "operator": "Telesat",
+      "country": "Canada",
+      "flag": "🇨🇦",
+      "status": "development",
+      "tracked_in_orbit": 0,
+      "tracked_source": "manual_reference",
+      "planned_satellites": 225,
+      "planned_label": "225 satellites (Aug. 2026 plan)",
+      "deployment_pct": 0.0,
+      "launched_this_year": null,
+      "avg_altitude_km": null,
+      "avg_inclination_deg": null,
+      "orbit_label": "LEO polar + inclined architecture",
+      "next_milestone": "First two production satellites planned for December 2026",
+      "target_service": "Global service: Q1 2028",
+      "last_data_date": "2026-08-21",
+      "source_ids": [
+        "telesat_aug_2026",
+        "telesat_2025_results",
+        "telesat_milka_2026"
+      ],
+      "crosscheck": {
+        "status": "not_compared",
+        "catalog_count": null,
+        "reference_count": 0,
+        "reference_date": "2026-08-21",
+        "reference_source_id": "telesat_aug_2026",
+        "delta": null,
+        "delta_pct": null
+      },
+      "crosscheck_points": [],
+      "note": "No operational Lightspeed constellation satellites are counted in V1.1 until cataloged deployment begins."
+    },
+    {
+      "id": "guowang",
+      "name": "Guowang / SatNet",
+      "operator": "China SatNet",
+      "country": "China",
+      "flag": "🇨🇳",
+      "status": "deploying",
+      "tracked_in_orbit": 199,
+      "tracked_source": "celestrak",
+      "planned_satellites": 13000,
+      "planned_label": "~13,000 target",
+      "deployment_pct": 1.5,
+      "launched_this_year": 63,
+      "avg_altitude_km": 1128.7,
+      "avg_inclination_deg": 61.1,
+      "orbit_label": "~1,149–1,168 km; multiple inclinations",
+      "next_milestone": "Continue batch deployment",
+      "target_service": "Deployment phase",
+      "last_data_date": "2026-08-24",
+      "source_ids": [
+        "guowang_group24",
+        "celestrak_groups"
+      ],
+      "crosscheck": {
+        "status": "review",
+        "catalog_count": 199,
+        "reference_count": 186,
+        "reference_date": "2026-08-16",
+        "reference_source_id": "guowang_group24",
+        "delta": 13,
+        "delta_pct": 7.0
+      },
+      "crosscheck_points": [
+        {
+          "source_id": "celestrak_groups",
+          "metric": "tracked",
+          "value": 199,
+          "date": "2026-08-24",
+          "approx": false
+        },
+        {
+          "source_id": "guowang_group24",
+          "metric": "tracked",
+          "value": 186,
+          "date": "2026-08-16",
+          "approx": false
+        }
+      ],
+      "note": "Publicly identified spacecraft count varies by cataloging source; V1.1 shows CelesTrak tracked count when available."
+    },
+    {
+      "id": "qianfan",
+      "name": "Qianfan / Spacesail",
+      "operator": "Shanghai Spacesail Technologies",
+      "country": "China",
+      "flag": "🇨🇳",
+      "status": "deploying",
+      "tracked_in_orbit": 238,
+      "tracked_source": "celestrak",
+      "planned_satellites": 15000,
+      "planned_label": ">15,000 long-term target",
+      "deployment_pct": 1.6,
+      "launched_this_year": 130,
+      "avg_altitude_km": 1026.6,
+      "avg_inclination_deg": 89.0,
+      "orbit_label": "LEO multi-plane deployment",
+      "next_milestone": "Continue Phase-1 network deployment",
+      "target_service": "Regional → global expansion",
+      "last_data_date": "2026-08-24",
+      "source_ids": [
+        "miit_qianfan_2026",
+        "songjiang_qianfan",
+        "celestrak_groups"
+      ],
+      "crosscheck": {
+        "status": "review",
+        "catalog_count": 238,
+        "reference_count": 218,
+        "reference_date": "2026-07-04",
+        "reference_source_id": "miit_qianfan_2026",
+        "delta": 20,
+        "delta_pct": 9.2
+      },
+      "crosscheck_points": [
+        {
+          "source_id": "celestrak_groups",
+          "metric": "tracked",
+          "value": 238,
+          "date": "2026-08-24",
+          "approx": false
+        },
+        {
+          "source_id": "miit_qianfan_2026",
+          "metric": "deployed",
+          "value": 218,
+          "date": "2026-07-04",
+          "approx": false
+        },
+        {
+          "source_id": "songjiang_qianfan",
+          "metric": "planned",
+          "value": 15000,
+          "date": "2026-04-08",
+          "approx": true
+        }
+      ],
+      "note": "MIIT reported 218 satellites launched by July 4, 2026."
+    },
+    {
+      "id": "iris2",
+      "name": "IRIS²",
+      "operator": "SpaceRISE / European Union",
+      "country": "European Union",
+      "flag": "🇪🇺",
+      "status": "development",
+      "tracked_in_orbit": 0,
+      "tracked_source": "manual_reference",
+      "planned_satellites": 348,
+      "planned_label": "348 total: 330 LEO + 18 MEO",
+      "deployment_pct": 0.0,
+      "launched_this_year": null,
+      "avg_altitude_km": null,
+      "avg_inclination_deg": null,
+      "orbit_label": "330 LEO + 18 MEO",
+      "next_milestone": "First launches on European launch vehicles in 2029",
+      "target_service": "Initial governmental services: 2030",
+      "last_data_date": "2026-08-21",
+      "source_ids": [
+        "eu_iris2_2026"
+      ],
+      "crosscheck": {
+        "status": "not_compared",
+        "catalog_count": null,
+        "reference_count": 0,
+        "reference_date": "2026-08-21",
+        "reference_source_id": "eu_iris2_2026",
+        "delta": null,
+        "delta_pct": null
+      },
+      "crosscheck_points": [],
+      "note": "IRIS² is multi-orbit; the tracker retains it because it is a major benchmark for sovereign LEO communications."
+    }
+  ]
 }
