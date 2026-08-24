@@ -30,6 +30,10 @@ async function init() {
   $('#detailMilestone').textContent = r.next_milestone || '—';
   $('#detailService').textContent = r.target_service || '—';
   $('#detailCountry').textContent = r.country || '—';
+  const check = r.crosscheck;
+  $('#detailCrosscheck').textContent = !check || check.status === 'not_compared'
+    ? '비교 대기 — 자동 카탈로그와 날짜가 명시된 독립 수치가 모두 필요합니다.'
+    : `${check.status.toUpperCase()} · 카탈로그 ${fmt.format(check.catalog_count)} / 레퍼런스 ${fmt.format(check.reference_count)} (${check.reference_date}) · 차이 ${check.delta > 0 ? '+' : ''}${fmt.format(check.delta)}`;
   $('#detailNote').textContent = r.note || '—';
 
   $('#detailRoadmap').innerHTML = data.roadmap.map(x => `<div class="mini-roadmap-item"><div><strong>${escapeHtml(x.milestone)}</strong><small>${escapeHtml(x.category)}</small></div>${trendBadge(x)}<div class="mini-compare"><span>${escapeHtml(x.baseline)}</span><b>→</b><span>${escapeHtml(x.current)}</span></div></div>`).join('') || '<div class="empty">비교 가능한 공개 기준선이 아직 없습니다.</div>';

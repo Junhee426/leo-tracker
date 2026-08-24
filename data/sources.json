@@ -9,6 +9,33 @@
     "note": "Provides constellation groups including Starlink, OneWeb, Qianfan, Hulianwang and Kuiper."
   },
   {
+    "id": "celestrak_gp_docs",
+    "title": "A New Way to Obtain GP Data",
+    "publisher": "CelesTrak",
+    "type": "methodology",
+    "date": "2026-08-24",
+    "url": "https://celestrak.org/NORAD/documentation/gp-data-formats.php",
+    "note": "Documents GP queries and CCSDS OMM formats. Group results are catalog objects, not an operator-certified operational fleet count."
+  },
+  {
+    "id": "spacetrack_satcat",
+    "title": "Space-Track SATCAT data model",
+    "publisher": "United States Space Command / 18 SDS",
+    "type": "crosscheck",
+    "date": "2026-08-24",
+    "url": "https://www.space-track.org/basicspacedata/modeldef/class/satcat/format/html",
+    "note": "Authenticated reference for NORAD catalog identifiers and CURRENT status. Useful for object-level review; automated access requires a Space-Track account."
+  },
+  {
+    "id": "unoosa_online_index",
+    "title": "Online Index of Objects Launched into Outer Space",
+    "publisher": "United Nations Office for Outer Space Affairs",
+    "type": "crosscheck",
+    "date": "2025-11-01",
+    "url": "https://www.unoosa.org/oosa/osoindex/search-ng.jspx",
+    "note": "Registration and identity cross-check for functional space objects. Registration lag means it is not suitable as the primary live fleet counter."
+  },
+  {
     "id": "spacex_2026_prospectus",
     "title": "SpaceX EU Prospectus",
     "publisher": "SpaceX",

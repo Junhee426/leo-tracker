@@ -95,10 +95,53 @@ def summarize_records(records: list[dict], year: int):
     }
 
 
+def build_crosscheck(plan: dict, live: dict | None):
+    """Compare the catalog count with a dated, independent published count.
+
+    The two figures intentionally keep their different definitions: CelesTrak is
+    a current catalog-object count, while the reference may be launched,
+    deployed, or operational satellites.  The result is a review signal, not a
+    claim that either source is wrong.
+    """
+    reference_count = plan.get("manual_reference_count")
+    reference_date = plan.get("manual_reference_date")
+    reference_source_id = plan.get("manual_reference_source_id")
+    if live is None or reference_count is None or not reference_source_id:
+        return {
+            "status": "not_compared",
+            "catalog_count": live.get("tracked_in_orbit") if live else None,
+            "reference_count": reference_count,
+            "reference_date": reference_date,
+            "reference_source_id": reference_source_id,
+            "delta": None,
+            "delta_pct": None,
+        }
+
+    catalog_count = live["tracked_in_orbit"]
+    delta = catalog_count - int(reference_count)
+    delta_pct = round((delta / reference_count) * 100, 1) if reference_count else None
+    # A small positive difference is expected when launches occur after a dated
+    # operator announcement. Larger or negative differences deserve inspection.
+    tolerance = max(5, round(reference_count * 0.02))
+    status = "matched" if delta == 0 else "close" if abs(delta) <= tolerance else "review"
+    return {
+        "status": status,
+        "catalog_count": catalog_count,
+        "reference_count": int(reference_count),
+        "reference_date": reference_date,
+        "reference_source_id": reference_source_id,
+        "delta": delta,
+        "delta_pct": delta_pct,
+    }
+
+
 def build_entry(plan: dict, live: dict | None):
     count = live["tracked_in_orbit"] if live else int(plan.get("manual_reference_count") or 0)
     planned = plan.get("planned_satellites")
     pct = round((count / planned) * 100, 1) if planned else None
+    source_ids = list(plan.get("source_ids", []))
+    if live and "celestrak_groups" not in source_ids:
+        source_ids.append("celestrak_groups")
     return {
         "id": plan["id"],
         "name": plan["name"],
@@ -118,7 +161,8 @@ def build_entry(plan: dict, live: dict | None):
         "next_milestone": plan.get("next_milestone"),
         "target_service": plan.get("target_service"),
         "last_data_date": live.get("last_data_date") if live else plan.get("manual_reference_date"),
-        "source_ids": plan.get("source_ids", []),
+        "source_ids": source_ids,
+        "crosscheck": build_crosscheck(plan, live),
         "note": plan.get("note", ""),
     }
 

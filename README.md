@@ -31,6 +31,12 @@ CelesTrak OMM JSON 그룹을 이용합니다.
 
 > `tracked_in_orbit`는 **catalog에서 추적되는 object 수**이며 서비스 가능한 operational satellite 수와 같다고 가정하지 않습니다.
 
+갱신 시 CelesTrak 카탈로그 수와 `plans.yaml`의 날짜가 명시된 사업자·정부 발표 수를
+`crosscheck` 필드에서 비교합니다. `matched`, `close`, `review`는 정의와 발표 시점 차이를
+검토하기 위한 신호이며 어느 한 출처가 틀렸다는 판정이 아닙니다. Space-Track SATCAT은
+NORAD 식별자와 현재 상태를, UNOOSA Online Index는 등록·식별 정보를 수동 확인하는 보조
+레퍼런스로 Sources에 포함합니다.
+
 ### 계획 데이터
 
 `data/plans.yaml`에서 사람이 검증한 공식/규제/정부 발표를 관리합니다.

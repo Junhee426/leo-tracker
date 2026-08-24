@@ -15,6 +15,7 @@ constellations:
     source_ids: [spacex_2026_prospectus, fcc_starlink_2026]
     manual_reference_count: 9600
     manual_reference_date: "2026-03-31"
+    manual_reference_source_id: spacex_2026_prospectus
     note: "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure."
 
   - id: oneweb
@@ -32,6 +33,7 @@ constellations:
     source_ids: [eutelsat_oneweb, eutelsat_maiaspace]
     manual_reference_count: 600
     manual_reference_date: "2026-08-01"
+    manual_reference_source_id: eutelsat_oneweb
     note: "Eutelsat describes the operational LEO network as 600+ satellites."
 
   - id: amazon_leo
@@ -49,6 +51,7 @@ constellations:
     source_ids: [amazon_leo_missions, amazon_q2_2026]
     manual_reference_count: 396
     manual_reference_date: "2026-07-02"
+    manual_reference_source_id: amazon_leo_missions
     note: "Amazon reported 396 satellites deployed after LA-08; tracked count may differ due to cataloging/commissioning."
 
   - id: lightspeed
@@ -66,6 +69,7 @@ constellations:
     source_ids: [telesat_aug_2026, telesat_2025_results, telesat_milka_2026]
     manual_reference_count: 0
     manual_reference_date: "2026-08-21"
+    manual_reference_source_id: telesat_aug_2026
     note: "No operational Lightspeed constellation satellites are counted in V1.1 until cataloged deployment begins."
 
   - id: guowang
@@ -83,6 +87,7 @@ constellations:
     source_ids: [guowang_group24, celestrak_groups]
     manual_reference_count: 186
     manual_reference_date: "2026-08-16"
+    manual_reference_source_id: guowang_group24
     note: "Publicly identified spacecraft count varies by cataloging source; V1.1 shows CelesTrak tracked count when available."
 
   - id: qianfan
@@ -100,6 +105,7 @@ constellations:
     source_ids: [miit_qianfan_2026, songjiang_qianfan]
     manual_reference_count: 218
     manual_reference_date: "2026-07-04"
+    manual_reference_source_id: miit_qianfan_2026
     note: "MIIT reported 218 satellites launched by July 4, 2026."
 
   - id: iris2
@@ -117,4 +123,5 @@ constellations:
     source_ids: [eu_iris2_2026]
     manual_reference_count: 0
     manual_reference_date: "2026-08-21"
+    manual_reference_source_id: eu_iris2_2026
     note: "IRIS² is multi-orbit; the tracker retains it because it is a major benchmark for sovereign LEO communications."

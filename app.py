@@ -81,9 +81,10 @@ def make_xlsx():
     launches = load_json("launches.json", [])
     changes = load_json("changes.json", [])
 
-    constellation_rows = [["Constellation", "Operator", "Country", "Status", "Tracked in orbit", "Planned/authorized", "Deployment %", "Orbit", "Next milestone", "Target service", "Data date", "Source IDs"]]
+    constellation_rows = [["Constellation", "Operator", "Country", "Status", "Tracked in orbit", "Planned/authorized", "Deployment %", "Orbit", "Next milestone", "Target service", "Data date", "Cross-check status", "Reference count", "Difference", "Source IDs"]]
     for r in status:
-        constellation_rows.append([r.get("name"), r.get("operator"), r.get("country"), r.get("status"), r.get("tracked_in_orbit"), r.get("planned_satellites"), r.get("deployment_pct"), r.get("orbit_label"), r.get("next_milestone"), r.get("target_service"), r.get("last_data_date"), ", ".join(r.get("source_ids", []))])
+        check = r.get("crosscheck") or {}
+        constellation_rows.append([r.get("name"), r.get("operator"), r.get("country"), r.get("status"), r.get("tracked_in_orbit"), r.get("planned_satellites"), r.get("deployment_pct"), r.get("orbit_label"), r.get("next_milestone"), r.get("target_service"), r.get("last_data_date"), check.get("status"), check.get("reference_count"), check.get("delta"), ", ".join(r.get("source_ids", []))])
 
     launch_rows = [["Date", "Constellation", "Mission", "Status", "Vehicle", "Satellites", "Launch site", "Source ID"]]
     for r in launches:
@@ -165,11 +166,15 @@ def constellation_api(constellation_id: str):
 @app.get("/download/constellations.csv")
 def download_csv():
     out = io.StringIO()
-    fields = ["name", "operator", "country", "status", "tracked_in_orbit", "planned_satellites", "deployment_pct", "orbit_label", "next_milestone", "target_service", "last_data_date", "source_ids"]
+    fields = ["name", "operator", "country", "status", "tracked_in_orbit", "planned_satellites", "deployment_pct", "orbit_label", "next_milestone", "target_service", "last_data_date", "crosscheck_status", "reference_count", "count_delta", "source_ids"]
     writer = csv.DictWriter(out, fieldnames=fields, extrasaction="ignore")
     writer.writeheader()
     for row in current_rows():
         item = dict(row)
+        check = item.pop("crosscheck", {}) or {}
+        item["crosscheck_status"] = check.get("status")
+        item["reference_count"] = check.get("reference_count")
+        item["count_delta"] = check.get("delta")
         item["source_ids"] = ", ".join(item.get("source_ids", []))
         writer.writerow(item)
     payload = out.getvalue().encode("utf-8-sig")
