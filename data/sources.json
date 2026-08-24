@@ -1,0 +1,137 @@
+[
+  {
+    "id": "celestrak_groups",
+    "title": "CelesTrak Current GP Element Sets",
+    "publisher": "CelesTrak",
+    "type": "tracking",
+    "date": "2026-08-19",
+    "url": "https://celestrak.org/NORAD/elements/",
+    "note": "Provides constellation groups including Starlink, OneWeb, Qianfan, Hulianwang and Kuiper."
+  },
+  {
+    "id": "spacex_2026_prospectus",
+    "title": "SpaceX EU Prospectus",
+    "publisher": "SpaceX",
+    "type": "official",
+    "date": "2026-06-05",
+    "url": "https://content.spacex.com/cms-assets/FINAL_Documents%20and%20Updates/SpaceX%20-%20EU%20Prospectus%20%28Approved%20by%20Bafin%29%20-%20June%205%2C%202026.pdf",
+    "note": "States approximately 9,600 Starlink broadband and mobile satellites as of March 31, 2026."
+  },
+  {
+    "id": "fcc_starlink_2026",
+    "title": "FCC Approves Next-Gen Satellite Constellation",
+    "publisher": "U.S. FCC",
+    "type": "regulatory",
+    "date": "2026-01-09",
+    "url": "https://docs.fcc.gov/public/attachments/DOC-417881A1.pdf",
+    "note": "Authorizes an additional 7,500 Gen2 satellites, bringing the authorized total referenced by FCC to 15,000."
+  },
+  {
+    "id": "eutelsat_oneweb",
+    "title": "OneWeb LEO Constellation",
+    "publisher": "Eutelsat",
+    "type": "official",
+    "date": "2026-08-01",
+    "url": "https://www.eutelsat.com/satellite-network/oneweb-leo-constellation",
+    "note": "Describes 600+ satellites in 12 orbital planes at about 1,200 km."
+  },
+  {
+    "id": "eutelsat_maiaspace",
+    "title": "Eutelsat and MaiaSpace launch agreement",
+    "publisher": "Eutelsat",
+    "type": "official",
+    "date": "2026-01-16",
+    "url": "https://www.eutelsat.com/media-press/media-centre/news/eutelsat-signs-launch-agreement-maiaspace-future-leo-satellite",
+    "note": "Future OneWeb LEO launch agreement starting in 2027."
+  },
+  {
+    "id": "amazon_leo_missions",
+    "title": "Amazon Leo mission updates",
+    "publisher": "Amazon",
+    "type": "official",
+    "date": "2026-07-02",
+    "url": "https://www.aboutamazon.com/news/innovation-at-amazon/project-kuiper-satellite-rocket-launch-progress-updates",
+    "note": "LA-08 brought the total deployed to 396 satellites; initial service rollout planned for 2026."
+  },
+  {
+    "id": "amazon_q2_2026",
+    "title": "Amazon Q2 2026 Results",
+    "publisher": "Amazon",
+    "type": "official",
+    "date": "2026-07-30",
+    "url": "https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Second-Quarter-Results/default.aspx",
+    "note": "Reports nearly 400 Amazon Leo satellites in orbit and initial service expected in 2026."
+  },
+  {
+    "id": "telesat_aug_2026",
+    "title": "Telesat expands Lightspeed network to 225 satellites",
+    "publisher": "Telesat",
+    "type": "official",
+    "date": "2026-08-04",
+    "url": "https://www.telesat.com/press/press-releases/telesat-secures-2-3-billion-arctic-military-satcom-contract-expanding-telesat-lightspeed-network-and-capacity-by-44/",
+    "note": "Expands the Lightspeed network to 225 satellites; global service delivery remains targeted for Q1 2028."
+  },
+  {
+    "id": "telesat_2025_results",
+    "title": "Telesat 2025 results",
+    "publisher": "Telesat",
+    "type": "official",
+    "date": "2026-03-01",
+    "url": "https://www.telesat.com/?jet_download=ba1ccfb5ee37224aa0ba1980a5a27c441780f0bf",
+    "note": "Telesat continued to expect the first Lightspeed satellites to launch in late 2026."
+  },
+  {
+    "id": "miit_qianfan_2026",
+    "title": "Qianfan constellation satellites reach 218",
+    "publisher": "China MIIT",
+    "type": "government",
+    "date": "2026-07-04",
+    "url": "https://www.miit.gov.cn/xwfb/gxdt/sjdt/art/2026/art_b4bbc68e008d43ec84e60505229e6960.html",
+    "note": "MIIT states 218 Qianfan satellites had been launched."
+  },
+  {
+    "id": "songjiang_qianfan",
+    "title": "Qianfan constellation overview",
+    "publisher": "Songjiang District Government",
+    "type": "government",
+    "date": "2026-04-08",
+    "url": "https://english.songjiang.gov.cn/news/3338.shtml",
+    "note": "States a long-term plan of more than 15,000 satellites."
+  },
+  {
+    "id": "guowang_group24",
+    "title": "SatNet LEO Group 24 launch notice",
+    "publisher": "National Space Facilities Control and Test Center of Ukraine",
+    "type": "tracking",
+    "date": "2026-08-16",
+    "url": "https://spacecenter.gov.ua/novyny/informacijna-dovidka-shhodo-zapusku-ka-satnet-leo-group-24.html?lang=en",
+    "note": "Reports 9 spacecraft in Group 24 and 186 identified spacecraft in the constellation at that time."
+  },
+  {
+    "id": "eu_iris2_2026",
+    "title": "IRIS² – EU Secure Connectivity Programme",
+    "publisher": "European Commission",
+    "type": "official",
+    "date": "2026-08-07",
+    "url": "https://defence-industry-space.ec.europa.eu/document/download/5cb72e29-5eb0-4c4c-be48-95570ffa13d3_pl?filename=IRIS2+-+EU+Secure+Connectivity+Programme_0.pdf",
+    "note": "348 satellites total: 330 LEO and 18 MEO; first launches in 2029 and initial governmental services in 2030."
+  },
+  {
+    "id": "telesat_2023_mda",
+    "title": "Telesat contracts MDA as prime satellite manufacturer for Lightspeed",
+    "publisher": "Telesat",
+    "type": "official",
+    "date": "2023-08-11",
+    "url": "https://www.telesat.com/press/press-releases/telesat-contracts-mda-as-prime-satellite-manufacturer-for-its-advanced-telesat-lightspeed-low-earth-orbit-constellation/",
+    "note": "2023 baseline: launches scheduled to commence in mid-2026 and global service in late 2027."
+  },
+  {
+    "id": "telesat_milka_2026",
+    "title": "Telesat adds military Ka-band to Lightspeed",
+    "publisher": "Telesat",
+    "type": "official",
+    "date": "2026-03-17",
+    "url": "https://www.telesat.com/press/press-releases/telesat-adds-military-ka-band-to-telesat-lightspeed-to-meet-strong-global-demand-for-defence-and-sovereignty-requirements/",
+    "note": "States the first two production satellites will launch in December 2026, followed by a high-cadence 2027 campaign."
+  }
+]

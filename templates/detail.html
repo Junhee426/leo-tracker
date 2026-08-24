@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Constellation Detail · Global LEO Tracker</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-constellation-id="{{ constellation_id }}">
+  <header class="topbar">
+    <a class="brand" href="/"><div class="brand-mark">LEO</div><div><h1>Global LEO Constellation Tracker</h1><p>Constellation Detail</p></div></a>
+    <div class="top-actions"><a class="download ghost" href="/">← Overview</a><span class="version">V{{ version }}</span></div>
+  </header>
+  <main class="detail-main">
+    <section class="detail-hero">
+      <div><span class="eyebrow">CONSTELLATION PROFILE</span><h2 id="detailName">Loading…</h2><p id="detailOperator">—</p></div>
+      <span id="detailStatus" class="status">—</span>
+    </section>
+    <section class="cards detail-cards">
+      <article class="metric"><span>Tracked in Orbit</span><strong id="detailTracked">—</strong><small id="detailTrackedSource">—</small></article>
+      <article class="metric"><span>Planned / Authorized</span><strong id="detailPlanned">—</strong><small id="detailPlannedLabel">—</small></article>
+      <article class="metric"><span>Deployment</span><strong id="detailPct">—</strong><small id="detailDataDate">—</small></article>
+      <article class="metric"><span>Launch Records</span><strong id="detailLaunchCount">—</strong><small>CURATED HISTORY</small></article>
+    </section>
+
+    <section class="detail-grid">
+      <article class="panel info-panel">
+        <div class="panel-head"><div><h3>Network Baseline</h3><p>현재 데이터 스냅샷</p></div></div>
+        <dl class="info-list">
+          <div><dt>Orbit</dt><dd id="detailOrbit">—</dd></div>
+          <div><dt>Next milestone</dt><dd id="detailMilestone">—</dd></div>
+          <div><dt>Target service</dt><dd id="detailService">—</dd></div>
+          <div><dt>Country / region</dt><dd id="detailCountry">—</dd></div>
+          <div><dt>Note</dt><dd id="detailNote">—</dd></div>
+        </dl>
+      </article>
+      <article class="panel info-panel">
+        <div class="panel-head"><div><h3>Plan Change Summary</h3><p>초기 기준선 대비 최신 계획</p></div></div>
+        <div id="detailRoadmap" class="mini-roadmap"></div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><h3>Launch History</h3><p>해당 위성망의 임무 단위 기록</p></div></div>
+      <div class="table-wrap"><table class="compact-table"><thead><tr><th>일자</th><th>임무</th><th>상태</th><th>발사체</th><th class="num">위성</th><th>발사장</th></tr></thead><tbody id="detailLaunches"></tbody></table></div>
+    </section>
+
+    <section class="detail-grid">
+      <article class="panel info-panel"><div class="panel-head"><div><h3>Changes</h3><p>최근 변경 이력</p></div></div><div id="detailChanges" class="stack-list"></div></article>
+      <article class="panel info-panel"><div class="panel-head"><div><h3>Sources</h3><p>관련 공식·추적 자료</p></div></div><div id="detailSources" class="stack-list"></div></article>
+    </section>
+  </main>
+  <footer><div>Global LEO Constellation Tracker V{{ version }}</div><div>Detail data uses the same source-separated model as the overview.</div></footer>
+  <script src="/static/detail.js"></script>
+</body>
+</html>

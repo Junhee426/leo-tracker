@@ -1,0 +1,120 @@
+version: "1.1.0"
+constellations:
+  - id: starlink
+    name: Starlink
+    operator: SpaceX
+    country: United States
+    flag: "🇺🇸"
+    status: operating_expanding
+    celestrak_group: STARLINK
+    planned_satellites: 15000
+    planned_label: "15,000 authorized"
+    orbit_label: "340–485 km Gen2 + existing shells"
+    next_milestone: "Continue Gen2 / mobile-capable deployment"
+    target_service: "Operational"
+    source_ids: [spacex_2026_prospectus, fcc_starlink_2026]
+    manual_reference_count: 9600
+    manual_reference_date: "2026-03-31"
+    note: "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure."
+
+  - id: oneweb
+    name: Eutelsat OneWeb
+    operator: Eutelsat
+    country: Europe / UK
+    flag: "🇪🇺"
+    status: operating
+    celestrak_group: ONEWEB
+    planned_satellites: 648
+    planned_label: "Gen 1 nominal: 648"
+    orbit_label: "~1,200 km / 12 planes"
+    next_milestone: "Replenishment / next-generation launches from 2027"
+    target_service: "Operational"
+    source_ids: [eutelsat_oneweb, eutelsat_maiaspace]
+    manual_reference_count: 600
+    manual_reference_date: "2026-08-01"
+    note: "Eutelsat describes the operational LEO network as 600+ satellites."
+
+  - id: amazon_leo
+    name: Amazon Leo
+    operator: Amazon
+    country: United States
+    flag: "🇺🇸"
+    status: deploying
+    celestrak_group: KUIPER
+    planned_satellites: 3236
+    planned_label: "3,236 initial constellation"
+    orbit_label: "Operational altitude incl. ~630 km"
+    next_milestone: "Initial service rollout in 2026; launch cadence increase"
+    target_service: "Initial rollout: 2026"
+    source_ids: [amazon_leo_missions, amazon_q2_2026]
+    manual_reference_count: 396
+    manual_reference_date: "2026-07-02"
+    note: "Amazon reported 396 satellites deployed after LA-08; tracked count may differ due to cataloging/commissioning."
+
+  - id: lightspeed
+    name: Telesat Lightspeed
+    operator: Telesat
+    country: Canada
+    flag: "🇨🇦"
+    status: development
+    celestrak_group: null
+    planned_satellites: 225
+    planned_label: "225 satellites (Aug. 2026 plan)"
+    orbit_label: "LEO polar + inclined architecture"
+    next_milestone: "First two production satellites planned for December 2026"
+    target_service: "Global service: Q1 2028"
+    source_ids: [telesat_aug_2026, telesat_2025_results, telesat_milka_2026]
+    manual_reference_count: 0
+    manual_reference_date: "2026-08-21"
+    note: "No operational Lightspeed constellation satellites are counted in V1.1 until cataloged deployment begins."
+
+  - id: guowang
+    name: Guowang / SatNet
+    operator: China SatNet
+    country: China
+    flag: "🇨🇳"
+    status: deploying
+    celestrak_group: HULIANWANG
+    planned_satellites: 13000
+    planned_label: "~13,000 target"
+    orbit_label: "~1,149–1,168 km; multiple inclinations"
+    next_milestone: "Continue batch deployment"
+    target_service: "Deployment phase"
+    source_ids: [guowang_group24, celestrak_groups]
+    manual_reference_count: 186
+    manual_reference_date: "2026-08-16"
+    note: "Publicly identified spacecraft count varies by cataloging source; V1.1 shows CelesTrak tracked count when available."
+
+  - id: qianfan
+    name: Qianfan / Spacesail
+    operator: Shanghai Spacesail Technologies
+    country: China
+    flag: "🇨🇳"
+    status: deploying
+    celestrak_group: QIANFAN
+    planned_satellites: 15000
+    planned_label: ">15,000 long-term target"
+    orbit_label: "LEO multi-plane deployment"
+    next_milestone: "Continue Phase-1 network deployment"
+    target_service: "Regional → global expansion"
+    source_ids: [miit_qianfan_2026, songjiang_qianfan]
+    manual_reference_count: 218
+    manual_reference_date: "2026-07-04"
+    note: "MIIT reported 218 satellites launched by July 4, 2026."
+
+  - id: iris2
+    name: IRIS²
+    operator: SpaceRISE / European Union
+    country: European Union
+    flag: "🇪🇺"
+    status: development
+    celestrak_group: null
+    planned_satellites: 348
+    planned_label: "348 total: 330 LEO + 18 MEO"
+    orbit_label: "330 LEO + 18 MEO"
+    next_milestone: "First launches on European launch vehicles in 2029"
+    target_service: "Initial governmental services: 2030"
+    source_ids: [eu_iris2_2026]
+    manual_reference_count: 0
+    manual_reference_date: "2026-08-21"
+    note: "IRIS² is multi-orbit; the tracker retains it because it is a major benchmark for sovereign LEO communications."

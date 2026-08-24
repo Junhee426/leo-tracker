@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Global LEO satellite constellation deployment, launch and roadmap tracker">
+  <title>Global LEO Constellation Tracker</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <div class="brand-mark">LEO</div>
+      <div><h1>Global LEO Constellation Tracker</h1><p>Deployment · Launch · Roadmap Intelligence</p></div>
+    </a>
+    <div class="top-actions">
+      <a class="download ghost" href="/download/constellations.csv">CSV</a>
+      <a class="download" href="/download/tracker.xlsx">Excel</a>
+      <span class="version">V{{ version }}</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <span class="eyebrow">GLOBAL SATCOM INTELLIGENCE</span>
+        <h2>LEO constellation status,<br>launches and plan changes.</h2>
+        <p>실제 추적 위성 수와 사업자의 계획·승인 수량을 분리하고, 발사이력과 일정 변경을 함께 추적합니다.</p>
+      </div>
+      <div class="update-box">
+        <span>LAST DATA SNAPSHOT</span>
+        <strong id="updatedAt">—</strong>
+        <small id="updateMode">Loading…</small>
+      </div>
+    </section>
+
+    <section class="cards" id="cards">
+      <article class="metric"><span>Tracked Networks</span><strong id="kpiNetworks">—</strong><small>CORE CONSTELLATIONS</small></article>
+      <article class="metric"><span>Tracked in Orbit</span><strong id="kpiOrbit">—</strong><small>CATALOG / REFERENCE TOTAL</small></article>
+      <article class="metric"><span>Launch Records</span><strong id="kpiLaunches">—</strong><small>CURATED MISSION-LEVEL RECORDS</small></article>
+      <article class="metric"><span>Schedule Slips</span><strong id="kpiDelays">—</strong><small>BASELINE → CURRENT</small></article>
+      <article class="metric"><span>Deploying / Operating</span><strong id="kpiActive">—</strong><small>NETWORK STATUS</small></article>
+    </section>
+
+    <nav class="tabs" aria-label="Dashboard sections">
+      <button class="tab active" data-target="overview">Overview</button>
+      <button class="tab" data-target="launches">Launches</button>
+      <button class="tab" data-target="roadmap">Plan vs Current</button>
+      <button class="tab" data-target="changes">Changes</button>
+      <button class="tab" data-target="sources">Sources</button>
+    </nav>
+
+    <section class="panel tab-panel active" id="overview">
+      <div class="panel-head">
+        <div><h3>Constellation Status</h3><p>행을 선택하면 위성망별 상세 페이지로 이동합니다. Tracked count ≠ operational count.</p></div>
+        <div class="controls">
+          <input id="search" type="search" placeholder="위성망 / 사업자 검색">
+          <select id="statusFilter" aria-label="상태 필터">
+            <option value="all">전체 상태</option>
+            <option value="operating">운영</option>
+            <option value="deploying">구축중</option>
+            <option value="development">개발</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="constellationTable">
+          <thead><tr>
+            <th data-sort="name">위성망</th><th data-sort="status">상태</th>
+            <th data-sort="tracked_in_orbit" class="num">추적 위성</th><th data-sort="planned_satellites" class="num">계획/승인</th>
+            <th data-sort="deployment_pct" class="num">구축률</th><th>궤도</th><th>다음 주요 일정</th><th>기준일</th><th></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <span><i class="dot official"></i> 계획값: 공식/규제/정부 자료</span>
+        <span><i class="dot tracking"></i> 추적값: CelesTrak 또는 명시된 공개 추적자료</span>
+      </div>
+    </section>
+
+    <section class="panel tab-panel" id="launches">
+      <div class="panel-head">
+        <div><h3>Launch History</h3><p>공식 확인 가능한 임무 단위 기록입니다. 대규모 위성망의 모든 개별 발사를 자동 수집하는 기능은 후속 버전에서 확장할 수 있습니다.</p></div>
+        <div class="controls"><select id="launchFilter"><option value="all">전체 위성망</option></select></div>
+      </div>
+      <div class="launch-summary" id="launchSummary"></div>
+      <div class="table-wrap">
+        <table id="launchTable" class="compact-table">
+          <thead><tr><th>일자</th><th>위성망</th><th>임무</th><th>상태</th><th>발사체</th><th class="num">위성</th><th>발사장</th><th>출처</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel tab-panel" id="roadmap">
+      <div class="panel-head"><div><h3>Plan vs Current</h3><p>초기 공개 기준선과 최신 공개 계획을 비교합니다. 날짜 범위 표현은 대략적인 지연 개월 수로 표시합니다.</p></div></div>
+      <div id="roadmapHistory" class="roadmap-history"></div>
+      <div class="subsection-title"><h4>Deployment Progress</h4><span>현재 추적/참조 수량 ÷ 계획/승인 수량</span></div>
+      <div id="roadmapList" class="roadmap-list"></div>
+    </section>
+
+    <section class="panel tab-panel" id="changes">
+      <div class="panel-head"><div><h3>Change Intelligence</h3><p>계획 변경, 규제 승인, 발사·추적 수량 변화를 날짜순으로 기록합니다.</p></div></div>
+      <div id="changeList" class="change-list"></div>
+    </section>
+
+    <section class="panel tab-panel" id="sources">
+      <div class="panel-head"><div><h3>Sources & Confidence</h3><p>공식/규제/정부 자료를 우선하고 자동 추적 자료는 별도로 구분합니다.</p></div></div>
+      <div id="sourceList" class="source-grid"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div>Global LEO Constellation Tracker V{{ version }}</div>
+    <div>Counts can differ by cataloging, commissioning, retirement and public disclosure timing.</div>
+  </footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>
