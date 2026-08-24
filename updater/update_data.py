@@ -103,10 +103,14 @@ def build_crosscheck(plan: dict, live: dict | None):
     deployed, or operational satellites.  The result is a review signal, not a
     claim that either source is wrong.
     """
-    reference_count = plan.get("manual_reference_count")
+    raw_reference_count = plan.get("manual_reference_count")
+    try:
+        reference_count = int(raw_reference_count) if raw_reference_count is not None else None
+    except (TypeError, ValueError):
+        reference_count = None
     reference_date = plan.get("manual_reference_date")
     reference_source_id = plan.get("manual_reference_source_id")
-    if live is None or reference_count is None or not reference_source_id:
+    if live is None or reference_count is None or reference_count <= 0 or not reference_source_id:
         return {
             "status": "not_compared",
             "catalog_count": live.get("tracked_in_orbit") if live else None,

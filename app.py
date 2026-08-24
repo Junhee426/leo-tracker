@@ -158,7 +158,11 @@ def constellation_api(constellation_id: str):
     launches = [x for x in load_json("launches.json", []) if x.get("constellation_id") == constellation_id]
     changes = [x for x in load_json("changes.json", []) if x.get("constellation") == name]
     roadmap = [x for x in load_json("roadmap_history.json", []) if x.get("constellation_id") == constellation_id]
-    source_ids = set(row.get("source_ids", [])) | {x.get("source_id") for x in launches + changes + roadmap if x.get("source_id")} | {x.get("baseline_source_id") for x in roadmap if x.get("baseline_source_id")}
+    crosscheck = row.get("crosscheck") or {}
+    source_ids = set(row.get("source_ids", []))
+    if crosscheck.get("reference_source_id"):
+        source_ids.add(crosscheck["reference_source_id"])
+    source_ids |= {x.get("source_id") for x in launches + changes + roadmap if x.get("source_id")} | {x.get("baseline_source_id") for x in roadmap if x.get("baseline_source_id")}
     sources = [x for x in load_json("sources.json", []) if x.get("id") in source_ids]
     return jsonify({"constellation": row, "launches": launches, "changes": changes, "roadmap": roadmap, "sources": sources})
 
