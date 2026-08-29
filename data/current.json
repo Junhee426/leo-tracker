@@ -1,7 +1,13 @@
 {
-  "generated_at": "2026-08-29T02:55:55Z",
-  "update_mode": "live",
-  "failures": [],
+  "generated_at": "2026-08-29T22:52:05Z",
+  "update_mode": "partial",
+  "failures": [
+    "STARLINK: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f482cb69a30>, 'Connection to celestrak.org timed out. (connect timeout=30)'))",
+    "ONEWEB: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=ONEWEB&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f482c429850>, 'Connection to celestrak.org timed out. (connect timeout=30)'))",
+    "KUIPER: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=KUIPER&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f482c42a810>, 'Connection to celestrak.org timed out. (connect timeout=30)'))",
+    "HULIANWANG: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=HULIANWANG&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f482c429ac0>, 'Connection to celestrak.org timed out. (connect timeout=30)'))",
+    "QIANFAN: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=QIANFAN&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f482c42a450>, 'Connection to celestrak.org timed out. (connect timeout=30)'))"
+  ],
   "constellations": [
     {
       "id": "starlink",
