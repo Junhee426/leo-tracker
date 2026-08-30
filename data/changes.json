@@ -1,5 +1,14 @@
 [
   {
+    "date": "2026-08-30",
+    "constellation": "Starlink",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "11042",
+    "current": "11040",
+    "source_id": "celestrak_groups"
+  },
+  {
     "date": "2026-08-28",
     "constellation": "Starlink",
     "type": "tracking_update",
