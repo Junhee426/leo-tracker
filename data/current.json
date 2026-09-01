@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-01T00:09:42Z",
+  "generated_at": "2026-09-01T22:52:49Z",
   "update_mode": "live",
   "failures": [],
   "constellations": [
@@ -10,18 +10,18 @@
       "country": "United States",
       "flag": "🇺🇸",
       "status": "operating_expanding",
-      "tracked_in_orbit": 11034,
+      "tracked_in_orbit": 11091,
       "tracked_source": "celestrak",
       "planned_satellites": 15000,
       "planned_label": "15,000 authorized",
-      "deployment_pct": 73.6,
-      "launched_this_year": 2000,
-      "avg_altitude_km": 466.6,
+      "deployment_pct": 73.9,
+      "launched_this_year": 2056,
+      "avg_altitude_km": 465.3,
       "avg_inclination_deg": 57.1,
       "orbit_label": "340–485 km Gen2 + existing shells",
       "next_milestone": "Continue Gen2 / mobile-capable deployment",
       "target_service": "Operational",
-      "last_data_date": "2026-08-31",
+      "last_data_date": "2026-09-01",
       "source_ids": [
         "spacex_2026_prospectus",
         "fcc_starlink_2026",
@@ -29,19 +29,19 @@
       ],
       "crosscheck": {
         "status": "review",
-        "catalog_count": 11034,
+        "catalog_count": 11091,
         "reference_count": 9600,
         "reference_date": "2026-03-31",
         "reference_source_id": "spacex_2026_prospectus",
-        "delta": 1434,
-        "delta_pct": 14.9
+        "delta": 1491,
+        "delta_pct": 15.5
       },
       "crosscheck_points": [
         {
           "source_id": "celestrak_groups",
           "metric": "tracked",
-          "value": 11034,
-          "date": "2026-08-31",
+          "value": 11091,
+          "date": "2026-09-01",
           "approx": false
         },
         {
@@ -79,7 +79,7 @@
       "orbit_label": "~1,200 km / 12 planes",
       "next_milestone": "Replenishment / next-generation launches from 2027",
       "target_service": "Operational",
-      "last_data_date": "2026-08-31",
+      "last_data_date": "2026-09-01",
       "source_ids": [
         "eutelsat_oneweb",
         "eutelsat_maiaspace",
@@ -99,7 +99,7 @@
           "source_id": "celestrak_groups",
           "metric": "tracked",
           "value": 651,
-          "date": "2026-08-31",
+          "date": "2026-09-01",
           "approx": false
         },
         {
@@ -125,12 +125,12 @@
       "planned_label": "3,236 initial constellation",
       "deployment_pct": 12.1,
       "launched_this_year": 216,
-      "avg_altitude_km": 612.1,
+      "avg_altitude_km": 612.6,
       "avg_inclination_deg": 51.9,
       "orbit_label": "Operational altitude incl. ~630 km",
       "next_milestone": "Initial service rollout in 2026; launch cadence increase",
       "target_service": "Initial rollout: 2026",
-      "last_data_date": "2026-08-31",
+      "last_data_date": "2026-09-01",
       "source_ids": [
         "amazon_leo_missions",
         "amazon_q2_2026",
@@ -150,7 +150,7 @@
           "source_id": "celestrak_groups",
           "metric": "tracked",
           "value": 391,
-          "date": "2026-08-31",
+          "date": "2026-09-01",
           "approx": false
         },
         {
@@ -219,12 +219,12 @@
       "planned_label": "~13,000 target",
       "deployment_pct": 1.5,
       "launched_this_year": 63,
-      "avg_altitude_km": 1131.6,
+      "avg_altitude_km": 1131.9,
       "avg_inclination_deg": 61.1,
       "orbit_label": "~1,149–1,168 km; multiple inclinations",
       "next_milestone": "Continue batch deployment",
       "target_service": "Deployment phase",
-      "last_data_date": "2026-08-31",
+      "last_data_date": "2026-09-01",
       "source_ids": [
         "guowang_group24",
         "celestrak_groups"
@@ -243,7 +243,7 @@
           "source_id": "celestrak_groups",
           "metric": "tracked",
           "value": 199,
-          "date": "2026-08-31",
+          "date": "2026-09-01",
           "approx": false
         },
         {
@@ -269,12 +269,12 @@
       "planned_label": ">15,000 long-term target",
       "deployment_pct": 1.6,
       "launched_this_year": 130,
-      "avg_altitude_km": 1031.7,
+      "avg_altitude_km": 1029.7,
       "avg_inclination_deg": 89.0,
       "orbit_label": "LEO multi-plane deployment",
       "next_milestone": "Continue Phase-1 network deployment",
       "target_service": "Regional → global expansion",
-      "last_data_date": "2026-08-31",
+      "last_data_date": "2026-09-01",
       "source_ids": [
         "miit_qianfan_2026",
         "songjiang_qianfan",
@@ -294,7 +294,7 @@
           "source_id": "celestrak_groups",
           "metric": "tracked",
           "value": 238,
-          "date": "2026-08-31",
+          "date": "2026-09-01",
           "approx": false
         },
         {
