@@ -1,143 +1,107 @@
-let state = { rows: [], sources: [], changes: [], launches: [], roadmapHistory: [], sortKey: 'tracked_in_orbit', sortDir: -1 };
+const {esc,number,statusLabel,scopeLabel,qualityLabel,dateTime,safeUrl,fetchJSON,errorBox,sourceLink,trendBadge,lineChart,monthlyTable}=window.LEO;
+const $=selector=>document.querySelector(selector);
+const $$=selector=>[...document.querySelectorAll(selector)];
+const state={rows:[],sources:[],changes:null,launches:null,roadmap:null,coverage:null,sortKey:'tracked_in_orbit',sortDir:-1,quality:{rows:[]}};
+const sourceMap=()=>Object.fromEntries(state.sources.map(s=>[s.id,s]));
 
-const fmt = new Intl.NumberFormat('ko-KR');
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => [...document.querySelectorAll(sel)];
-
-function statusLabel(status) {
-  return ({operating:'운영', operating_expanding:'운영·확장', deploying:'구축중', development:'개발'})[status] || status;
+function renderKPIs() {
+  $('#kpiNetworks').textContent=number(state.rows.length);
+  const observed=state.rows.filter(r=>r.tracked_in_orbit!=null);
+  $('#kpiOrbit').textContent=observed.length?number(observed.reduce((sum,r)=>sum+r.tracked_in_orbit,0)):'—';
+  $('#kpiOrbitNote').textContent=`관측값 보유 ${observed.length}/${state.rows.length}개 위성망`;
+  $('#kpiLaunches').textContent=number(state.launches?.length);
+  $('#kpiDelays').textContent=state.roadmap?number(state.roadmap.filter(r=>r.trend==='delayed').length):'—';
+  $('#kpiActive').textContent=number(state.rows.filter(r=>['operating','operating_expanding','deploying'].includes(r.status)).length);
 }
-function statusGroup(status) { return ['operating','operating_expanding'].includes(status) ? 'operating' : status; }
-function escapeHtml(value) { return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
-function sourceMap() { return Object.fromEntries(state.sources.map(s => [s.id, s])); }
-
-function renderKPIs(data) {
-  const rows = data.constellations || [];
-  $('#kpiNetworks').textContent = rows.length;
-  $('#kpiOrbit').textContent = fmt.format(rows.reduce((s,r) => s + (Number(r.tracked_in_orbit)||0), 0));
-  $('#kpiLaunches').textContent = fmt.format(state.launches.length);
-  $('#kpiDelays').textContent = state.roadmapHistory.filter(x => x.trend === 'delayed').length;
-  $('#kpiActive').textContent = rows.filter(r => ['operating','operating_expanding','deploying'].includes(r.status)).length;
-  if (data.generated_at) {
-    const d = new Date(data.generated_at);
-    $('#updatedAt').textContent = d.toLocaleString('ko-KR', {timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
-  }
-  $('#updateMode').textContent = data.update_mode === 'live' ? 'LIVE CELESTRAK SNAPSHOT' : data.update_mode === 'partial' ? 'PARTIAL UPDATE' : 'V1.1 SEED DATA';
+function renderQuality() {
+  const mode={live:'수집 완료',cached:'저장값 사용',partial:'일부 수집 실패',failed:'전체 수집 실패',manual:'수동 자료',seed:'초기 자료'}[state.quality.update_mode]||'기존 스냅샷';
+  $('#updatedAt').textContent=dateTime(state.quality.generated_at);
+  $('#updateMode').textContent=mode+(state.quality.degraded?' · 오래된 관측값 확인 필요':'');
+  const bad=state.quality.rows.filter(r=>['stale','unavailable'].includes(r.status));
+  $('#qualityNotice').innerHTML=bad.length?`<div class="quality-warning" role="status">${bad.map(r=>esc(r.name)).join(', ')}: 새 관측값을 확보하지 못했거나 48시간이 지났습니다. 이전 값과 기준일을 확인해 주세요.</div>`:'';
 }
-
 function filteredRows() {
-  const q = $('#search').value.trim().toLowerCase();
-  const f = $('#statusFilter').value;
-  return state.rows.filter(r => {
-    const text = `${r.name} ${r.operator} ${r.country}`.toLowerCase();
-    return (!q || text.includes(q)) && (f === 'all' || statusGroup(r.status) === f);
-  }).sort((a,b) => {
-    const av=a[state.sortKey], bv=b[state.sortKey];
-    if (typeof av === 'number' && typeof bv === 'number') return (av-bv)*state.sortDir;
-    return String(av??'').localeCompare(String(bv??''))*state.sortDir;
+  const q=$('#search').value.trim().toLowerCase(),f=$('#statusFilter').value;
+  return state.rows.filter(r=>(!q||`${r.name} ${r.operator} ${r.country}`.toLowerCase().includes(q))&&(f==='all'||(f==='operating'?['operating','operating_expanding'].includes(r.status):r.status===f))).sort((a,b)=>{
+    const av=a[state.sortKey],bv=b[state.sortKey];
+    if(av==null) return bv==null?0:1;
+    if(bv==null) return -1;
+    return (typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv)))*state.sortDir;
   });
 }
-
 function renderTable() {
-  const rows = filteredRows();
-  const body = $('#constellationTable tbody');
-  if (!rows.length) { body.innerHTML = `<tr><td colspan="9" class="empty">검색 결과가 없습니다.</td></tr>`; return; }
-  body.innerHTML = rows.map(r => {
-    const pct = r.deployment_pct == null ? '—' : `${r.deployment_pct.toFixed(1)}%`;
-    const bar = r.deployment_pct == null ? '' : `<span class="progress"><i style="width:${Math.min(100,r.deployment_pct)}%"></i></span>`;
-    return `<tr class="clickable-row" data-href="/constellation/${encodeURIComponent(r.id)}" title="${escapeHtml(r.note)}">
-      <td class="name-cell"><strong>${escapeHtml(r.flag)} ${escapeHtml(r.name)}</strong><small>${escapeHtml(r.operator)}</small></td>
-      <td><span class="status ${escapeHtml(r.status)}">${escapeHtml(statusLabel(r.status))}</span></td>
-      <td class="num"><strong>${fmt.format(r.tracked_in_orbit ?? 0)}</strong><br><small>${escapeHtml(r.tracked_source)}</small></td>
-      <td class="num"><strong>${r.planned_satellites ? fmt.format(r.planned_satellites) : '—'}</strong><br><small>${escapeHtml(r.planned_label || '')}</small></td>
-      <td class="num">${pct}${bar}</td>
-      <td>${escapeHtml(r.orbit_label || '—')}</td>
-      <td>${escapeHtml(r.next_milestone || '—')}<br><small>${escapeHtml(r.target_service || '')}</small></td>
-      <td>${escapeHtml(r.last_data_date || '—')}</td>
-      <td><a class="detail-link" href="/constellation/${encodeURIComponent(r.id)}">Detail →</a></td>
-    </tr>`;
-  }).join('');
-  $$('.clickable-row').forEach(row => row.addEventListener('click', e => {
-    if (e.target.closest('a')) return;
-    location.href = row.dataset.href;
-  }));
+  const qualities=Object.fromEntries(state.quality.rows.map(r=>[r.id,r]));
+  $('#constellationTable tbody').innerHTML=filteredRows().map(r=>{
+    const q=qualities[r.id]||r.observation||{};
+    return `<tr><td class="name-cell"><a href="/constellation/${encodeURIComponent(r.id)}"><strong>${esc(r.flag)} ${esc(r.name)}</strong></a><small>${esc(r.operator)}</small></td><td><span class="status ${esc(r.status)}">${esc(statusLabel(r.status))}</span></td><td class="num"><strong>${number(r.tracked_in_orbit)}</strong><br><small>${r.tracked_in_orbit==null?'미관측':esc(qualityLabel(q.status))}</small>${r.reference_count!=null?`<br><small>별도 발표 ${number(r.reference_count)} · ${esc(r.reference_date)}</small>`:''}</td><td class="num"><strong>${number(r.planned_satellites)}</strong><br><small>${esc(r.planned_label)}</small></td><td class="num" title="${esc(r.progress?.note)}">${r.deployment_pct==null?'비교 보류':number(r.deployment_pct)+'%'}<br><small>${esc(scopeLabel(r.plan_scope))}</small></td><td>${esc(r.orbit_label||'—')}</td><td>${esc(r.next_milestone||'—')}<br><small>${esc(r.target_service)}</small></td><td>${esc(r.last_data_date||'—')}<br><small>수집 ${dateTime(q.last_success_at)}</small></td><td><a href="/constellation/${encodeURIComponent(r.id)}">상세 →</a></td></tr>`;
+  }).join('')||'<tr><td colspan="9" class="empty">검색 결과가 없습니다.</td></tr>';
 }
-
 function renderLaunches() {
-  const select = $('#launchFilter');
-  const names = [...new Set(state.launches.map(x => x.constellation))].sort();
-  select.innerHTML = '<option value="all">전체 위성망</option>' + names.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
-  const draw = () => {
-    const value = select.value;
-    const rows = state.launches.filter(x => value === 'all' || x.constellation === value).sort((a,b) => b.date.localeCompare(a.date));
-    const completed = rows.filter(x => x.status === 'completed');
-    const satellites = completed.reduce((s,x) => s + (Number(x.satellites)||0), 0);
-    $('#launchSummary').innerHTML = `<div><span>Records</span><strong>${fmt.format(rows.length)}</strong></div><div><span>Completed</span><strong>${fmt.format(completed.length)}</strong></div><div><span>Satellites in listed missions</span><strong>${fmt.format(satellites)}</strong></div>`;
-    const byId = sourceMap();
-    $('#launchTable tbody').innerHTML = rows.map(x => {
-      const src = byId[x.source_id];
-      return `<tr><td>${escapeHtml(x.date)}</td><td><a href="/constellation/${escapeHtml(x.constellation_id)}">${escapeHtml(x.constellation)}</a></td><td><strong>${escapeHtml(x.mission)}</strong><br><small>${escapeHtml(x.note || '')}</small></td><td><span class="mission-status ${escapeHtml(x.status)}">${escapeHtml(x.status)}</span></td><td>${escapeHtml(x.vehicle || '—')}</td><td class="num">${x.satellites == null ? '—' : fmt.format(x.satellites)}</td><td>${escapeHtml(x.site || '—')}</td><td>${src ? `<a href="${escapeHtml(src.url)}" target="_blank" rel="noopener">${escapeHtml(src.publisher)} ↗</a>` : escapeHtml(x.source_id || '—')}</td></tr>`;
-    }).join('') || '<tr><td colspan="8" class="empty">발사기록이 없습니다.</td></tr>';
-  };
-  select.addEventListener('change', draw);
-  draw();
+  if(!state.launches) return;
+  const selected=$('#launchFilter').value;
+  const rows=state.launches.filter(r=>selected==='all'||r.constellation_id===selected).sort((a,b)=>(b.date_start||'').localeCompare(a.date_start||''));
+  const completed=rows.filter(r=>r.status==='completed');
+  $('#launchSummary').innerHTML=`<div><span>수록 기록</span><strong>${rows.length}</strong></div><div><span>수록 완료 임무</span><strong>${completed.length}</strong></div><div><span>수록 완료 임무의 위성 수</span><strong>${number(completed.reduce((s,r)=>s+(r.satellites||0),0))}</strong></div>`;
+  const byId=sourceMap();
+  $('#launchTable tbody').innerHTML=rows.map(r=>`<tr><td>${esc(r.date_label)}</td><td><a href="/constellation/${encodeURIComponent(r.constellation_id)}">${esc(r.constellation)}</a></td><td><strong>${esc(r.mission)}</strong><br><small>${esc(r.note)}</small></td><td><span class="mission-status ${esc(r.status)}">${r.status==='completed'?'완료':'계획'}</span></td><td>${esc(r.vehicle)}</td><td class="num">${number(r.satellites)}</td><td>${esc(r.site)}</td><td>${sourceLink(r.source_id,byId)}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">수록된 발사 기록이 없습니다.</td></tr>';
+  if(state.coverage) $('#coverageList').innerHTML=state.coverage.filter(r=>selected==='all'||r.constellation_id===selected).map(r=>`<div class="coverage-item"><strong>${esc(state.rows.find(x=>x.id===r.constellation_id)?.name||r.constellation_id)}</strong><span>${r.status==='complete_for_period'?'명시 기간 수록 완료':r.status==='not_collected'?'완료 임무 미수록':'일부 임무 수록'} · ${esc(r.from||'—')} ~ ${esc(r.through||'—')}</span><small>${esc(r.note)}</small></div>`).join('');
 }
-
-function trendBadge(item) {
-  const label = item.trend === 'delayed' ? `+${item.delta_months ?? '?'} mo` : item.trend === 'expanded' ? 'SCOPE ↑' : item.trend === 'completed' ? 'DONE' : 'ON TRACK';
-  return `<span class="trend ${escapeHtml(item.trend)}">${escapeHtml(label)}</span>`;
-}
-
 function renderRoadmap() {
-  const byId = sourceMap();
-  $('#roadmapHistory').innerHTML = state.roadmapHistory.map(item => {
-    const src = byId[item.source_id];
-    const baselineSrc = byId[item.baseline_source_id];
-    return `<article class="roadmap-card">
-      <div class="roadmap-card-top"><div><small>${escapeHtml(item.constellation)} · ${escapeHtml(item.category)}</small><h4>${escapeHtml(item.milestone)}</h4></div>${trendBadge(item)}</div>
-      <div class="plan-compare"><div><span>BASELINE</span><strong>${escapeHtml(item.baseline)}</strong></div><div class="plan-arrow">→</div><div><span>CURRENT</span><strong>${escapeHtml(item.current)}</strong></div></div>
-      <p>${escapeHtml(item.note || '')}</p>${baselineSrc ? `<a href="${escapeHtml(baselineSrc.url)}" target="_blank" rel="noopener">Baseline: ${escapeHtml(baselineSrc.publisher)} ↗</a> · ` : ''}${src ? `<a href="${escapeHtml(src.url)}" target="_blank" rel="noopener">Current: ${escapeHtml(src.publisher)} ↗</a>` : ''}
-    </article>`;
-  }).join('');
-
-  const rows = [...state.rows].sort((a,b)=>(b.deployment_pct||0)-(a.deployment_pct||0));
-  $('#roadmapList').innerHTML = rows.map(r => `<div class="roadmap-row">
-    <div class="roadmap-name"><strong>${escapeHtml(r.flag)} ${escapeHtml(r.name)}</strong><small>${escapeHtml(statusLabel(r.status))} · ${escapeHtml(r.next_milestone || '')}</small></div>
-    <div class="bigbar"><i style="width:${Math.min(100,r.deployment_pct||0)}%"></i></div>
-    <div class="roadmap-meta"><strong>${r.deployment_pct == null ? '—' : r.deployment_pct.toFixed(1)+'%'}</strong><br><small>${fmt.format(r.tracked_in_orbit||0)} / ${r.planned_satellites ? fmt.format(r.planned_satellites) : '—'}</small></div>
-  </div>`).join('');
+  if(!state.roadmap) return;
+  const byId=sourceMap();
+  $('#roadmapHistory').innerHTML=state.roadmap.map(r=>`<article class="roadmap-card"><div class="roadmap-card-top"><div><small>${esc(r.constellation)}</small><h4>${esc(r.milestone)}</h4></div>${trendBadge(r)}</div><div class="plan-compare"><div><span>기준 계획</span><strong>${esc(r.baseline)}</strong></div><div class="plan-arrow">→</div><div><span>현재 계획</span><strong>${esc(r.current)}</strong></div></div><p>${esc(r.note)}</p>${sourceLink(r.source_id,byId)}</article>`).join('');
 }
-
 function renderChanges() {
-  const byId = sourceMap();
-  $('#changeList').innerHTML = state.changes.map(c => {
-    const src = byId[c.source_id];
-    return `<div class="change-item"><div class="change-date">${escapeHtml(c.date)}<br>${escapeHtml(c.type)}</div><div class="change-title"><strong>${escapeHtml(c.constellation)}</strong><small>${escapeHtml(c.field)}</small></div><div class="delta">${escapeHtml(c.previous)} <span class="arrow">→</span> <strong>${escapeHtml(c.current)}</strong>${src ? `<br><small><a href="${escapeHtml(src.url)}" target="_blank" rel="noopener">${escapeHtml(src.publisher)} source ↗</a></small>` : ''}</div></div>`;
-  }).join('') || '<div class="empty">기록된 변경사항이 없습니다.</div>';
+  if(!state.changes) return;
+  const byId=sourceMap();
+  $('#changeList').innerHTML=state.changes.map(r=>`<div class="change-item"><div class="change-date">${esc(r.date)}<br>${r.type==='source_change'?'집계 기준 변경':esc(r.type)}</div><div class="change-title"><strong>${esc(r.constellation)}</strong><small>${esc(r.field)}</small></div><div class="delta">${esc(r.previous??'—')} → <strong>${esc(r.current??'—')}</strong><br><small>${sourceLink(r.source_id,byId)}${r.note?' · '+esc(r.note):''}</small></div></div>`).join('')||'<div class="empty">변경 이력이 없습니다.</div>';
 }
-
 function renderSources() {
-  $('#sourceList').innerHTML = state.sources.map(s => `<article class="source-card"><span class="tag ${escapeHtml(s.type)}">${escapeHtml(s.type)}</span><h4>${escapeHtml(s.title)}</h4><small>${escapeHtml(s.publisher)} · ${escapeHtml(s.date)}</small><p>${escapeHtml(s.note)}</p><a href="${escapeHtml(s.url)}" target="_blank" rel="noopener">원문 보기 ↗</a></article>`).join('');
+  $('#sourceList').innerHTML=state.sources.map(r=>`<article class="source-card"><span class="tag ${esc(r.type)}">${esc(r.type)}</span><h4>${esc(r.title)}</h4><small>${esc(r.publisher)} · ${esc(r.date)}</small><p>${esc(r.note)}</p><a href="${safeUrl(r.url)}" target="_blank" rel="noopener">원문 보기 ↗</a></article>`).join('');
 }
-
-async function init() {
+async function loadPart(key,url,render,errorId) {
+  try { const data=await fetchJSON(url); if(!Array.isArray(data))throw new Error('Expected a list'); state[key]=data; $('#'+errorId).innerHTML=''; render(); renderKPIs(); }
+  catch { errorBox($('#'+errorId),()=>loadPart(key,url,render,errorId)); }
+}
+let trendRequest=0;
+async function loadTrends() {
+  const requestId=++trendRequest,cid=$('#trendFilter').value,months=$('#trendMonths').value;
+  const params=new URLSearchParams({constellation_id:cid,months});
   try {
-    const [statusRes, changesRes, sourcesRes, launchesRes, roadmapRes] = await Promise.all([fetch('/api/status'), fetch('/api/changes'), fetch('/api/sources'), fetch('/api/launches'), fetch('/api/roadmap-history')]);
-    const data = await statusRes.json();
-    state.rows = data.constellations || [];
-    state.changes = await changesRes.json();
-    state.sources = await sourcesRes.json();
-    state.launches = await launchesRes.json();
-    state.roadmapHistory = await roadmapRes.json();
-    renderKPIs(data); renderTable(); renderLaunches(); renderRoadmap(); renderChanges(); renderSources();
-  } catch (err) {
-    console.error(err); $('#updateMode').textContent = 'DATA LOAD ERROR';
-  }
+    const data=await fetchJSON('/api/trends?'+params);
+    if(requestId!==trendRequest) return;
+    $('#trendError').innerHTML='';
+    $('#trendChart').innerHTML=lineChart(data.series.find(s=>s.constellation_id===cid)?.points||[]);
+    $('#monthlyTable').innerHTML=monthlyTable(data.monthly);
+    $('#trendNote').textContent=data.note+(data.warnings.length?' 일부 스냅샷을 읽지 못했습니다.':'');
+    $('#downloadTrends').href='/download/trends.csv?'+params;
+  } catch { if(requestId===trendRequest) errorBox($('#trendError'),loadTrends); }
 }
-
-$('#search').addEventListener('input', renderTable);
-$('#statusFilter').addEventListener('change', renderTable);
-$$('th[data-sort]').forEach(th => th.addEventListener('click', () => { const key=th.dataset.sort; if(state.sortKey===key) state.sortDir*=-1; else {state.sortKey=key; state.sortDir=1;} renderTable(); }));
-$$('.tab').forEach(btn => btn.addEventListener('click', () => { $$('.tab').forEach(x=>x.classList.remove('active')); $$('.tab-panel').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); document.getElementById(btn.dataset.target).classList.add('active'); }));
-
+async function loadStatus() {
+  try {
+    const data=await fetchJSON('/api/status'); state.rows=data.constellations; state.quality=data.quality;
+    $('#overviewError').innerHTML=''; renderQuality(); renderKPIs(); renderTable();
+    const options=state.rows.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
+    $('#launchFilter').innerHTML='<option value="all">전체 위성망</option>'+options;
+    $('#trendFilter').innerHTML=options;
+    renderLaunches(); loadTrends();
+  } catch { errorBox($('#overviewError'),loadStatus,'위성 현황을 불러오지 못했습니다.'); $('#updateMode').textContent='현황 로딩 실패'; }
+}
+async function init() {
+  return Promise.allSettled([
+    loadStatus(),
+    loadPart('launches','/api/launches',renderLaunches,'launchError'),
+    loadPart('coverage','/api/launch-coverage',renderLaunches,'coverageError'),
+    loadPart('roadmap','/api/roadmap-history',renderRoadmap,'roadmapError'),
+    loadPart('changes','/api/changes',renderChanges,'changesError'),
+    loadPart('sources','/api/sources',()=>{renderSources();renderLaunches();renderRoadmap();renderChanges();},'sourcesError')
+  ]);
+}
+$('#search').addEventListener('input',renderTable);
+$('#statusFilter').addEventListener('change',renderTable);
+$('#launchFilter').addEventListener('change',renderLaunches);
+$('#trendFilter').addEventListener('change',loadTrends);
+$('#trendMonths').addEventListener('change',loadTrends);
+$$('th[data-sort] button').forEach(button=>button.addEventListener('click',()=>{const th=button.closest('th'),key=th.dataset.sort;state.sortDir=state.sortKey===key?-state.sortDir:1;state.sortKey=key;$$('th[data-sort]').forEach(x=>x.removeAttribute('aria-sort'));th.setAttribute('aria-sort',state.sortDir===1?'ascending':'descending');renderTable();}));
+$$('.tab').forEach(button=>button.addEventListener('click',()=>{$$('.tab').forEach(x=>{x.classList.remove('active');x.setAttribute('aria-pressed','false');});$$('.tab-panel').forEach(x=>x.classList.remove('active'));button.classList.add('active');button.setAttribute('aria-pressed','true');document.getElementById(button.dataset.target).classList.add('active');}));
 init();

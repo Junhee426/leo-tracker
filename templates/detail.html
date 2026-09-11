@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Constellation Detail · Global LEO Tracker</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v={{ version }}">
 </head>
 <body data-constellation-id="{{ constellation_id }}">
   <header class="topbar">
@@ -16,11 +16,25 @@
       <div><span class="eyebrow">CONSTELLATION PROFILE</span><h2 id="detailName">Loading…</h2><p id="detailOperator">—</p></div>
       <span id="detailStatus" class="status">—</span>
     </section>
+    <div id="detailError"></div><div id="detailQuality"></div>
     <section class="cards detail-cards">
       <article class="metric"><span>Tracked in Orbit</span><strong id="detailTracked">—</strong><small id="detailTrackedSource">—</small></article>
       <article class="metric"><span>Planned / Authorized</span><strong id="detailPlanned">—</strong><small id="detailPlannedLabel">—</small></article>
-      <article class="metric"><span>Deployment</span><strong id="detailPct">—</strong><small id="detailDataDate">—</small></article>
+      <article class="metric"><span>동일 범위 비율</span><strong id="detailPct">—</strong><small id="detailDataDate">—</small></article>
       <article class="metric"><span>Launch Records</span><strong id="detailLaunchCount">—</strong><small>CURATED HISTORY</small></article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><h3>관측 추세</h3><p>최근 12개월 · 카탈로그 추적 순증감</p></div></div>
+      <div id="detailTrendError"></div><div id="detailTrendChart"></div><div id="detailMonthly"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><h3>NORAD 관측 이력</h3><p>이 대시보드가 수집한 이력입니다. 첫 관측·미수록 시점은 발사·퇴역 시점을 의미하지 않습니다.</p></div>
+        <form id="objectSearch" class="controls"><input id="objectQuery" type="search" aria-label="NORAD 번호 또는 위성 이름" placeholder="NORAD 번호 / 위성 이름"><select id="objectPresence" aria-label="관측 상태"><option value="all">전체 이력</option><option value="present">최근 카탈로그에 수록</option><option value="missing">최근 카탈로그에 미수록</option></select><button type="submit">검색</button></form>
+      </div>
+      <div id="objectError"></div><p id="objectSummary" class="chart-note"></p><div id="objectTable"></div>
+      <div class="pagination"><button id="objectPrev" type="button">이전</button><span id="objectPage"></span><button id="objectNext" type="button">다음</button></div>
+      <section id="objectHistory" hidden aria-live="polite"><h4 id="objectHistoryTitle"></h4><div id="objectHistoryRows"></div></section>
     </section>
 
     <section class="detail-grid">
@@ -36,26 +50,27 @@
       </article>
       <article class="panel info-panel">
         <div class="panel-head"><div><h3>Plan Change Summary</h3><p>초기 기준선 대비 최신 계획</p></div></div>
-        <div id="detailRoadmap" class="mini-roadmap"></div>
+        <div id="detailRoadmapError"></div><div id="detailRoadmap" class="mini-roadmap"></div>
       </article>
     </section>
 
     <section class="panel">
-      <div class="panel-head"><div><h3>Cross-check</h3><p>동일 지표(추적/배치/승인/계획)를 보고한 서로 다른 출처를 날짜와 함께 비교합니다. 지표가 다르면 직접 비교하지 않습니다.</p></div></div>
-      <div id="detailCrosscheck" class="xcheck-list"></div>
+      <div class="panel-head"><div><h3>Cross-check</h3><p>동일 지표·범위·기준일의 수치를 원천 출처와 함께 비교합니다. 동일 원천이나 근사값은 일치 판정을 보류합니다.</p></div></div>
+      <div id="detailSourcesError"></div><div id="detailCrosscheck" class="xcheck-list"></div>
     </section>
 
     <section class="panel">
       <div class="panel-head"><div><h3>Launch History</h3><p>해당 위성망의 임무 단위 기록</p></div></div>
-      <div class="table-wrap"><table class="compact-table"><thead><tr><th>일자</th><th>임무</th><th>상태</th><th>발사체</th><th class="num">위성</th><th>발사장</th></tr></thead><tbody id="detailLaunches"></tbody></table></div>
+      <div id="detailLaunchError"></div><div id="detailCoverageError"></div><div id="detailCoverage" class="chart-note"></div><div class="table-wrap"><table class="compact-table"><thead><tr><th>일자</th><th>임무</th><th>상태</th><th>발사체</th><th class="num">위성</th><th>발사장</th></tr></thead><tbody id="detailLaunches"></tbody></table></div>
     </section>
 
     <section class="detail-grid">
-      <article class="panel info-panel"><div class="panel-head"><div><h3>Changes</h3><p>최근 변경 이력</p></div></div><div id="detailChanges" class="stack-list"></div></article>
+      <article class="panel info-panel"><div class="panel-head"><div><h3>Changes</h3><p>최근 변경 이력</p></div></div><div id="detailChangesError"></div><div id="detailChanges" class="stack-list"></div></article>
       <article class="panel info-panel"><div class="panel-head"><div><h3>Sources</h3><p>관련 공식·추적 자료</p></div></div><div id="detailSources" class="stack-list"></div></article>
     </section>
   </main>
   <footer><div>Global LEO Constellation Tracker V{{ version }}</div><div>Detail data uses the same source-separated model as the overview.</div></footer>
-  <script src="/static/detail.js"></script>
+  <script src="/static/common.js?v={{ version }}"></script>
+  <script src="/static/detail.js?v={{ version }}"></script>
 </body>
 </html>

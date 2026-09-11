@@ -1,0 +1,62 @@
+[
+  {
+    "constellation_id": "starlink",
+    "status": "not_collected",
+    "from": null,
+    "through": null,
+    "source_ids": [],
+    "note": "수록된 임무만 집계하며 전체 발사 목록의 완전성을 보증하지 않습니다."
+  },
+  {
+    "constellation_id": "oneweb",
+    "status": "not_collected",
+    "from": null,
+    "through": null,
+    "source_ids": [],
+    "note": "수록된 임무만 집계하며 전체 발사 목록의 완전성을 보증하지 않습니다."
+  },
+  {
+    "constellation_id": "amazon_leo",
+    "status": "partial",
+    "from": "2025-04-28",
+    "through": "2026-07-02",
+    "source_ids": [
+      "amazon_leo_missions"
+    ],
+    "note": "수록된 임무만 집계하며 전체 발사 목록의 완전성을 보증하지 않습니다."
+  },
+  {
+    "constellation_id": "lightspeed",
+    "status": "not_collected",
+    "from": null,
+    "through": null,
+    "source_ids": [],
+    "note": "수록된 임무만 집계하며 전체 발사 목록의 완전성을 보증하지 않습니다."
+  },
+  {
+    "constellation_id": "guowang",
+    "status": "not_collected",
+    "from": null,
+    "through": null,
+    "source_ids": [],
+    "note": "수록된 임무만 집계하며 전체 발사 목록의 완전성을 보증하지 않습니다."
+  },
+  {
+    "constellation_id": "qianfan",
+    "status": "partial",
+    "from": "2026-07-04",
+    "through": "2026-07-04",
+    "source_ids": [
+      "miit_qianfan_2026"
+    ],
+    "note": "수록된 임무만 집계하며 전체 발사 목록의 완전성을 보증하지 않습니다."
+  },
+  {
+    "constellation_id": "iris2",
+    "status": "not_collected",
+    "from": null,
+    "through": null,
+    "source_ids": [],
+    "note": "수록된 임무만 집계하며 전체 발사 목록의 완전성을 보증하지 않습니다."
+  }
+]

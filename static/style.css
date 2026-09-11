@@ -172,3 +172,45 @@ footer { width: min(1500px,94vw); margin: 0 auto; padding: 24px 0 40px; display:
 @media (max-width: 1180px) { .cards { grid-template-columns:repeat(3,1fr); } }
 @media (max-width: 980px) { .roadmap-history { grid-template-columns:1fr; } .detail-grid { grid-template-columns:1fr; } .detail-cards { grid-template-columns:repeat(2,1fr); } }
 @media (max-width: 640px) { .top-actions .download { display:none; } .cards { grid-template-columns:1fr 1fr; } .launch-summary { grid-template-columns:1fr; } .roadmap-history { padding:12px; } .plan-compare { grid-template-columns:1fr; } .plan-arrow { transform:rotate(90deg); } .detail-hero { align-items:flex-start; flex-direction:column; padding:45px 0 25px; min-height:auto; } .detail-cards { grid-template-columns:1fr 1fr; } .info-list > div { grid-template-columns:1fr; gap:4px; } }
+
+/* V1.2: retain the existing palette; make data quality and history readable. */
+.hero {padding-block:24px;min-height:160px;}
+.hero h2 {font-size:clamp(1.45rem,3vw,2.1rem);}
+.quality-warning,.load-error {padding:14px 18px;border:1px solid #c88627;background:#fff4dc;color:#653b08;border-radius:8px;margin:12px 0;font-size:1rem;}
+.load-error {border-color:#c34e50;background:#fff0f0;color:#79292b;}
+.load-error button,.pagination button,.controls button {border:1px solid #8ea1b6;background:var(--panel2);color:var(--text);padding:8px 14px;border-radius:6px;cursor:pointer;font:inherit;}
+button:disabled {opacity:.5;cursor:default;}
+th[data-sort] button {font:inherit;font-weight:700;border:0;background:transparent;color:inherit;padding:4px 0;cursor:pointer;text-align:inherit;}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {outline:3px solid #1266c0;outline-offset:3px;}
+.chart-note {font-size:.9rem;color:var(--muted);margin:10px 0;}
+.trend-chart {width:100%;min-width:300px;max-height:320px;display:block;}
+.trend-chart text {fill:var(--muted);font-size:14px;}
+.trend-chart circle {fill:var(--cyan);}
+.chart-grid {stroke:var(--line);stroke-width:1;}
+.chart-line {fill:none;stroke:var(--cyan);stroke-width:2.5;}
+.positive {color:var(--green);font-weight:700;}
+.negative {color:var(--red);font-weight:700;}
+.coverage-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:16px 0;}
+.coverage-item {display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;}
+.coverage-item small {font-size:.875rem;}
+.pagination {display:flex;gap:16px;justify-content:center;align-items:center;margin-top:16px;}
+.object-link {border:0;padding:0;background:none;color:var(--blue);text-decoration:underline;font:inherit;cursor:pointer;}
+#objectHistory {border-top:1px solid var(--line);margin-top:20px;padding-top:12px;}
+.xcheck-status.conflict {background:#fff0f0;color:#9e2b2f;}
+.xcheck-status.consistent {background:#e2f4ed;color:#176245;}
+.xcheck-status.same_origin,.xcheck-status.different_dates,.xcheck-status.approximate,.xcheck-status.incomplete,.xcheck-status.mixed {background:#fff4dc;color:#754508;}
+.xcheck-head small {font-size:.875rem;font-weight:400;}
+.detail-main>.panel {margin-bottom:20px;}
+@media(max-width:700px){.panel-head{flex-wrap:wrap;gap:12px;}.controls{flex-wrap:wrap;max-width:100%;}.controls input,.controls select{max-width:100%;min-width:0;}.hero{display:block}.update-box{margin-top:16px}.trend-chart text{font-size:16px} .top-actions{flex-wrap:wrap}.coverage-list{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}}
+
+body {font-size:16px;line-height:1.5;}
+.panel-head p,td,th,.name-cell strong,.controls input,.controls select,.download,.status,.metric span {font-size:.875rem;letter-spacing:normal;}
+.metric small,.update-box small,.update-box span,.legend,.source-card p,.source-card small,.roadmap-card p,.change-date,.info-list dt,.info-list dd,.stack-item small,.trend,.mission-status,.plan-compare span {font-size:.8125rem;letter-spacing:normal;}
+.metric small,.source-card small,th {color:var(--muted);}
+.chart-note {padding-inline:18px;}
+#trendChart,#detailTrendChart {padding:10px 14px;}
+.coverage-list {padding:0 18px;}
+.pagination {padding-bottom:18px;}
+#objectHistory {padding:16px;}
+#objectTable table,#monthlyTable table,#detailMonthly table {min-width:700px;}
+@media(max-width:700px){.topbar{height:auto;min-height:76px;padding-block:12px;gap:12px;flex-wrap:wrap}.brand{min-width:0}.brand h1{overflow-wrap:anywhere}.hero{min-height:0}.detail-hero{min-height:150px}.info-list>div{grid-template-columns:100px 1fr;gap:12px}.cards.detail-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}

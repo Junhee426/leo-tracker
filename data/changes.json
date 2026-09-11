@@ -1,21 +1,13 @@
 [
   {
-    "date": "2026-09-08",
-    "constellation": "Starlink",
-    "type": "tracking_update",
-    "field": "Tracked in orbit",
-    "previous": "11086",
-    "current": "11079",
-    "source_id": "celestrak_groups"
-  },
-  {
     "date": "2026-09-04",
     "constellation": "Starlink",
     "type": "tracking_update",
     "field": "Tracked in orbit",
     "previous": "11087",
     "current": "11086",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-09-03",
@@ -24,7 +16,8 @@
     "field": "Tracked in orbit",
     "previous": "11088",
     "current": "11087",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-09-02",
@@ -33,7 +26,8 @@
     "field": "Tracked in orbit",
     "previous": "11091",
     "current": "11088",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-09-01",
@@ -42,7 +36,8 @@
     "field": "Tracked in orbit",
     "previous": "11034",
     "current": "11091",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-09-01",
@@ -51,7 +46,8 @@
     "field": "Tracked in orbit",
     "previous": "11040",
     "current": "11034",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-08-30",
@@ -60,7 +56,8 @@
     "field": "Tracked in orbit",
     "previous": "11042",
     "current": "11040",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-08-28",
@@ -69,7 +66,8 @@
     "field": "Tracked in orbit",
     "previous": "10987",
     "current": "11042",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-08-27",
@@ -78,52 +76,73 @@
     "field": "Tracked in orbit",
     "previous": "10968",
     "current": "10987",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-08-24",
     "constellation": "Starlink",
-    "type": "tracking_update",
-    "field": "Tracked in orbit",
+    "type": "source_change",
+    "field": "Source / measurement basis",
     "previous": "9600",
     "current": "10968",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink",
+    "previous_source": "manual_reference",
+    "current_source": "celestrak",
+    "note": "V1.1 참조값에서 카탈로그 집계로 전환. 실제 위성 증감을 의미하지 않습니다."
   },
   {
     "date": "2026-08-24",
     "constellation": "Eutelsat OneWeb",
-    "type": "tracking_update",
-    "field": "Tracked in orbit",
+    "type": "source_change",
+    "field": "Source / measurement basis",
     "previous": "600",
     "current": "651",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "oneweb",
+    "previous_source": "manual_reference",
+    "current_source": "celestrak",
+    "note": "V1.1 참조값에서 카탈로그 집계로 전환. 실제 위성 증감을 의미하지 않습니다."
   },
   {
     "date": "2026-08-24",
     "constellation": "Amazon Leo",
-    "type": "tracking_update",
-    "field": "Tracked in orbit",
+    "type": "source_change",
+    "field": "Source / measurement basis",
     "previous": "396",
     "current": "391",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "amazon_leo",
+    "previous_source": "manual_reference",
+    "current_source": "celestrak",
+    "note": "V1.1 참조값에서 카탈로그 집계로 전환. 실제 위성 증감을 의미하지 않습니다."
   },
   {
     "date": "2026-08-24",
     "constellation": "Guowang / SatNet",
-    "type": "tracking_update",
-    "field": "Tracked in orbit",
+    "type": "source_change",
+    "field": "Source / measurement basis",
     "previous": "186",
     "current": "199",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "guowang",
+    "previous_source": "manual_reference",
+    "current_source": "celestrak",
+    "note": "V1.1 참조값에서 카탈로그 집계로 전환. 실제 위성 증감을 의미하지 않습니다."
   },
   {
     "date": "2026-08-24",
     "constellation": "Qianfan / Spacesail",
-    "type": "tracking_update",
-    "field": "Tracked in orbit",
+    "type": "source_change",
+    "field": "Source / measurement basis",
     "previous": "218",
     "current": "238",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "qianfan",
+    "previous_source": "manual_reference",
+    "current_source": "celestrak",
+    "note": "V1.1 참조값에서 카탈로그 집계로 전환. 실제 위성 증감을 의미하지 않습니다."
   },
   {
     "date": "2026-08-07",
@@ -132,7 +151,8 @@
     "field": "Architecture",
     "previous": "Earlier public baseline: 290+ satellites",
     "current": "348 satellites: 330 LEO + 18 MEO",
-    "source_id": "eu_iris2_2026"
+    "source_id": "eu_iris2_2026",
+    "constellation_id": "iris2"
   },
   {
     "date": "2026-08-04",
@@ -141,7 +161,8 @@
     "field": "Global service",
     "previous": "Late 2027",
     "current": "Q1 2028",
-    "source_id": "telesat_aug_2026"
+    "source_id": "telesat_aug_2026",
+    "constellation_id": "lightspeed"
   },
   {
     "date": "2026-08-04",
@@ -150,7 +171,8 @@
     "field": "Initial constellation",
     "previous": "156 satellites",
     "current": "225 satellites; global service target Q1 2028",
-    "source_id": "telesat_aug_2026"
+    "source_id": "telesat_aug_2026",
+    "constellation_id": "lightspeed"
   },
   {
     "date": "2026-07-30",
@@ -159,7 +181,8 @@
     "field": "Constellation status",
     "previous": "Deployment ramp-up",
     "current": "Nearly 400 satellites in orbit; initial service planned in 2026",
-    "source_id": "amazon_q2_2026"
+    "source_id": "amazon_q2_2026",
+    "constellation_id": "amazon_leo"
   },
   {
     "date": "2026-07-04",
@@ -168,7 +191,8 @@
     "field": "Launched satellites",
     "previous": "200",
     "current": "218",
-    "source_id": "miit_qianfan_2026"
+    "source_id": "miit_qianfan_2026",
+    "constellation_id": "qianfan"
   },
   {
     "date": "2026-03-17",
@@ -177,7 +201,8 @@
     "field": "First production launch",
     "previous": "Mid-2026",
     "current": "December 2026",
-    "source_id": "telesat_milka_2026"
+    "source_id": "telesat_milka_2026",
+    "constellation_id": "lightspeed"
   },
   {
     "date": "2026-01-09",
@@ -186,6 +211,7 @@
     "field": "Authorized satellites",
     "previous": "Prior authorization baseline",
     "current": "15,000 total referenced by FCC authorization",
-    "source_id": "fcc_starlink_2026"
+    "source_id": "fcc_starlink_2026",
+    "constellation_id": "starlink"
   }
 ]

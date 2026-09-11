@@ -1,33 +1,41 @@
 name: Update LEO tracker data
-
 on:
   workflow_dispatch:
   schedule:
-    # 06:00 Korea Standard Time (21:00 UTC, previous day)
     - cron: "0 21 * * *"
-
 permissions:
   contents: write
-
+concurrency:
+  group: leo-tracker-data-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt
-      - run: python updater/update_data.py
-      - name: Commit changed data
+          cache-dependency-path: requirements.lock
+      - run: pip install -r requirements.lock
+      - run: python -m unittest discover -s tests -v
+      - name: Collect validated data
+        id: collect
+        continue-on-error: true
+        run: python updater/update_data.py
+      - name: Commit data and collection status
         run: |
           git config user.name "leo-tracker-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/current.json data/changes.json data/snapshots/
-          if git diff --cached --quiet; then
-            echo "No data changes"
-          else
-            git commit -m "data: daily constellation update"
+          git add data/
+          if ! git diff --cached --quiet; then
+            git commit -m "data: validated daily constellation update"
             git push
           fi
+      - name: Report incomplete collection
+        if: steps.collect.outcome == 'failure'
+        run: |
+          echo "::error::Collection was incomplete. Previous valid observations and failure status have been preserved."
+          exit 1

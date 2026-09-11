@@ -4,112 +4,104 @@ import csv
 import io
 import json
 import os
-import zipfile
 from pathlib import Path
-from xml.sax.saxutils import escape
 
-from flask import Flask, Response, abort, jsonify, render_template, send_file
+from flask import Flask, Response, abort, jsonify, render_template, request, send_file
+
+from tracker import VERSION
+from tracker.export import workbook
+from tracker.history import object_history, object_list, trend_data
+from tracker.metrics import dated_value
+from tracker.storage import load_json as read_json, parse_time, utc_now
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
-VERSION = "1.1.0"
-
 app = Flask(__name__)
 app.json.ensure_ascii = False
 
 
-def load_json(name: str, default):
-    path = DATA_DIR / name
-    if not path.exists():
-        return default
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+def load_json(name, default):
+    return read_json(DATA_DIR / name, default)
+
+
+def current_payload():
+    data = load_json("current.json", None)
+    if not isinstance(data, dict) or not data.get("constellations"):
+        abort(503, description="사용 가능한 위성 현황 데이터가 없습니다.")
+    return data
 
 
 def current_rows():
-    return load_json("current.json", {"constellations": []}).get("constellations", [])
+    return current_payload()["constellations"]
 
 
-def find_constellation(constellation_id: str):
-    return next((row for row in current_rows() if row.get("id") == constellation_id), None)
+def find_constellation(cid):
+    return next((r for r in current_rows() if r["id"] == cid), None)
 
 
-def cell_xml(value, style=0):
-    if value is None:
-        return '<c/>'
-    if isinstance(value, bool):
-        return f'<c t="b" s="{style}"><v>{1 if value else 0}</v></c>'
-    if isinstance(value, (int, float)):
-        return f'<c s="{style}"><v>{value}</v></c>'
-    text = escape(str(value))
-    return f'<c t="inlineStr" s="{style}"><is><t xml:space="preserve">{text}</t></is></c>'
+def require_constellation(cid):
+    row = find_constellation(cid)
+    if row is None:
+        abort(404, description="위성망을 찾을 수 없습니다.")
+    return row
 
 
-def col_name(n: int) -> str:
-    result = ""
-    while n:
-        n, rem = divmod(n - 1, 26)
-        result = chr(65 + rem) + result
+def bounded_int(name, default, minimum, maximum):
+    try:
+        value = int(request.args.get(name, default))
+    except (TypeError, ValueError):
+        abort(400, description=f"{name}은 정수여야 합니다.")
+    if not minimum <= value <= maximum:
+        abort(400, description=f"{name}의 허용 범위는 {minimum}~{maximum}입니다.")
+    return value
+
+
+def launch_rows():
+    return [dict(row, **dated_value(row.get("date"))) for row in load_json("launches.json", [])]
+
+
+def coverage_rows():
+    missions = launch_rows()
+    result = []
+    for coverage in load_json("launch_coverage.json", []):
+        listed = [r for r in missions if r.get("constellation_id") == coverage["constellation_id"]]
+        completed = [r for r in listed if r["status"] == "completed"]
+        years = sorted({r["date"][:4] for r in completed if r.get("date_start")})
+        result.append({**coverage, "records": len(listed), "completed_missions": len(completed),
+                       "listed_satellites": sum(r.get("satellites") or 0 for r in completed),
+                       "yearly": [{"year": y, "listed_satellites": sum(r.get("satellites") or 0 for r in completed if r["date"].startswith(y))} for y in years]})
     return result
 
 
-def worksheet_xml(rows):
-    widths = []
-    if rows:
-        for c in range(max(len(r) for r in rows)):
-            longest = max((len(str(r[c])) if c < len(r) and r[c] is not None else 0) for r in rows[:250])
-            widths.append(min(45, max(10, longest + 2)))
-    cols = '<cols>' + ''.join(f'<col min="{i}" max="{i}" width="{w}" customWidth="1"/>' for i,w in enumerate(widths,1)) + '</cols>' if widths else ''
-    parts = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
-             '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">',
-             '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>', cols,
-             '<sheetData>']
-    for r_idx, row in enumerate(rows, 1):
-        parts.append(f'<row r="{r_idx}">')
-        for c_idx, value in enumerate(row, 1):
-            ref = f'{col_name(c_idx)}{r_idx}'
-            style = 1 if r_idx == 1 else 0
-            xml = cell_xml(value, style)
-            parts.append(xml.replace('<c', f'<c r="{ref}"', 1))
-        parts.append('</row>')
-    parts.extend(['</sheetData>', '<autoFilter ref="A1:%s%d"/>' % (col_name(max(len(r) for r in rows)), len(rows)) if rows else '', '</worksheet>'])
-    return ''.join(parts)
+def quality_data(data=None):
+    data = data or current_payload()
+    now, rows = utc_now(), []
+    for row in data["constellations"]:
+        observation = row.get("observation", {})
+        last = parse_time(observation.get("last_success_at"))
+        age = round(max(0, (now-last).total_seconds()/3600), 1) if last else None
+        state = observation.get("status", "unavailable")
+        if state not in ("manual", "unavailable") and (age is None or age > 48):
+            state = "stale"
+        rows.append({"id": row["id"], "name": row["name"], **observation,
+                     "status": state, "age_hours": age, "epoch_min": row.get("epoch_min"), "epoch_max": row.get("epoch_max")})
+    issues = [r for r in rows if r["status"] in ("stale", "unavailable")]
+    return {"update_mode": data.get("update_mode"), "generated_at": data.get("generated_at"),
+            "failures": data.get("failures", []), "rows": rows, "degraded": bool(issues)}
 
 
-def make_xlsx():
-    status = current_rows()
-    launches = load_json("launches.json", [])
-    changes = load_json("changes.json", [])
+@app.errorhandler(json.JSONDecodeError)
+@app.errorhandler(OSError)
+def data_error(error):
+    app.logger.error("Data read failed: %s", error)
+    return jsonify(error="data_unavailable", message="데이터 파일을 읽지 못했습니다. 잠시 후 다시 시도해 주세요."), 503
 
-    constellation_rows = [["Constellation", "Operator", "Country", "Status", "Tracked in orbit", "Planned/authorized", "Deployment %", "Orbit", "Next milestone", "Target service", "Data date", "Cross-check status", "Reference count", "Difference", "Source IDs"]]
-    for r in status:
-        check = r.get("crosscheck") or {}
-        constellation_rows.append([r.get("name"), r.get("operator"), r.get("country"), r.get("status"), r.get("tracked_in_orbit"), r.get("planned_satellites"), r.get("deployment_pct"), r.get("orbit_label"), r.get("next_milestone"), r.get("target_service"), r.get("last_data_date"), check.get("status"), check.get("reference_count"), check.get("delta"), ", ".join(r.get("source_ids", []))])
 
-    launch_rows = [["Date", "Constellation", "Mission", "Status", "Vehicle", "Satellites", "Launch site", "Source ID"]]
-    for r in launches:
-        launch_rows.append([r.get("date"), r.get("constellation"), r.get("mission"), r.get("status"), r.get("vehicle"), r.get("satellites"), r.get("site"), r.get("source_id")])
-
-    change_rows = [["Date", "Constellation", "Type", "Field", "Previous", "Current", "Source ID"]]
-    for r in changes:
-        change_rows.append([r.get("date"), r.get("constellation"), r.get("type"), r.get("field"), r.get("previous"), r.get("current"), r.get("source_id")])
-
-    source_rows = [["Source ID", "Title", "Publisher", "Type", "Date", "URL", "Note"]]
-    for r in load_json("sources.json", []):
-        source_rows.append([r.get("id"), r.get("title"), r.get("publisher"), r.get("type"), r.get("date"), r.get("url"), r.get("note")])
-
-    sheets = [("Constellations", constellation_rows), ("Launches", launch_rows), ("Changes", change_rows), ("Sources", source_rows)]
-    buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + ''.join(f'<Override PartName="/xl/worksheets/sheet{i}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' for i in range(1, len(sheets)+1)) + '</Types>')
-        z.writestr("_rels/.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>')
-        z.writestr("xl/workbook.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' + ''.join(f'<sheet name="{escape(name)}" sheetId="{i}" r:id="rId{i}"/>' for i,(name,_) in enumerate(sheets,1)) + '</sheets></workbook>')
-        z.writestr("xl/_rels/workbook.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + ''.join(f'<Relationship Id="rId{i}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet{i}.xml"/>' for i in range(1,len(sheets)+1)) + f'<Relationship Id="rId{len(sheets)+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>')
-        z.writestr("xl/styles.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Aptos"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Aptos"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF173B57"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs></styleSheet>')
-        for i, (_, rows) in enumerate(sheets, 1):
-            z.writestr(f"xl/worksheets/sheet{i}.xml", worksheet_xml(rows))
-    buf.seek(0)
-    return buf
+@app.errorhandler(400)
+@app.errorhandler(404)
+@app.errorhandler(503)
+def http_error(error):
+    return jsonify(error=error.name, message=error.description), error.code
 
 
 @app.get("/")
@@ -118,15 +110,20 @@ def index():
 
 
 @app.get("/constellation/<constellation_id>")
-def constellation_detail(constellation_id: str):
-    if not find_constellation(constellation_id):
-        abort(404)
+def detail_page(constellation_id):
+    require_constellation(constellation_id)
     return render_template("detail.html", version=VERSION, constellation_id=constellation_id)
 
 
 @app.get("/api/status")
 def status():
-    return jsonify(load_json("current.json", {"generated_at": None, "constellations": []}))
+    payload = current_payload()
+    return jsonify({**payload, "quality": quality_data(payload)})
+
+
+@app.get("/api/quality")
+def quality():
+    return jsonify(quality_data())
 
 
 @app.get("/api/changes")
@@ -141,7 +138,12 @@ def sources():
 
 @app.get("/api/launches")
 def launches():
-    return jsonify(load_json("launches.json", []))
+    return jsonify(launch_rows())
+
+
+@app.get("/api/launch-coverage")
+def coverage():
+    return jsonify(coverage_rows())
 
 
 @app.get("/api/roadmap-history")
@@ -149,46 +151,114 @@ def roadmap_history():
     return jsonify(load_json("roadmap_history.json", []))
 
 
+@app.get("/api/trends")
+def trends():
+    cid = request.args.get("constellation_id") or None
+    if cid:
+        require_constellation(cid)
+    return jsonify(trend_data(DATA_DIR, current_payload(), cid, bounded_int("months", 12, 1, 36)))
+
+
+@app.get("/api/objects/<constellation_id>")
+def objects(constellation_id):
+    require_constellation(constellation_id)
+    presence = request.args.get("presence", "all")
+    if presence not in ("all", "present", "missing"):
+        abort(400, description="presence는 all, present, missing 중 하나여야 합니다.")
+    return jsonify(object_list(DATA_DIR, constellation_id, request.args.get("q", "")[:100], presence,
+                               bounded_int("page", 1, 1, 100000), bounded_int("per_page", 50, 1, 100)))
+
+
+@app.get("/api/objects/<constellation_id>/<int:norad_id>")
+def object_detail(constellation_id, norad_id):
+    require_constellation(constellation_id)
+    data = object_history(DATA_DIR, constellation_id, norad_id, bounded_int("days", 90, 1, 90))
+    if data is None:
+        abort(404, description="수집된 NORAD 관측 이력이 없습니다.")
+    return jsonify(data)
+
+
 @app.get("/api/constellation/<constellation_id>")
-def constellation_api(constellation_id: str):
-    row = find_constellation(constellation_id)
-    if not row:
-        abort(404)
-    name = row.get("name")
-    launches = [x for x in load_json("launches.json", []) if x.get("constellation_id") == constellation_id]
-    changes = [x for x in load_json("changes.json", []) if x.get("constellation") == name]
-    roadmap = [x for x in load_json("roadmap_history.json", []) if x.get("constellation_id") == constellation_id]
-    crosscheck = row.get("crosscheck") or {}
+def constellation_api(constellation_id):
+    row = require_constellation(constellation_id)
+    result = {"constellation": row, "section_errors": {},
+              "quality": next(r for r in quality_data()["rows"] if r["id"] == constellation_id)}
+    # Keep the V1.1 detail contract while isolating corrupt ancillary files.
+    for key, filename in (("launches", "launches.json"), ("changes", "changes.json"),
+                          ("roadmap", "roadmap_history.json"), ("sources", "sources.json")):
+        try:
+            values = launch_rows() if key == "launches" else load_json(filename, [])
+            result[key] = values if key == "sources" else [r for r in values if r.get("constellation_id") == constellation_id]
+        except (OSError, ValueError):
+            result[key] = []
+            result["section_errors"][key] = "data_unavailable"
     source_ids = set(row.get("source_ids", []))
-    if crosscheck.get("reference_source_id"):
-        source_ids.add(crosscheck["reference_source_id"])
-    source_ids |= {p.get("source_id") for p in row.get("crosscheck_points", []) if p.get("source_id")}
-    source_ids |= {x.get("source_id") for x in launches + changes + roadmap if x.get("source_id")} | {x.get("baseline_source_id") for x in roadmap if x.get("baseline_source_id")}
-    sources = [x for x in load_json("sources.json", []) if x.get("id") in source_ids]
-    return jsonify({"constellation": row, "launches": launches, "changes": changes, "roadmap": roadmap, "sources": sources})
+    for related in result["launches"] + result["changes"] + result["roadmap"]:
+        source_ids.update(related[k] for k in ("source_id", "baseline_source_id") if related.get(k))
+    result["sources"] = [r for r in result["sources"] if r["id"] in source_ids]
+    return jsonify(result)
+
+
+def csv_response(rows, filename):
+    out = io.StringIO()
+    writer = csv.writer(out)
+    for row in rows:
+        # Spreadsheet formula prefixes in text must remain literal text.
+        writer.writerow(["'"+v if isinstance(v, str) and v.startswith(("=", "+", "-", "@", "\t", "\r")) else v for v in row])
+    return Response(out.getvalue().encode("utf-8-sig"), mimetype="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": f"attachment; filename={filename}"})
+
+
+def constellation_export_rows():
+    keys = ["name", "operator", "country", "status", "tracked_in_orbit", "planned_satellites", "plan_metric", "plan_scope",
+            "deployment_pct", "reference_count", "reference_metric", "reference_date", "last_data_date", "tracking_year", "tracked_launched_this_year"]
+    rows = [keys + ["progress_note", "collection_status", "last_success_at", "crosscheck_status", "source_ids"]]
+    qualities = {r["id"]: r for r in quality_data()["rows"]}
+    for row in current_rows():
+        rows.append([row.get(k) for k in keys] + [row.get("progress", {}).get("note"), qualities[row["id"]]["status"],
+                    row.get("observation", {}).get("last_success_at"), row.get("crosscheck", {}).get("status"), ", ".join(row.get("source_ids", []))])
+    return rows
+
+
+def trend_export_rows(constellation_id=None, months=12):
+    keys = ["constellation", "month", "baseline_date", "end_date", "start_count", "end_count", "net_change", "observed_days", "expected_days", "coverage"]
+    return [keys] + [[r.get(k) for k in keys] for r in trend_data(DATA_DIR, current_payload(), constellation_id, months)["monthly"]]
+
+
+def export_sheets():
+    def table(records, keys):
+        return [keys] + [[r.get(k) for k in keys] for r in records]
+    checks = []
+    for row in current_rows():
+        for group in row.get("crosscheck", {}).get("groups", []):
+            for point in group["points"]:
+                checks.append({**point, "constellation": row["name"], "comparison_status": group["status"]})
+    return [("Constellations", constellation_export_rows()),
+            ("Launches", table(launch_rows(), ["date_label", "date_precision", "constellation", "mission", "status", "vehicle", "satellites", "source_id"])),
+            ("Changes", table(load_json("changes.json", []), ["date", "constellation_id", "constellation", "type", "field", "previous", "current", "previous_source", "current_source", "source_id"])),
+            ("Sources", table(load_json("sources.json", []), ["id", "title", "publisher", "origin_id", "date", "url", "note"])),
+            ("Crosschecks", table(checks, ["constellation", "metric", "scope", "value", "date", "qualifier", "origin_id", "source_id", "comparison_status"])),
+            ("Monthly Trends", trend_export_rows()),
+            ("Launch Coverage", table(coverage_rows(), ["constellation_id", "status", "from", "through", "records", "completed_missions", "listed_satellites", "note"]))]
 
 
 @app.get("/download/constellations.csv")
 def download_csv():
-    out = io.StringIO()
-    fields = ["name", "operator", "country", "status", "tracked_in_orbit", "planned_satellites", "deployment_pct", "orbit_label", "next_milestone", "target_service", "last_data_date", "crosscheck_status", "reference_count", "count_delta", "source_ids"]
-    writer = csv.DictWriter(out, fieldnames=fields, extrasaction="ignore")
-    writer.writeheader()
-    for row in current_rows():
-        item = dict(row)
-        check = item.pop("crosscheck", {}) or {}
-        item["crosscheck_status"] = check.get("status")
-        item["reference_count"] = check.get("reference_count")
-        item["count_delta"] = check.get("delta")
-        item["source_ids"] = ", ".join(item.get("source_ids", []))
-        writer.writerow(item)
-    payload = out.getvalue().encode("utf-8-sig")
-    return Response(payload, mimetype="text/csv; charset=utf-8", headers={"Content-Disposition": "attachment; filename=global-leo-tracker-v1.1.csv"})
+    return csv_response(constellation_export_rows(), "global-leo-tracker-v1.2.csv")
+
+
+@app.get("/download/trends.csv")
+def download_trends():
+    cid = request.args.get("constellation_id") or None
+    if cid:
+        require_constellation(cid)
+    return csv_response(trend_export_rows(cid, bounded_int("months", 12, 1, 36)), "leo-monthly-trends-v1.2.csv")
 
 
 @app.get("/download/tracker.xlsx")
 def download_xlsx():
-    return send_file(make_xlsx(), mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, download_name="global-leo-tracker-v1.1.xlsx")
+    return send_file(workbook(export_sheets()), mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                     as_attachment=True, download_name="global-leo-tracker-v1.2.xlsx")
 
 
 @app.get("/health")
@@ -196,6 +266,11 @@ def health():
     return {"status": "ok", "version": VERSION}
 
 
+@app.get("/ready")
+def ready():
+    quality = quality_data()
+    return jsonify({"status": "degraded" if quality["degraded"] else "ready", "version": VERSION, "quality": quality}), 503 if quality["degraded"] else 200
+
+
 if __name__ == "__main__":
-    debug = os.environ.get("FLASK_DEBUG", "0") == "1"
-    app.run(host="0.0.0.0", port=5000, debug=debug)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=os.environ.get("FLASK_DEBUG", "0") == "1")

@@ -1,5 +1,7 @@
 {
-  "generated_at": "2026-09-08T23:01:56Z",
+  "version": "1.2.0",
+  "schema_version": 2,
+  "generated_at": "2026-09-04T22:36:06Z",
   "update_mode": "live",
   "failures": [],
   "constellations": [
@@ -10,45 +12,63 @@
       "country": "United States",
       "flag": "🇺🇸",
       "status": "operating_expanding",
-      "tracked_in_orbit": 11079,
-      "tracked_source": "celestrak",
-      "planned_satellites": 15000,
-      "planned_label": "15,000 authorized",
-      "deployment_pct": 73.9,
-      "launched_this_year": 2056,
-      "avg_altitude_km": 464.5,
-      "avg_inclination_deg": 57.1,
       "orbit_label": "340–485 km Gen2 + existing shells",
       "next_milestone": "Continue Gen2 / mobile-capable deployment",
       "target_service": "Operational",
-      "last_data_date": "2026-09-08",
+      "planned_satellites": 15000,
+      "planned_label": "15,000 authorized",
+      "note": "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure.",
+      "tracked_in_orbit": 11086,
+      "tracked_source": "celestrak",
+      "count_scope": "all_catalogued",
+      "plan_metric": "authorized",
+      "plan_scope": "gen2",
+      "progress": {
+        "status": "not_comparable",
+        "pct": null,
+        "note": "Gen1을 포함한 전체 추적 수와 Gen2 승인 수량은 대상 범위가 다릅니다."
+      },
+      "deployment_pct": null,
+      "reference_count": 9600,
+      "reference_metric": "deployed",
+      "reference_date": "2026-03-31",
       "source_ids": [
-        "spacex_2026_prospectus",
+        "celestrak_groups",
         "fcc_starlink_2026",
-        "celestrak_groups"
+        "spacex_2026_prospectus"
       ],
-      "crosscheck": {
-        "status": "review",
-        "catalog_count": 11079,
-        "reference_count": 9600,
-        "reference_date": "2026-03-31",
-        "reference_source_id": "spacex_2026_prospectus",
-        "delta": 1479,
-        "delta_pct": 15.4
+      "tracked_launched_this_year": 2056,
+      "tracking_year": 2026,
+      "avg_altitude_km": 464.7,
+      "avg_inclination_deg": 57.1,
+      "last_data_date": "2026-09-04",
+      "epoch_min": null,
+      "epoch_max": null,
+      "observation": {
+        "status": "legacy",
+        "last_attempt_at": "2026-09-04T22:36:06Z",
+        "last_success_at": "2026-09-04T22:36:06Z",
+        "error": null
       },
       "crosscheck_points": [
         {
           "source_id": "celestrak_groups",
           "metric": "tracked",
-          "value": 11079,
-          "date": "2026-09-08",
+          "scope": "all_catalogued",
+          "value": 11086,
+          "date": "2026-09-04",
+          "qualifier": "exact",
+          "origin_id": "18sds_gp",
           "approx": false
         },
         {
           "source_id": "spacex_2026_prospectus",
-          "metric": "deployed",
           "value": 9600,
+          "metric": "deployed",
+          "scope": "reported_fleet",
           "date": "2026-03-31",
+          "qualifier": "approx",
+          "origin_id": "spacex",
           "approx": true
         },
         {
@@ -56,10 +76,78 @@
           "metric": "authorized",
           "value": 15000,
           "date": "2026-01-09",
+          "scope": "gen2",
+          "qualifier": "exact",
+          "origin_id": "fcc",
           "approx": false
         }
       ],
-      "note": "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure."
+      "crosscheck": {
+        "status": "not_compared",
+        "label": "비교 가능한 자료 없음",
+        "groups": [
+          {
+            "metric": "tracked",
+            "scope": "all_catalogued",
+            "metric_label": "카탈로그 추적",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "celestrak_groups",
+                "metric": "tracked",
+                "scope": "all_catalogued",
+                "value": 11086,
+                "date": "2026-09-04",
+                "qualifier": "exact",
+                "origin_id": "18sds_gp",
+                "approx": false
+              }
+            ],
+            "comparisons": []
+          },
+          {
+            "metric": "deployed",
+            "scope": "reported_fleet",
+            "metric_label": "배치 발표",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "spacex_2026_prospectus",
+                "value": 9600,
+                "metric": "deployed",
+                "scope": "reported_fleet",
+                "date": "2026-03-31",
+                "qualifier": "approx",
+                "origin_id": "spacex",
+                "approx": true
+              }
+            ],
+            "comparisons": []
+          },
+          {
+            "metric": "authorized",
+            "scope": "gen2",
+            "metric_label": "규제 승인",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "fcc_starlink_2026",
+                "metric": "authorized",
+                "value": 15000,
+                "date": "2026-01-09",
+                "scope": "gen2",
+                "qualifier": "exact",
+                "origin_id": "fcc",
+                "approx": false
+              }
+            ],
+            "comparisons": []
+          }
+        ]
+      }
     },
     {
       "id": "oneweb",
@@ -68,49 +156,112 @@
       "country": "Europe / UK",
       "flag": "🇪🇺",
       "status": "operating",
-      "tracked_in_orbit": 651,
-      "tracked_source": "celestrak",
-      "planned_satellites": 648,
-      "planned_label": "Gen 1 nominal: 648",
-      "deployment_pct": 100.5,
-      "launched_this_year": 0,
-      "avg_altitude_km": 1197.4,
-      "avg_inclination_deg": 87.9,
       "orbit_label": "~1,200 km / 12 planes",
       "next_milestone": "Replenishment / next-generation launches from 2027",
       "target_service": "Operational",
-      "last_data_date": "2026-09-08",
+      "planned_satellites": 648,
+      "planned_label": "Gen 1 nominal: 648",
+      "note": "Eutelsat describes the operational LEO network as 600+ satellites.",
+      "tracked_in_orbit": 651,
+      "tracked_source": "celestrak",
+      "count_scope": "all_catalogued",
+      "plan_metric": "planned",
+      "plan_scope": "gen1_nominal",
+      "progress": {
+        "status": "not_comparable",
+        "pct": null,
+        "note": "예비기·보충기를 포함할 수 있는 카탈로그 수와 명목 배치계획을 직접 비교하지 않습니다."
+      },
+      "deployment_pct": null,
+      "reference_count": 600,
+      "reference_metric": "deployed",
+      "reference_date": "2026-08-01",
       "source_ids": [
-        "eutelsat_oneweb",
+        "celestrak_groups",
         "eutelsat_maiaspace",
-        "celestrak_groups"
+        "eutelsat_oneweb"
       ],
-      "crosscheck": {
-        "status": "review",
-        "catalog_count": 651,
-        "reference_count": 600,
-        "reference_date": "2026-08-01",
-        "reference_source_id": "eutelsat_oneweb",
-        "delta": 51,
-        "delta_pct": 8.5
+      "tracked_launched_this_year": 0,
+      "tracking_year": 2026,
+      "avg_altitude_km": 1197.4,
+      "avg_inclination_deg": 87.9,
+      "last_data_date": "2026-09-04",
+      "epoch_min": null,
+      "epoch_max": null,
+      "observation": {
+        "status": "legacy",
+        "last_attempt_at": "2026-09-04T22:36:06Z",
+        "last_success_at": "2026-09-04T22:36:06Z",
+        "error": null
       },
       "crosscheck_points": [
         {
           "source_id": "celestrak_groups",
           "metric": "tracked",
+          "scope": "all_catalogued",
           "value": 651,
-          "date": "2026-09-08",
+          "date": "2026-09-04",
+          "qualifier": "exact",
+          "origin_id": "18sds_gp",
           "approx": false
         },
         {
           "source_id": "eutelsat_oneweb",
-          "metric": "deployed",
           "value": 600,
+          "metric": "deployed",
+          "scope": "reported_fleet",
           "date": "2026-08-01",
+          "qualifier": "lower_bound",
+          "origin_id": "eutelsat",
           "approx": true
         }
       ],
-      "note": "Eutelsat describes the operational LEO network as 600+ satellites."
+      "crosscheck": {
+        "status": "not_compared",
+        "label": "비교 가능한 자료 없음",
+        "groups": [
+          {
+            "metric": "tracked",
+            "scope": "all_catalogued",
+            "metric_label": "카탈로그 추적",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "celestrak_groups",
+                "metric": "tracked",
+                "scope": "all_catalogued",
+                "value": 651,
+                "date": "2026-09-04",
+                "qualifier": "exact",
+                "origin_id": "18sds_gp",
+                "approx": false
+              }
+            ],
+            "comparisons": []
+          },
+          {
+            "metric": "deployed",
+            "scope": "reported_fleet",
+            "metric_label": "배치 발표",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "eutelsat_oneweb",
+                "value": 600,
+                "metric": "deployed",
+                "scope": "reported_fleet",
+                "date": "2026-08-01",
+                "qualifier": "lower_bound",
+                "origin_id": "eutelsat",
+                "approx": true
+              }
+            ],
+            "comparisons": []
+          }
+        ]
+      }
     },
     {
       "id": "amazon_leo",
@@ -119,45 +270,63 @@
       "country": "United States",
       "flag": "🇺🇸",
       "status": "deploying",
-      "tracked_in_orbit": 391,
-      "tracked_source": "celestrak",
-      "planned_satellites": 3236,
-      "planned_label": "3,236 initial constellation",
-      "deployment_pct": 12.1,
-      "launched_this_year": 216,
-      "avg_altitude_km": 616.3,
-      "avg_inclination_deg": 51.9,
       "orbit_label": "Operational altitude incl. ~630 km",
       "next_milestone": "Initial service rollout in 2026; launch cadence increase",
       "target_service": "Initial rollout: 2026",
-      "last_data_date": "2026-09-08",
+      "planned_satellites": 3236,
+      "planned_label": "3,236 initial constellation",
+      "note": "Amazon reported 396 satellites deployed after LA-08; tracked count may differ due to cataloging/commissioning.",
+      "tracked_in_orbit": 391,
+      "tracked_source": "celestrak",
+      "count_scope": "all_catalogued",
+      "plan_metric": "planned",
+      "plan_scope": "initial_constellation",
+      "progress": {
+        "status": "not_comparable",
+        "pct": null,
+        "note": "카탈로그 구성품의 초기 계획 포함 여부를 확인한 뒤 비율 계산이 가능합니다."
+      },
+      "deployment_pct": null,
+      "reference_count": 396,
+      "reference_metric": "deployed",
+      "reference_date": "2026-07-02",
       "source_ids": [
         "amazon_leo_missions",
         "amazon_q2_2026",
         "celestrak_groups"
       ],
-      "crosscheck": {
-        "status": "close",
-        "catalog_count": 391,
-        "reference_count": 396,
-        "reference_date": "2026-07-02",
-        "reference_source_id": "amazon_leo_missions",
-        "delta": -5,
-        "delta_pct": -1.3
+      "tracked_launched_this_year": 216,
+      "tracking_year": 2026,
+      "avg_altitude_km": 614.3,
+      "avg_inclination_deg": 51.9,
+      "last_data_date": "2026-09-04",
+      "epoch_min": null,
+      "epoch_max": null,
+      "observation": {
+        "status": "legacy",
+        "last_attempt_at": "2026-09-04T22:36:06Z",
+        "last_success_at": "2026-09-04T22:36:06Z",
+        "error": null
       },
       "crosscheck_points": [
         {
           "source_id": "celestrak_groups",
           "metric": "tracked",
+          "scope": "all_catalogued",
           "value": 391,
-          "date": "2026-09-08",
+          "date": "2026-09-04",
+          "qualifier": "exact",
+          "origin_id": "18sds_gp",
           "approx": false
         },
         {
           "source_id": "amazon_leo_missions",
-          "metric": "deployed",
           "value": 396,
+          "metric": "deployed",
+          "scope": "reported_fleet",
           "date": "2026-07-02",
+          "qualifier": "exact",
+          "origin_id": "amazon",
           "approx": false
         },
         {
@@ -165,10 +334,74 @@
           "metric": "deployed",
           "value": 400,
           "date": "2026-07-30",
-          "approx": true
+          "approx": true,
+          "scope": "reported_fleet",
+          "qualifier": "approx",
+          "origin_id": "amazon"
         }
       ],
-      "note": "Amazon reported 396 satellites deployed after LA-08; tracked count may differ due to cataloging/commissioning."
+      "crosscheck": {
+        "status": "not_compared",
+        "label": "비교 가능한 자료 없음",
+        "groups": [
+          {
+            "metric": "tracked",
+            "scope": "all_catalogued",
+            "metric_label": "카탈로그 추적",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "celestrak_groups",
+                "metric": "tracked",
+                "scope": "all_catalogued",
+                "value": 391,
+                "date": "2026-09-04",
+                "qualifier": "exact",
+                "origin_id": "18sds_gp",
+                "approx": false
+              }
+            ],
+            "comparisons": []
+          },
+          {
+            "metric": "deployed",
+            "scope": "reported_fleet",
+            "metric_label": "배치 발표",
+            "status": "same_origin",
+            "label": "동일 원천의 반복 발표",
+            "points": [
+              {
+                "source_id": "amazon_leo_missions",
+                "value": 396,
+                "metric": "deployed",
+                "scope": "reported_fleet",
+                "date": "2026-07-02",
+                "qualifier": "exact",
+                "origin_id": "amazon",
+                "approx": false
+              },
+              {
+                "source_id": "amazon_q2_2026",
+                "metric": "deployed",
+                "value": 400,
+                "date": "2026-07-30",
+                "approx": true,
+                "scope": "reported_fleet",
+                "qualifier": "approx",
+                "origin_id": "amazon"
+              }
+            ],
+            "comparisons": [
+              {
+                "left_source_id": "amazon_leo_missions",
+                "right_source_id": "amazon_q2_2026",
+                "status": "same_origin"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "lightspeed",
@@ -177,34 +410,82 @@
       "country": "Canada",
       "flag": "🇨🇦",
       "status": "development",
-      "tracked_in_orbit": 0,
-      "tracked_source": "manual_reference",
-      "planned_satellites": 225,
-      "planned_label": "225 satellites (Aug. 2026 plan)",
-      "deployment_pct": 0.0,
-      "launched_this_year": null,
-      "avg_altitude_km": null,
-      "avg_inclination_deg": null,
       "orbit_label": "LEO polar + inclined architecture",
       "next_milestone": "First two production satellites planned for December 2026",
       "target_service": "Global service: Q1 2028",
-      "last_data_date": "2026-08-21",
+      "planned_satellites": 225,
+      "planned_label": "225 satellites (Aug. 2026 plan)",
+      "note": "No operational Lightspeed constellation satellites are counted in V1.1 until cataloged deployment begins. V1.2 does not treat an unobserved fleet as a measured zero.",
+      "tracked_in_orbit": null,
+      "tracked_source": "unavailable",
+      "count_scope": "all_catalogued",
+      "plan_metric": "planned",
+      "plan_scope": "production_network",
+      "progress": {
+        "status": "not_comparable",
+        "pct": null,
+        "note": "생산 위성의 동일 범위 관측값을 확보한 뒤 비교합니다."
+      },
+      "deployment_pct": null,
+      "reference_count": null,
+      "reference_metric": "planned",
+      "reference_date": "2026-08-21",
       "source_ids": [
-        "telesat_aug_2026",
         "telesat_2025_results",
+        "telesat_aug_2026",
         "telesat_milka_2026"
+      ],
+      "tracked_launched_this_year": null,
+      "tracking_year": null,
+      "avg_altitude_km": null,
+      "avg_inclination_deg": null,
+      "last_data_date": null,
+      "epoch_min": null,
+      "epoch_max": null,
+      "observation": {
+        "status": "manual",
+        "last_attempt_at": null,
+        "last_success_at": null,
+        "error": null
+      },
+      "crosscheck_points": [
+        {
+          "source_id": "telesat_aug_2026",
+          "metric": "planned",
+          "scope": "production_network",
+          "value": 225,
+          "date": "2026-08-04",
+          "qualifier": "exact",
+          "origin_id": "telesat",
+          "approx": false
+        }
       ],
       "crosscheck": {
         "status": "not_compared",
-        "catalog_count": null,
-        "reference_count": 0,
-        "reference_date": "2026-08-21",
-        "reference_source_id": "telesat_aug_2026",
-        "delta": null,
-        "delta_pct": null
-      },
-      "crosscheck_points": [],
-      "note": "No operational Lightspeed constellation satellites are counted in V1.1 until cataloged deployment begins."
+        "label": "비교 가능한 자료 없음",
+        "groups": [
+          {
+            "metric": "planned",
+            "scope": "production_network",
+            "metric_label": "사업계획",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "telesat_aug_2026",
+                "metric": "planned",
+                "scope": "production_network",
+                "value": 225,
+                "date": "2026-08-04",
+                "qualifier": "exact",
+                "origin_id": "telesat",
+                "approx": false
+              }
+            ],
+            "comparisons": []
+          }
+        ]
+      }
     },
     {
       "id": "guowang",
@@ -213,48 +494,107 @@
       "country": "China",
       "flag": "🇨🇳",
       "status": "deploying",
-      "tracked_in_orbit": 199,
-      "tracked_source": "celestrak",
-      "planned_satellites": 13000,
-      "planned_label": "~13,000 target",
-      "deployment_pct": 1.5,
-      "launched_this_year": 63,
-      "avg_altitude_km": 1133.1,
-      "avg_inclination_deg": 61.1,
       "orbit_label": "~1,149–1,168 km; multiple inclinations",
       "next_milestone": "Continue batch deployment",
       "target_service": "Deployment phase",
-      "last_data_date": "2026-09-08",
+      "planned_satellites": 13000,
+      "planned_label": "~13,000 target",
+      "note": "Publicly identified spacecraft count varies by cataloging source; V1.1 shows CelesTrak tracked count when available.",
+      "tracked_in_orbit": 199,
+      "tracked_source": "celestrak",
+      "count_scope": "all_catalogued",
+      "plan_metric": "planned",
+      "plan_scope": "long_term",
+      "progress": {
+        "status": "not_comparable",
+        "pct": null,
+        "note": "장기 목표와 현재 추적 대상의 단계별 범위가 다릅니다."
+      },
+      "deployment_pct": null,
+      "reference_count": 186,
+      "reference_metric": "tracked",
+      "reference_date": "2026-08-16",
       "source_ids": [
-        "guowang_group24",
-        "celestrak_groups"
+        "celestrak_groups",
+        "guowang_group24"
       ],
-      "crosscheck": {
-        "status": "review",
-        "catalog_count": 199,
-        "reference_count": 186,
-        "reference_date": "2026-08-16",
-        "reference_source_id": "guowang_group24",
-        "delta": 13,
-        "delta_pct": 7.0
+      "tracked_launched_this_year": 63,
+      "tracking_year": 2026,
+      "avg_altitude_km": 1132.4,
+      "avg_inclination_deg": 61.1,
+      "last_data_date": "2026-09-04",
+      "epoch_min": null,
+      "epoch_max": null,
+      "observation": {
+        "status": "legacy",
+        "last_attempt_at": "2026-09-04T22:36:06Z",
+        "last_success_at": "2026-09-04T22:36:06Z",
+        "error": null
       },
       "crosscheck_points": [
         {
           "source_id": "celestrak_groups",
           "metric": "tracked",
+          "scope": "all_catalogued",
           "value": 199,
-          "date": "2026-09-08",
+          "date": "2026-09-04",
+          "qualifier": "exact",
+          "origin_id": "18sds_gp",
           "approx": false
         },
         {
           "source_id": "guowang_group24",
-          "metric": "tracked",
           "value": 186,
+          "metric": "tracked",
+          "scope": "all_catalogued",
           "date": "2026-08-16",
+          "qualifier": "exact",
+          "origin_id": null,
           "approx": false
         }
       ],
-      "note": "Publicly identified spacecraft count varies by cataloging source; V1.1 shows CelesTrak tracked count when available."
+      "crosscheck": {
+        "status": "not_compared",
+        "label": "비교 가능한 자료 없음",
+        "groups": [
+          {
+            "metric": "tracked",
+            "scope": "all_catalogued",
+            "metric_label": "카탈로그 추적",
+            "status": "incomplete",
+            "label": "비교 조건 미확인",
+            "points": [
+              {
+                "source_id": "celestrak_groups",
+                "metric": "tracked",
+                "scope": "all_catalogued",
+                "value": 199,
+                "date": "2026-09-04",
+                "qualifier": "exact",
+                "origin_id": "18sds_gp",
+                "approx": false
+              },
+              {
+                "source_id": "guowang_group24",
+                "value": 186,
+                "metric": "tracked",
+                "scope": "all_catalogued",
+                "date": "2026-08-16",
+                "qualifier": "exact",
+                "origin_id": null,
+                "approx": false
+              }
+            ],
+            "comparisons": [
+              {
+                "left_source_id": "celestrak_groups",
+                "right_source_id": "guowang_group24",
+                "status": "incomplete"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "qianfan",
@@ -263,45 +603,63 @@
       "country": "China",
       "flag": "🇨🇳",
       "status": "deploying",
-      "tracked_in_orbit": 238,
-      "tracked_source": "celestrak",
-      "planned_satellites": 15000,
-      "planned_label": ">15,000 long-term target",
-      "deployment_pct": 1.6,
-      "launched_this_year": 130,
-      "avg_altitude_km": 1031.9,
-      "avg_inclination_deg": 89.0,
       "orbit_label": "LEO multi-plane deployment",
       "next_milestone": "Continue Phase-1 network deployment",
       "target_service": "Regional → global expansion",
-      "last_data_date": "2026-09-08",
+      "planned_satellites": 15000,
+      "planned_label": ">15,000 long-term target",
+      "note": "MIIT reported 218 satellites launched by July 4, 2026.",
+      "tracked_in_orbit": 238,
+      "tracked_source": "celestrak",
+      "count_scope": "all_catalogued",
+      "plan_metric": "planned",
+      "plan_scope": "long_term",
+      "progress": {
+        "status": "not_comparable",
+        "pct": null,
+        "note": "장기 목표와 현재 추적 대상의 단계별 범위가 다릅니다."
+      },
+      "deployment_pct": null,
+      "reference_count": 218,
+      "reference_metric": "deployed",
+      "reference_date": "2026-07-04",
       "source_ids": [
+        "celestrak_groups",
         "miit_qianfan_2026",
-        "songjiang_qianfan",
-        "celestrak_groups"
+        "songjiang_qianfan"
       ],
-      "crosscheck": {
-        "status": "review",
-        "catalog_count": 238,
-        "reference_count": 218,
-        "reference_date": "2026-07-04",
-        "reference_source_id": "miit_qianfan_2026",
-        "delta": 20,
-        "delta_pct": 9.2
+      "tracked_launched_this_year": 130,
+      "tracking_year": 2026,
+      "avg_altitude_km": 1030.1,
+      "avg_inclination_deg": 89.0,
+      "last_data_date": "2026-09-04",
+      "epoch_min": null,
+      "epoch_max": null,
+      "observation": {
+        "status": "legacy",
+        "last_attempt_at": "2026-09-04T22:36:06Z",
+        "last_success_at": "2026-09-04T22:36:06Z",
+        "error": null
       },
       "crosscheck_points": [
         {
           "source_id": "celestrak_groups",
           "metric": "tracked",
+          "scope": "all_catalogued",
           "value": 238,
-          "date": "2026-09-08",
+          "date": "2026-09-04",
+          "qualifier": "exact",
+          "origin_id": "18sds_gp",
           "approx": false
         },
         {
           "source_id": "miit_qianfan_2026",
-          "metric": "deployed",
           "value": 218,
+          "metric": "deployed",
+          "scope": "reported_fleet",
           "date": "2026-07-04",
+          "qualifier": "exact",
+          "origin_id": null,
           "approx": false
         },
         {
@@ -309,10 +667,78 @@
           "metric": "planned",
           "value": 15000,
           "date": "2026-04-08",
-          "approx": true
+          "approx": true,
+          "scope": "long_term",
+          "qualifier": "lower_bound",
+          "origin_id": null
         }
       ],
-      "note": "MIIT reported 218 satellites launched by July 4, 2026."
+      "crosscheck": {
+        "status": "not_compared",
+        "label": "비교 가능한 자료 없음",
+        "groups": [
+          {
+            "metric": "tracked",
+            "scope": "all_catalogued",
+            "metric_label": "카탈로그 추적",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "celestrak_groups",
+                "metric": "tracked",
+                "scope": "all_catalogued",
+                "value": 238,
+                "date": "2026-09-04",
+                "qualifier": "exact",
+                "origin_id": "18sds_gp",
+                "approx": false
+              }
+            ],
+            "comparisons": []
+          },
+          {
+            "metric": "deployed",
+            "scope": "reported_fleet",
+            "metric_label": "배치 발표",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "miit_qianfan_2026",
+                "value": 218,
+                "metric": "deployed",
+                "scope": "reported_fleet",
+                "date": "2026-07-04",
+                "qualifier": "exact",
+                "origin_id": null,
+                "approx": false
+              }
+            ],
+            "comparisons": []
+          },
+          {
+            "metric": "planned",
+            "scope": "long_term",
+            "metric_label": "사업계획",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "songjiang_qianfan",
+                "metric": "planned",
+                "value": 15000,
+                "date": "2026-04-08",
+                "approx": true,
+                "scope": "long_term",
+                "qualifier": "lower_bound",
+                "origin_id": null
+              }
+            ],
+            "comparisons": []
+          }
+        ]
+      }
     },
     {
       "id": "iris2",
@@ -321,32 +747,80 @@
       "country": "European Union",
       "flag": "🇪🇺",
       "status": "development",
-      "tracked_in_orbit": 0,
-      "tracked_source": "manual_reference",
-      "planned_satellites": 348,
-      "planned_label": "348 total: 330 LEO + 18 MEO",
-      "deployment_pct": 0.0,
-      "launched_this_year": null,
-      "avg_altitude_km": null,
-      "avg_inclination_deg": null,
       "orbit_label": "330 LEO + 18 MEO",
       "next_milestone": "First launches on European launch vehicles in 2029",
       "target_service": "Initial governmental services: 2030",
-      "last_data_date": "2026-08-21",
+      "planned_satellites": 348,
+      "planned_label": "348 total: 330 LEO + 18 MEO",
+      "note": "IRIS² is multi-orbit; the tracker retains it because it is a major benchmark for sovereign LEO communications. V1.2 does not treat an unobserved fleet as a measured zero.",
+      "tracked_in_orbit": null,
+      "tracked_source": "unavailable",
+      "count_scope": "all_catalogued",
+      "plan_metric": "planned",
+      "plan_scope": "leo_meo_total",
+      "progress": {
+        "status": "not_comparable",
+        "pct": null,
+        "note": "LEO·MEO 전체 계획은 LEO 추적 수와 직접 비교하지 않습니다."
+      },
+      "deployment_pct": null,
+      "reference_count": null,
+      "reference_metric": "planned",
+      "reference_date": "2026-08-21",
       "source_ids": [
         "eu_iris2_2026"
       ],
+      "tracked_launched_this_year": null,
+      "tracking_year": null,
+      "avg_altitude_km": null,
+      "avg_inclination_deg": null,
+      "last_data_date": null,
+      "epoch_min": null,
+      "epoch_max": null,
+      "observation": {
+        "status": "manual",
+        "last_attempt_at": null,
+        "last_success_at": null,
+        "error": null
+      },
+      "crosscheck_points": [
+        {
+          "source_id": "eu_iris2_2026",
+          "metric": "planned",
+          "scope": "leo_meo_total",
+          "value": 348,
+          "date": "2026-08-07",
+          "qualifier": "exact",
+          "origin_id": "ec",
+          "approx": false
+        }
+      ],
       "crosscheck": {
         "status": "not_compared",
-        "catalog_count": null,
-        "reference_count": 0,
-        "reference_date": "2026-08-21",
-        "reference_source_id": "eu_iris2_2026",
-        "delta": null,
-        "delta_pct": null
-      },
-      "crosscheck_points": [],
-      "note": "IRIS² is multi-orbit; the tracker retains it because it is a major benchmark for sovereign LEO communications."
+        "label": "비교 가능한 자료 없음",
+        "groups": [
+          {
+            "metric": "planned",
+            "scope": "leo_meo_total",
+            "metric_label": "사업계획",
+            "status": "single",
+            "label": "단일 출처 · 비교 대기",
+            "points": [
+              {
+                "source_id": "eu_iris2_2026",
+                "metric": "planned",
+                "scope": "leo_meo_total",
+                "value": 348,
+                "date": "2026-08-07",
+                "qualifier": "exact",
+                "origin_id": "ec",
+                "approx": false
+              }
+            ],
+            "comparisons": []
+          }
+        ]
+      }
     }
   ]
 }

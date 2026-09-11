@@ -1,0 +1,33 @@
+name: Tests
+on:
+  pull_request:
+  push:
+    paths:
+      - '**.py'
+      - 'static/**'
+      - 'templates/**'
+      - 'requirements*'
+      - '.github/workflows/test.yml'
+      - 'data/plans.yaml'
+      - 'data/launches.json'
+      - 'data/sources.json'
+      - 'data/launch_coverage.json'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.lock
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.lock
+      - run: python -m unittest discover -s tests -v
+      - run: node --test tests/frontend.test.cjs
+      - run: node --check static/common.js && node --check static/app.js && node --check static/detail.js
