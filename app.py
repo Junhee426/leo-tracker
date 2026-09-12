@@ -74,8 +74,8 @@ def launch_rows():
     return [dict(row, **dated_value(row.get("date"))) for row in load_json("launches.json", [])]
 
 
-def coverage_rows():
-    missions = launch_rows()
+def coverage_rows(missions=None):
+    missions = launch_rows() if missions is None else missions
     result = []
     for coverage in load_json("launch_coverage.json", []):
         listed = [r for r in missions if r.get("constellation_id") == coverage["constellation_id"]]
@@ -308,13 +308,14 @@ def export_sheets():
         for group in row.get("crosscheck", {}).get("groups", []):
             for point in group["points"]:
                 checks.append({**point, "constellation": row["name"], "comparison_status": group["status"]})
+    missions = launch_rows()
     return [("Constellations", constellation_export_rows()),
-            ("Launches", table(launch_rows(), ["date_label", "date_precision", "constellation", "mission", "status", "vehicle", "satellites", "source_id"])),
+            ("Launches", table(missions, ["date_label", "date_precision", "constellation", "mission", "status", "vehicle", "satellites", "source_id"])),
             ("Changes", table(load_json("changes.json", []), ["date", "constellation_id", "constellation", "type", "field", "previous", "current", "previous_source", "current_source", "source_id"])),
             ("Sources", table(load_json("sources.json", []), ["id", "title", "publisher", "origin_id", "date", "url", "note"])),
             ("Crosschecks", table(checks, ["constellation", "metric", "scope", "value", "date", "qualifier", "origin_id", "source_id", "comparison_status"])),
             ("Monthly Trends", trend_export_rows()),
-            ("Launch Coverage", table(coverage_rows(), ["constellation_id", "status", "from", "through", "records", "completed_missions", "listed_satellites", "note"]))]
+            ("Launch Coverage", table(coverage_rows(missions), ["constellation_id", "status", "from", "through", "records", "completed_missions", "listed_satellites", "note"]))]
 
 
 @app.get("/download/constellations.csv")

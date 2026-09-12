@@ -272,6 +272,31 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual(data["total"], 0)
         self.assertEqual(data["points"], [])
 
+    def test_trend_data_skips_snapshots_well_before_the_requested_window_without_opening_them(self):
+        self.snapshot("2026-09-02", 100)
+        self.snapshot("2026-09-04", 110)
+        (self.data / "snapshots" / "2020-01-01.json").write_text("not valid json at all")
+        data = trend_data(self.data, months=1, now=NOW)
+        self.assertEqual(data["warnings"], [])
+        self.assertEqual(len(data["series"][0]["points"]), 2)
+
+    def test_object_history_caches_the_parsed_daily_snapshot_across_lookups(self):
+        records = normalize_records(gp(3), NOW)
+        record_observations(self.data, "starlink", records, NOW)
+        with patch("tracker.history.load_json", wraps=load_json) as wrapped:
+            object_history(self.data, "starlink", 100000, now=NOW)
+            object_history(self.data, "starlink", 100001, now=NOW)
+            gz_calls = [c for c in wrapped.call_args_list if str(c.args[0]).endswith(".json.gz")]
+            self.assertEqual(len(gz_calls), 1)
+
+    def test_trend_data_still_finds_a_baseline_just_before_the_window(self):
+        self.snapshot("2026-08-30", 100)
+        self.snapshot("2026-09-02", 110)
+        data = trend_data(self.data, months=1, now=NOW)
+        row = next(r for r in data["monthly"] if r["month"] == "2026-09")
+        self.assertEqual(row["baseline_date"], "2026-08-30")
+        self.assertEqual(row["net_change"], 10)
+
 
 class ApiTests(unittest.TestCase):
     def setUp(self):
@@ -338,6 +363,12 @@ class ApiTests(unittest.TestCase):
             launch_xml = package.read("xl/worksheets/sheet2.xml").decode()
             self.assertIn("2026년 12월", launch_xml)
             self.assertNotIn("2026-12-01", launch_xml)
+
+    def test_xlsx_export_reads_launches_json_only_once(self):
+        with patch("app.load_json", wraps=app.load_json) as wrapped:
+            app.export_sheets()
+            launch_file_calls = [c for c in wrapped.call_args_list if c.args[0] == "launches.json"]
+            self.assertEqual(len(launch_file_calls), 1)
 
     def test_missing_current_is_unavailable_but_liveness_works(self):
         with tempfile.TemporaryDirectory() as tmp, patch.object(app, "DATA_DIR", Path(tmp)):

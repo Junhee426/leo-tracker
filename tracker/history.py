@@ -4,10 +4,32 @@ import calendar
 import math
 from collections import defaultdict
 from datetime import date, timedelta
+from functools import lru_cache
 from pathlib import Path
 
 from tracker.metrics import numeric
 from tracker.storage import iso_time, load_json, parse_time, save_json, utc_now
+
+
+@lru_cache(maxsize=128)
+def _cached_daily_snapshot(path_str, mtime_ns):
+    return load_json(Path(path_str))
+
+
+def _load_daily_snapshot(path):
+    """Loads one day's per-object observation archive, cached by path+mtime.
+
+    object_history() re-reads these to answer single-NORAD-ID lookups, and once a
+    day's file is written it never changes, so repeated requests for different
+    objects (or the same object browsed again) on the same day of history can
+    reuse the parsed result instead of gunzip+json-parsing a multi-thousand-record
+    file from scratch each time.
+    """
+    try:
+        mtime_ns = path.stat().st_mtime_ns
+    except OSError:
+        return None
+    return _cached_daily_snapshot(str(path), mtime_ns)
 
 GROUPS = {"starlink": "STARLINK", "oneweb": "ONEWEB", "amazon_leo": "KUIPER",
           "guowang": "HULIANWANG", "qianfan": "QIANFAN"}
@@ -69,7 +91,7 @@ def object_history(data_dir, constellation_id, norad_id, days=90, now=None):
             continue
         if not cutoff <= day <= today:
             continue
-        snapshot = load_json(folder / f"{constellation_id}.json.gz")
+        snapshot = _load_daily_snapshot(folder / f"{constellation_id}.json.gz")
         if snapshot:
             match = next((x for x in snapshot["records"] if x["norad_cat_id"] == norad_id), None)
             samples.append({"date": day.isoformat(), "observed_at": snapshot["observed_at"],
@@ -119,8 +141,16 @@ def trend_data(data_dir, current=None, constellation_id=None, months=12, now=Non
     today = (now or utc_now()).date()
     start_number = today.year * 12 + today.month - 1 - (months - 1)
     start = date(start_number // 12, start_number % 12 + 1, 1)
+    # Snapshot filenames are the date itself (YYYY-MM-DD.json), so files from well before the
+    # requested window can be skipped without opening them. The margin (not an exact cutoff at
+    # `start`) preserves the monthly baseline lookback below, which needs the single most recent
+    # point before the window's first month even if that point predates `start`. Without this,
+    # every call re-parses the snapshot archive in full, which only grows over the app's life.
+    cutoff = (start - timedelta(days=45)).isoformat()
     snapshots, warnings = [], []
     for path in sorted((data_dir / "snapshots").glob("*.json")):
+        if path.stem < cutoff:
+            continue
         try:
             payload = load_json(path)
             if isinstance(payload, dict):
