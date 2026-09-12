@@ -43,6 +43,15 @@
       <article class="metric"><span>Deploying / Operating</span><strong id="kpiActive">—</strong><small>NETWORK STATUS</small></article>
     </section>
 
+    <section class="panel" aria-labelledby="activityTitle">
+      <div class="panel-head">
+        <div><h3 id="activityTitle">최근 동향 비교</h3><p id="activityNote">위성망별 순증감과 실제 관측 범위를 비교합니다.</p></div>
+        <div class="controls"><select id="activityDays" aria-label="동향 비교 기간"><option value="7">최근 7일</option><option value="30" selected>최근 30일</option><option value="90">최근 90일</option></select></div>
+      </div>
+      <div id="activityError"></div>
+      <div id="activityTable" aria-live="polite"><p class="empty">최근 동향을 불러오는 중입니다.</p></div>
+    </section>
+
     <nav class="tabs" aria-label="Dashboard sections">
       <button class="tab active" data-target="overview">Overview</button>
       <button class="tab" data-target="trends">관측 추세</button>

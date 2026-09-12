@@ -11,6 +11,7 @@ from flask import Flask, Response, abort, jsonify, render_template, request, sen
 from tracker import VERSION
 from tracker.export import workbook
 from tracker.history import object_history, object_list, trend_data
+from tracker.insights import recent_activity
 from tracker.metrics import dated_value
 from tracker.storage import load_json as read_json, parse_time, utc_now
 
@@ -157,6 +158,11 @@ def trends():
     if cid:
         require_constellation(cid)
     return jsonify(trend_data(DATA_DIR, current_payload(), cid, bounded_int("months", 12, 1, 36)))
+
+
+@app.get("/api/activity")
+def activity():
+    return jsonify(recent_activity(DATA_DIR, current_payload(), bounded_int("days", 30, 1, 90)))
 
 
 @app.get("/api/objects/<constellation_id>")

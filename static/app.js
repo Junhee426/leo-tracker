@@ -64,6 +64,22 @@ async function loadPart(key,url,render,errorId) {
   catch { errorBox($('#'+errorId),()=>loadPart(key,url,render,errorId)); }
 }
 let trendRequest=0;
+let activityRequest=0;
+async function loadActivity() {
+  const requestId=++activityRequest;
+  $('#activityTable').innerHTML='<p class="empty">최근 동향을 불러오는 중입니다.</p>';
+  $('#activityError').innerHTML='';
+  try {
+    const data=await fetchJSON('/api/activity?days='+($('#activityDays').value||'30'));
+    if(requestId!==activityRequest) return;
+    $('#activityTable').innerHTML=window.LEO.activityTable(data.rows);
+    $('#activityNote').textContent=`${data.from} ~ ${data.through} (UTC) · ${data.note}`+(data.warnings.length?' 일부 스냅샷을 읽지 못했습니다.':'');
+  } catch {
+    if(requestId!==activityRequest) return;
+    $('#activityTable').innerHTML='';
+    errorBox($('#activityError'),loadActivity);
+  }
+}
 async function loadTrends() {
   const requestId=++trendRequest,cid=$('#trendFilter').value,months=$('#trendMonths').value;
   const params=new URLSearchParams({constellation_id:cid,months});
@@ -89,6 +105,7 @@ async function loadStatus() {
 }
 async function init() {
   return Promise.allSettled([
+    loadActivity(),
     loadStatus(),
     loadPart('launches','/api/launches',renderLaunches,'launchError'),
     loadPart('coverage','/api/launch-coverage',renderLaunches,'coverageError'),
@@ -98,6 +115,7 @@ async function init() {
   ]);
 }
 $('#search').addEventListener('input',renderTable);
+$('#activityDays').addEventListener('change',loadActivity);
 $('#statusFilter').addEventListener('change',renderTable);
 $('#launchFilter').addEventListener('change',renderLaunches);
 $('#trendFilter').addEventListener('change',loadTrends);

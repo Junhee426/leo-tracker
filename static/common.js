@@ -50,5 +50,9 @@ window.LEO = (() => {
     if (!rows.length) return '<div class="empty">월별 비교에는 관측값이 필요합니다.</div>';
     return `<div class="table-wrap"><table><thead><tr><th>월</th><th>비교 기간 (UTC)</th><th class="num">기준 수</th><th class="num">마지막 수</th><th class="num">추적 순증감</th><th>수집 범위</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.month)}</td><td>${esc(r.baseline_date)} → ${esc(r.end_date)}</td><td class="num">${number(r.start_count)}</td><td class="num">${number(r.end_count)}</td><td class="num ${r.net_change>0?'positive':r.net_change<0?'negative':''}">${r.net_change>0?'+':''}${number(r.net_change)}</td><td>${r.complete_month?'완전한 월':'일부 기간'} · ${r.observed_days}/${r.expected_days}일</td></tr>`).join('')}</tbody></table></div>`;
   }
-  return {esc,number,statusLabel,scopeLabel,qualityLabel,dateTime,safeUrl,fetchJSON,errorBox,sourceLink,trendBadge,crosschecks,lineChart,monthlyTable};
+  function activityTable(rows) {
+    if (!rows.length) return '<p class="empty">비교할 위성망이 없습니다.</p>';
+    return `<div class="table-wrap"><table><thead><tr><th>위성망</th><th>실제 비교 기간 (UTC)</th><th class="num">첫 관측 → 마지막 관측</th><th class="num">순증감</th><th class="num">변화율</th><th>관측 범위</th></tr></thead><tbody>${rows.map(r=>`<tr><td><a href="/constellation/${encodeURIComponent(r.constellation_id)}">${esc(r.constellation)}</a></td><td>${esc(r.baseline_date||'—')} → ${esc(r.end_date||'—')}</td><td class="num">${number(r.start_count)} → ${number(r.end_count)}</td><td class="num ${r.net_change>0?'positive':r.net_change<0?'negative':''}">${r.net_change>0?'+':''}${number(r.net_change)}</td><td class="num">${r.change_pct>0?'+':''}${number(r.change_pct)}${r.change_pct==null?'':'%'}</td><td>${r.coverage==='complete'?'전체 기간':'일부 기간'} · ${number(r.observed_days)}/${number(r.expected_days)}일<br><small>관측 공백 ${number(r.missing_days)}일${r.comparison_status==='scope_changed'?' · 집계 범위 변경으로 비교 보류':r.comparison_status==='insufficient'?' · 비교 관측 부족':''}</small></td></tr>`).join('')}</tbody></table></div>`;
+  }
+  return {esc,number,statusLabel,scopeLabel,qualityLabel,dateTime,safeUrl,fetchJSON,errorBox,sourceLink,trendBadge,crosschecks,lineChart,monthlyTable,activityTable};
 })();

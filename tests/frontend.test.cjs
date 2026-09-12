@@ -92,3 +92,39 @@ test('untrusted HTML and URL schemes cannot become markup or script links',()=>{
   assert.equal(context.LEO.esc('<img onerror="bad">'),'&lt;img onerror=&quot;bad&quot;&gt;');
   assert.equal(context.LEO.safeUrl('javascript:alert(1)'),'#');
 });
+
+test('activity comparison preserves missing values and escapes network names',()=>{
+  const {context}=environment(()=>[]);
+  const html=context.LEO.activityTable([{constellation_id:'test',constellation:'<img>',
+    baseline_date:null,end_date:null,start_count:null,end_count:null,net_change:null,change_pct:null,
+    observed_days:0,expected_days:8,missing_days:8,coverage:'partial',comparison_status:'insufficient'}]);
+  assert.match(html,/&lt;img&gt;/);
+  assert.match(html,/관측 공백 8일/);
+  assert.match(html,/비교 관측 부족/);
+  assert.doesNotMatch(html,/—%|<img>/);
+});
+
+test('activity request failure clears previous comparison and allows retry',async()=>{
+  const {context,el}=environment(()=>{throw new Error('outage');});
+  loadScript(context,'app.js');
+  el('#activityTable').innerHTML='old comparison';
+  await context.loadActivity();
+  assert.equal(el('#activityTable').innerHTML,'');
+  assert.match(el('#activityError').innerHTML,/다시 시도/);
+});
+
+test('a late activity response cannot overwrite a newer period selection',async()=>{
+  const pending=[];
+  const {context,el}=environment(()=>new Promise(resolve=>pending.push(resolve)));
+  loadScript(context,'app.js');
+  el('#activityDays').value='7';
+  const first=context.loadActivity();
+  el('#activityDays').value='90';
+  const second=context.loadActivity();
+  pending[1]({rows:[],from:'new period',through:'today',note:'new',warnings:[]});
+  await second;
+  pending[0]({rows:[],from:'old period',through:'today',note:'old',warnings:[]});
+  await first;
+  assert.match(el('#activityNote').textContent,/new period/);
+  assert.doesNotMatch(el('#activityNote').textContent,/old period/);
+});

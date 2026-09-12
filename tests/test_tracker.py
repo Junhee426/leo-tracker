@@ -285,7 +285,7 @@ class ApiTests(unittest.TestCase):
 
     def test_corrupt_sources_do_not_hide_detail_core(self):
         with tempfile.TemporaryDirectory() as tmp, patch.object(app, "DATA_DIR", Path(tmp)):
-            Path(tmp,"current.json").write_text((ROOT/"data/current.json").read_text())
+            Path(tmp,"current.json").write_text((ROOT/"data/current.json").read_text(encoding="utf-8"), encoding="utf-8")
             Path(tmp,"sources.json").write_text("invalid")
             response = self.client.get("/api/constellation/starlink")
             self.assertEqual(response.status_code, 200)
