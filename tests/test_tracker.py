@@ -14,7 +14,7 @@ from xml.etree import ElementTree
 
 import yaml
 import app
-from tracker.history import object_history, record_observations, trend_data
+from tracker.history import object_history, record_observations, shell_distribution, trend_data
 from tracker.metrics import crosscheck, dated_value, progress
 from tracker.storage import iso_time, load_json, save_json
 from updater.update_data import ProviderUnavailable, normalize_records, update
@@ -247,16 +247,78 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual([r["present"] for r in data["samples"]], [True, False, True])
         self.assertEqual(data["object"]["first_seen_at"], iso_time(NOW))
 
+    def test_shell_distribution_bins_present_objects_by_altitude_and_inclination(self):
+        records = [
+            {"norad_cat_id": 1, "object_name": "A", "object_id": "2026-001A", "epoch": iso_time(NOW),
+             "altitude_km": 340.0, "inclination_deg": 53.0},
+            {"norad_cat_id": 2, "object_name": "B", "object_id": "2026-001B", "epoch": iso_time(NOW),
+             "altitude_km": 345.0, "inclination_deg": 53.2},
+            {"norad_cat_id": 3, "object_name": "C", "object_id": "2026-001C", "epoch": iso_time(NOW),
+             "altitude_km": 550.0, "inclination_deg": 97.5},
+        ]
+        record_observations(self.data, "starlink", records, NOW)
+        # NORAD 2 goes missing on the next pass; it must be excluded from the distribution.
+        record_observations(self.data, "starlink", [records[0], records[2]], NOW+timedelta(days=1))
+        data = shell_distribution(self.data, "starlink")
+        self.assertEqual(data["total"], 2)
+        self.assertEqual(sum(b["count"] for b in data["altitude_bins"]), 2)
+        self.assertEqual(sum(b["count"] for b in data["inclination_bins"]), 2)
+        low_bin = next(b for b in data["altitude_bins"] if b["range_km"][0] <= 340 < b["range_km"][1])
+        self.assertEqual(low_bin["count"], 1)
+        self.assertEqual({p["norad_cat_id"] for p in data["points"]}, {1, 3})
+
+    def test_shell_distribution_is_empty_for_unknown_constellation(self):
+        data = shell_distribution(self.data, "does_not_exist")
+        self.assertEqual(data["total"], 0)
+        self.assertEqual(data["points"], [])
+
 
 class ApiTests(unittest.TestCase):
     def setUp(self):
         self.client = app.app.test_client()
 
     def test_normal_routes(self):
-        routes = ["/", "/health", "/api/status", "/api/trends", "/api/changes", "/api/sources", "/api/launches", "/api/launch-coverage", "/api/roadmap-history", "/download/constellations.csv", "/download/trends.csv"]
+        routes = ["/", "/health", "/api/status", "/api/trends", "/api/changes", "/api/sources", "/api/launches", "/api/launch-coverage", "/api/roadmap-history", "/download/constellations.csv", "/download/trends.csv", "/feeds/changes.xml"]
         routes += [f"/constellation/{r['id']}" for r in app.current_rows()]
+        routes += [f"/api/constellation/{r['id']}/shells" for r in app.current_rows()]
         for route in routes:
             with self.subTest(route=route): self.assertEqual(self.client.get(route).status_code, 200)
+
+    def test_shells_route_404s_for_unknown_constellation(self):
+        self.assertEqual(self.client.get("/api/constellation/unknown/shells").status_code, 404)
+
+    def test_changes_feed_is_well_formed_rss_and_filters_by_constellation(self):
+        response = self.client.get("/feeds/changes.xml")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("application/rss+xml", response.headers["Content-Type"])
+        root = ElementTree.fromstring(response.data)
+        self.assertEqual(root.tag, "rss")
+        all_events = [e for e in load_json(app.DATA_DIR/"changes.json", []) if e.get("constellation_id") and e.get("event_id")]
+        items = root.findall("./channel/item")
+        self.assertEqual(len(items), min(100, len(all_events)))
+
+        cid = all_events[0]["constellation_id"] if all_events else app.current_rows()[0]["id"]
+        filtered = self.client.get(f"/feeds/changes.xml?constellation_id={cid}")
+        self.assertEqual(filtered.status_code, 200)
+        filtered_root = ElementTree.fromstring(filtered.data)
+        expected = [e for e in all_events if e["constellation_id"] == cid][:100]
+        self.assertEqual(len(filtered_root.findall("./channel/item")), len(expected))
+
+    def test_changes_feed_404s_for_unknown_constellation(self):
+        self.assertEqual(self.client.get("/feeds/changes.xml?constellation_id=unknown").status_code, 404)
+
+    def test_changes_feed_skips_legacy_entries_missing_ids(self):
+        with tempfile.TemporaryDirectory() as tmp, patch.object(app, "DATA_DIR", Path(tmp)):
+            Path(tmp, "current.json").write_text((ROOT/"data/current.json").read_text(encoding="utf-8"), encoding="utf-8")
+            legacy = {"date": "2026-09-11", "constellation": "Starlink", "type": "tracking_update",
+                      "field": "Tracked in orbit", "previous": "11131", "current": "11130", "source_id": "celestrak_groups"}
+            modern = {**legacy, "date": "2026-09-10", "constellation_id": "starlink", "observed_at": "2026-09-10T21:00:00Z",
+                      "event_id": "2026-09-10T21:00:00Z:starlink:tracking_update"}
+            save_json(Path(tmp, "changes.json"), [legacy, modern])
+            response = self.client.get("/feeds/changes.xml")
+            self.assertEqual(response.status_code, 200)
+            items = ElementTree.fromstring(response.data).findall("./channel/item")
+            self.assertEqual(len(items), 1)
 
     def test_bad_queries_and_unknown_objects(self):
         for route in ["/api/trends?months=bad", "/api/trends?months=999", "/api/objects/starlink?per_page=1000", "/api/objects/starlink?presence=wrong"]:

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Constellation Detail · Global LEO Tracker</title>
   <link rel="stylesheet" href="/static/style.css?v={{ version }}">
+  <link rel="alternate" type="application/rss+xml" title="변경 알림" href="/feeds/changes.xml?constellation_id={{ constellation_id }}">
 </head>
 <body data-constellation-id="{{ constellation_id }}">
   <header class="topbar">
@@ -27,6 +28,14 @@
     <section class="panel">
       <div class="panel-head"><div><h3>관측 추세</h3><p>최근 12개월 · 카탈로그 추적 순증감</p></div></div>
       <div id="detailTrendError"></div><div id="detailTrendChart"></div><div id="detailMonthly"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><h3>궤도 shell 분포</h3><p id="detailShellNote">최근 카탈로그 수록 위성의 고도·경사각 분포</p></div></div>
+      <div id="detailShellError"></div>
+      <div class="detail-grid">
+        <div><h4 class="chart-note">고도 (km)</h4><div id="detailAltitudeChart"></div></div>
+        <div><h4 class="chart-note">경사각 (°)</h4><div id="detailInclinationChart"></div></div>
+      </div>
     </section>
     <section class="panel">
       <div class="panel-head"><div><h3>NORAD 관측 이력</h3><p>이 대시보드가 수집한 이력입니다. 첫 관측·미수록 시점은 발사·퇴역 시점을 의미하지 않습니다.</p></div>

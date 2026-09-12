@@ -4,13 +4,15 @@ import csv
 import io
 import json
 import os
+from email.utils import format_datetime
 from pathlib import Path
+from xml.sax.saxutils import escape as xml_escape
 
 from flask import Flask, Response, abort, g, has_app_context, jsonify, render_template, request, send_file
 
 from tracker import VERSION
 from tracker.export import workbook
-from tracker.history import object_history, object_list, trend_data
+from tracker.history import object_history, object_list, shell_distribution, trend_data
 from tracker.insights import recent_activity
 from tracker.metrics import dated_value
 from tracker.storage import load_json as read_json, parse_time, utc_now
@@ -143,6 +145,56 @@ def changes():
     return jsonify(load_json("changes.json", []))
 
 
+def _rss_pub_date(iso_value):
+    dt = parse_time(iso_value)
+    return format_datetime(dt) if dt else None
+
+
+def _rss_item(event, base_url):
+    link = f"{base_url}constellation/{event['constellation_id']}"
+    if event.get("type") == "source_change":
+        title = f"{event['constellation']} · 집계 기준 변경"
+        description = (f"{event.get('previous_source') or '—'} → {event.get('current_source') or '—'} "
+                        f"({event.get('previous_date') or '—'} → {event.get('current_date') or '—'})")
+    else:
+        title = f"{event['constellation']} · {event.get('field') or '추적 수 변경'}"
+        description = (f"{event.get('previous')} → {event.get('current')} "
+                        f"({event.get('previous_date') or '—'} → {event.get('current_date') or '—'})")
+    pub_date = _rss_pub_date(event.get("observed_at"))
+    pub_date_tag = f"<pubDate>{pub_date}</pubDate>" if pub_date else ""
+    return (f"<item><title>{xml_escape(title)}</title><link>{xml_escape(link)}</link>"
+            f"<guid isPermaLink=\"false\">{xml_escape(event['event_id'])}</guid>{pub_date_tag}"
+            f"<description>{xml_escape(description)}</description></item>")
+
+
+@app.get("/feeds/changes.xml")
+def changes_feed():
+    cid = request.args.get("constellation_id") or None
+    row = require_constellation(cid) if cid else None
+    events = load_json("changes.json", [])
+    # Older entries predating the per-event constellation_id/event_id fields cannot be
+    # filtered or given a stable GUID; skip rather than fail the whole feed.
+    events = [e for e in events if e.get("constellation_id") and e.get("event_id")]
+    if cid:
+        events = [e for e in events if e["constellation_id"] == cid]
+    events = events[:100]
+    base_url = request.host_url
+    title = "Global LEO Tracker · 변경 알림" + (f" · {row['name']}" if row else "")
+    link = base_url + (f"constellation/{cid}" if cid else "")
+    items = "".join(_rss_item(e, base_url) for e in events)
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<rss version="2.0"><channel>'
+        f"<title>{xml_escape(title)}</title>"
+        f"<link>{xml_escape(link)}</link>"
+        "<description>카탈로그 추적 수·집계 기준 변경 이벤트입니다. 발사·퇴역 확정 정보가 아닙니다.</description>"
+        "<language>ko</language>"
+        f"{items}"
+        "</channel></rss>"
+    )
+    return Response(xml, mimetype="application/rss+xml; charset=utf-8")
+
+
 @app.get("/api/sources")
 def sources():
     return jsonify(load_json("sources.json", []))
@@ -184,6 +236,12 @@ def objects(constellation_id):
         abort(400, description="presence는 all, present, missing 중 하나여야 합니다.")
     return jsonify(object_list(DATA_DIR, constellation_id, request.args.get("q", "")[:100], presence,
                                bounded_int("page", 1, 1, 100000), bounded_int("per_page", 50, 1, 100)))
+
+
+@app.get("/api/constellation/<constellation_id>/shells")
+def constellation_shells(constellation_id):
+    require_constellation(constellation_id)
+    return jsonify(shell_distribution(DATA_DIR, constellation_id))
 
 
 @app.get("/api/objects/<constellation_id>/<int:norad_id>")

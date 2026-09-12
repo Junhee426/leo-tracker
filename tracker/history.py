@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import calendar
+import math
 from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
@@ -75,6 +76,43 @@ def object_history(data_dir, constellation_id, norad_id, days=90, now=None):
                             "present": match is not None, "observation": match})
     return {"constellation_id": constellation_id, "object": record, "days": days, "samples": samples,
             "note": "수집 성공일만 표시합니다. 미수록은 해당 카탈로그에서 찾지 못했다는 뜻입니다."}
+
+
+def _bin_start(value, width):
+    return math.floor(value / width) * width
+
+
+def shell_distribution(data_dir, constellation_id, altitude_bin_km=25.0, inclination_bin_deg=5.0):
+    """Altitude/inclination distribution of currently-present objects, from the most
+    recent orbital elements already recorded per NORAD ID in the object catalog."""
+    catalog = load_json(data_dir / "catalogs" / f"{constellation_id}.json", {"objects": {}})
+    points = []
+    for record in catalog["objects"].values():
+        if not record.get("present"):
+            continue
+        altitude, inclination = record.get("altitude_km"), record.get("inclination_deg")
+        if not numeric(altitude) or not numeric(inclination):
+            continue
+        points.append({"norad_cat_id": record["norad_cat_id"], "altitude_km": altitude, "inclination_deg": inclination})
+
+    altitude_counts, inclination_counts = defaultdict(int), defaultdict(int)
+    for p in points:
+        altitude_counts[_bin_start(p["altitude_km"], altitude_bin_km)] += 1
+        inclination_counts[_bin_start(p["inclination_deg"], inclination_bin_deg)] += 1
+    altitude_bins = [{"range_km": [start, start + altitude_bin_km], "count": count}
+                      for start, count in sorted(altitude_counts.items())]
+    inclination_bins = [{"range_deg": [start, start + inclination_bin_deg], "count": count}
+                         for start, count in sorted(inclination_counts.items())]
+    return {
+        "constellation_id": constellation_id,
+        "total": len(points),
+        "altitude_bin_km": altitude_bin_km,
+        "inclination_bin_deg": inclination_bin_deg,
+        "altitude_bins": altitude_bins,
+        "inclination_bins": inclination_bins,
+        "points": points,
+        "note": "현재 수록(present) 상태인 객체의 최근 궤도요소 기준입니다. 미수록 객체는 제외합니다.",
+    }
 
 
 def trend_data(data_dir, current=None, constellation_id=None, months=12, now=None):

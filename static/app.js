@@ -81,14 +81,19 @@ async function loadActivity() {
   }
 }
 async function loadTrends() {
-  const requestId=++trendRequest,cid=$('#trendFilter').value,months=$('#trendMonths').value;
-  const params=new URLSearchParams({constellation_id:cid,months});
+  const requestId=++trendRequest,cid=$('#trendFilter').value,months=$('#trendMonths').value,compareAll=cid==='__all__';
+  const params=new URLSearchParams(compareAll?{months}:{constellation_id:cid,months});
   try {
     const data=await fetchJSON('/api/trends?'+params);
     if(requestId!==trendRequest) return;
     $('#trendError').innerHTML='';
-    $('#trendChart').innerHTML=lineChart(data.series.find(s=>s.constellation_id===cid)?.points||[]);
-    $('#monthlyTable').innerHTML=monthlyTable(data.monthly);
+    if (compareAll) {
+      $('#trendChart').innerHTML=window.LEO.multiLineChart(data.series);
+      $('#monthlyTable').innerHTML='<p class="empty">위성망을 하나 선택하면 월별 비교표가 표시됩니다.</p>';
+    } else {
+      $('#trendChart').innerHTML=lineChart(data.series.find(s=>s.constellation_id===cid)?.points||[]);
+      $('#monthlyTable').innerHTML=monthlyTable(data.monthly);
+    }
     $('#trendNote').textContent=data.note+(data.warnings.length?' 일부 스냅샷을 읽지 못했습니다.':'');
     $('#downloadTrends').href='/download/trends.csv?'+params;
   } catch { if(requestId===trendRequest) errorBox($('#trendError'),loadTrends); }
@@ -99,7 +104,7 @@ async function loadStatus() {
     $('#overviewError').innerHTML=''; renderQuality(); renderKPIs(); renderTable();
     const options=state.rows.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
     $('#launchFilter').innerHTML='<option value="all">전체 위성망</option>'+options;
-    $('#trendFilter').innerHTML=options;
+    $('#trendFilter').innerHTML='<option value="__all__">전체 비교</option>'+options;
     renderLaunches(); loadTrends();
   } catch { errorBox($('#overviewError'),loadStatus,'위성 현황을 불러오지 못했습니다.'); $('#updateMode').textContent='현황 로딩 실패'; }
 }

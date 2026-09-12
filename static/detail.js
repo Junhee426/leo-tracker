@@ -1,4 +1,4 @@
-const {esc,number,statusLabel,qualityLabel,dateTime,fetchJSON,errorBox,sourceLink,trendBadge,crosschecks,lineChart,monthlyTable}=window.LEO;
+const {esc,number,statusLabel,qualityLabel,dateTime,fetchJSON,errorBox,sourceLink,trendBadge,crosschecks,lineChart,monthlyTable,histogramChart}=window.LEO;
 const $=selector=>document.querySelector(selector);
 const cid=document.body.dataset.constellationId;
 let relevantSourceIds=new Set();
@@ -67,6 +67,15 @@ async function loadHistory(norad) {
     $('#objectHistoryRows').innerHTML=`<p class="chart-note">${esc(data.note)}</p><div class="table-wrap"><table><thead><tr><th>관측일 (UTC)</th><th>카탈로그</th><th>궤도요소 기준시각 (UTC)</th><th class="num">장반경 환산 고도 (km)</th><th class="num">경사각 (°)</th></tr></thead><tbody>${data.samples.map(s=>`<tr><td>${esc(s.date)}</td><td>${s.present?'수록':'미수록'}</td><td>${esc(s.observation?.epoch||'—')}</td><td class="num">${number(s.observation?.altitude_km)}</td><td class="num">${number(s.observation?.inclination_deg)}</td></tr>`).join('')}</tbody></table></div>`;
   } catch { if(requestId===historyRequest)errorBox($('#objectHistoryRows'),()=>loadHistory(norad)); }
 }
+async function loadShells() {
+  try {
+    const data=await fetchJSON(`/api/constellation/${encodeURIComponent(cid)}/shells`);
+    $('#detailShellError').innerHTML='';
+    $('#detailShellNote').textContent=`${data.note} · 총 ${number(data.total)}기`;
+    $('#detailAltitudeChart').innerHTML=histogramChart(data.altitude_bins,'range_km','km');
+    $('#detailInclinationChart').innerHTML=histogramChart(data.inclination_bins,'range_deg','°');
+  } catch { errorBox($('#detailShellError'),loadShells); }
+}
 async function loadPrimary() {
   try {const data=await fetchJSON('/api/constellation/'+encodeURIComponent(cid));$('#detailError').innerHTML='';showPrimary(data);}
   catch {errorBox($('#detailError'),loadPrimary,'위성 현황을 읽지 못했습니다.');$('#detailName').textContent='현황 로딩 실패';}
@@ -80,6 +89,7 @@ async function init() {
     section('/api/sources','detailSourcesError',data=>{sources=Object.fromEntries(data.map(s=>[s.id,s]));if(record){$('#detailCrosscheck').innerHTML=crosschecks(record.crosscheck,sources);renderSources();}}),
     section('/api/launch-coverage','detailCoverageError',data=>{const c=data.find(r=>r.constellation_id===cid);$('#detailCoverage').textContent=c?`${c.status==='not_collected'?'완료 임무 미수록':'수록 범위: '+(c.from||'—')+' ~ '+(c.through||'—')} · ${c.note}`:'';}),
     section('/api/trends?'+new URLSearchParams({constellation_id:cid,months:12}),'detailTrendError',data=>{$('#detailTrendChart').innerHTML=lineChart(data.series.find(r=>r.constellation_id===cid)?.points||[]);$('#detailMonthly').innerHTML=monthlyTable(data.monthly);}),
+    loadShells(),
     loadObjects()
   ]);
 }
