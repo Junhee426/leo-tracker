@@ -175,6 +175,12 @@ def update(data_dir=DATA, fetcher=None, now=None, refresh_derived=False):
     plans = load_plans(data_dir)
     previous = load_json(data_dir/"current.json", {"constellations": []})
     sources = {s["id"]: s for s in load_json(data_dir/"sources.json", [])}
+    # Read before the per-plan loop below writes any catalog/observation-archive files, so a
+    # corrupt changes.json fails the whole run before this run's per-object writes happen, rather
+    # than after: the CI workflow commits data/ on any exit code, so partial writes ahead of a
+    # not-yet-updated current.json (this failed before reaching save_json(current.json) below)
+    # would otherwise still get committed.
+    changes = load_json(data_dir/"changes.json", [])
     old_by_id = {r["id"]: r for r in previous["constellations"]}
     entries, failures, successful, cached = [], [], 0, 0
     provider_error = None
@@ -228,7 +234,6 @@ def update(data_dir=DATA, fetcher=None, now=None, refresh_derived=False):
         generated_at = iso_time(now)
     result = {"version": VERSION, "schema_version": SCHEMA_VERSION, "generated_at": generated_at,
               "update_mode": mode, "failures": failures, "constellations": entries}
-    changes = load_json(data_dir/"changes.json", [])
     if not refresh_derived:
         events = detect_count_changes(previous, result)
         known = {e.get("event_id") for e in changes}

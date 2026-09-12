@@ -79,7 +79,7 @@ def coverage_rows(missions=None):
     result = []
     for coverage in load_json("launch_coverage.json", []):
         listed = [r for r in missions if r.get("constellation_id") == coverage["constellation_id"]]
-        completed = [r for r in listed if r["status"] == "completed"]
+        completed = [r for r in listed if r.get("status") == "completed"]
         years = sorted({r["date"][:4] for r in completed if r.get("date_start")})
         result.append({**coverage, "records": len(listed), "completed_missions": len(completed),
                        "listed_satellites": sum(r.get("satellites") or 0 for r in completed),
@@ -87,7 +87,7 @@ def coverage_rows(missions=None):
     return result
 
 
-def quality_data(data=None):
+def _compute_quality_data(data):
     data = data or current_payload()
     now, rows = utc_now(), []
     for row in data["constellations"]:
@@ -102,6 +102,17 @@ def quality_data(data=None):
     issues = [r for r in rows if r["status"] in ("stale", "unavailable")]
     return {"update_mode": data.get("update_mode"), "generated_at": data.get("generated_at"),
             "failures": data.get("failures", []), "rows": rows, "degraded": bool(issues)}
+
+
+def quality_data(data=None):
+    # Cached like current_payload(): every caller in a request derives `data` from the same
+    # current_payload(), so recomputing this per call (constellation detail, exports, /api/quality)
+    # is redundant work over identical input.
+    if not has_app_context():
+        return _compute_quality_data(data)
+    if "quality_data" not in g:
+        g.quality_data = _compute_quality_data(data)
+    return g.quality_data
 
 
 @app.errorhandler(json.JSONDecodeError)
@@ -152,12 +163,13 @@ def _rss_pub_date(iso_value):
 
 def _rss_item(event, base_url):
     link = f"{base_url}constellation/{event['constellation_id']}"
+    name = event.get("constellation") or event["constellation_id"]
     if event.get("type") == "source_change":
-        title = f"{event['constellation']} · 집계 기준 변경"
+        title = f"{name} · 집계 기준 변경"
         description = (f"{event.get('previous_source') or '—'} → {event.get('current_source') or '—'} "
                         f"({event.get('previous_date') or '—'} → {event.get('current_date') or '—'})")
     else:
-        title = f"{event['constellation']} · {event.get('field') or '추적 수 변경'}"
+        title = f"{name} · {event.get('field') or '추적 수 변경'}"
         description = (f"{event.get('previous')} → {event.get('current')} "
                         f"({event.get('previous_date') or '—'} → {event.get('current_date') or '—'})")
     pub_date = _rss_pub_date(event.get("observed_at"))
@@ -256,8 +268,9 @@ def object_detail(constellation_id, norad_id):
 @app.get("/api/constellation/<constellation_id>")
 def constellation_api(constellation_id):
     row = require_constellation(constellation_id)
-    result = {"constellation": row, "section_errors": {},
-              "quality": next(r for r in quality_data()["rows"] if r["id"] == constellation_id)}
+    quality = next((r for r in quality_data()["rows"] if r["id"] == constellation_id), None)
+    result = {"constellation": row, "section_errors": {} if quality is not None else {"quality": "data_unavailable"},
+              "quality": quality}
     # Keep the V1.1 detail contract while isolating corrupt ancillary files.
     for key, filename in (("launches", "launches.json"), ("changes", "changes.json"),
                           ("roadmap", "roadmap_history.json"), ("sources", "sources.json")):

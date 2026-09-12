@@ -89,6 +89,12 @@ class DataFixture(unittest.TestCase):
         history = object_history(self.data, "starlink", 100000, now=NOW)
         self.assertEqual(history["samples"][0]["observation"]["norad_cat_id"], 100000)
 
+    def test_corrupt_changes_json_fails_before_any_catalog_writes(self):
+        (self.data/"changes.json").write_text("not valid json", encoding="utf-8")
+        with self.assertRaises(json.JSONDecodeError):
+            self.collect(lambda group: gp(20))
+        self.assertFalse((self.data/"catalogs").exists())
+
     def test_cached_run_makes_no_provider_request(self):
         self.collect(lambda group: gp(20))
         fetcher = Mock(side_effect=AssertionError("must not fetch within two hours"))
@@ -345,6 +351,27 @@ class ApiTests(unittest.TestCase):
             items = ElementTree.fromstring(response.data).findall("./channel/item")
             self.assertEqual(len(items), 1)
 
+    def test_changes_feed_tolerates_events_missing_the_constellation_name(self):
+        with tempfile.TemporaryDirectory() as tmp, patch.object(app, "DATA_DIR", Path(tmp)):
+            Path(tmp, "current.json").write_text((ROOT/"data/current.json").read_text(encoding="utf-8"), encoding="utf-8")
+            nameless = {"date": "2026-09-10", "constellation_id": "starlink", "type": "tracking_update",
+                        "field": "Tracked in orbit", "previous": "11131", "current": "11130",
+                        "observed_at": "2026-09-10T21:00:00Z", "event_id": "nameless-event"}
+            save_json(Path(tmp, "changes.json"), [nameless])
+            response = self.client.get("/feeds/changes.xml")
+            self.assertEqual(response.status_code, 200)
+            items = ElementTree.fromstring(response.data).findall("./channel/item")
+            self.assertEqual(len(items), 1)
+            self.assertIn("starlink", items[0].find("title").text)
+
+    def test_constellation_detail_survives_a_missing_quality_row(self):
+        with patch.object(app, "quality_data", return_value={"rows": []}):
+            response = self.client.get(f"/api/constellation/{app.current_rows()[0]['id']}")
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertIsNone(data["quality"])
+            self.assertEqual(data["section_errors"]["quality"], "data_unavailable")
+
     def test_bad_queries_and_unknown_objects(self):
         for route in ["/api/trends?months=bad", "/api/trends?months=999", "/api/objects/starlink?per_page=1000", "/api/objects/starlink?presence=wrong"]:
             self.assertEqual(self.client.get(route).status_code, 400)
@@ -363,6 +390,12 @@ class ApiTests(unittest.TestCase):
             launch_xml = package.read("xl/worksheets/sheet2.xml").decode()
             self.assertIn("2026년 12월", launch_xml)
             self.assertNotIn("2026-12-01", launch_xml)
+
+    def test_coverage_rows_tolerates_missions_missing_a_status_field(self):
+        missions = [{"constellation_id": "starlink", "date": "2026-01-01"}]
+        with patch.object(app, "load_json", return_value=[{"constellation_id": "starlink"}]):
+            rows = app.coverage_rows(missions)
+        self.assertEqual(rows[0]["completed_missions"], 0)
 
     def test_xlsx_export_reads_launches_json_only_once(self):
         with patch("app.load_json", wraps=app.load_json) as wrapped:
