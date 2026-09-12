@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from flask import Flask, Response, abort, jsonify, render_template, request, send_file
+from flask import Flask, Response, abort, g, has_app_context, jsonify, render_template, request, send_file
 
 from tracker import VERSION
 from tracker.export import workbook
@@ -17,6 +17,7 @@ from tracker.storage import load_json as read_json, parse_time, utc_now
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
+FILE_VERSION_TAG = "v" + ".".join(VERSION.split(".")[:2])
 app = Flask(__name__)
 app.json.ensure_ascii = False
 
@@ -25,11 +26,21 @@ def load_json(name, default):
     return read_json(DATA_DIR / name, default)
 
 
-def current_payload():
+def _read_current_payload():
     data = load_json("current.json", None)
     if not isinstance(data, dict) or not data.get("constellations"):
         abort(503, description="사용 가능한 위성 현황 데이터가 없습니다.")
     return data
+
+
+def current_payload():
+    # Cache for the lifetime of the request: several handlers (quality/trends/exports)
+    # each ask for this, and re-reading/re-parsing current.json per call adds up.
+    if not has_app_context():
+        return _read_current_payload()
+    if "current_payload" not in g:
+        g.current_payload = _read_current_payload()
+    return g.current_payload
 
 
 def current_rows():
@@ -250,7 +261,7 @@ def export_sheets():
 
 @app.get("/download/constellations.csv")
 def download_csv():
-    return csv_response(constellation_export_rows(), "global-leo-tracker-v1.2.csv")
+    return csv_response(constellation_export_rows(), f"global-leo-tracker-{FILE_VERSION_TAG}.csv")
 
 
 @app.get("/download/trends.csv")
@@ -258,13 +269,13 @@ def download_trends():
     cid = request.args.get("constellation_id") or None
     if cid:
         require_constellation(cid)
-    return csv_response(trend_export_rows(cid, bounded_int("months", 12, 1, 36)), "leo-monthly-trends-v1.2.csv")
+    return csv_response(trend_export_rows(cid, bounded_int("months", 12, 1, 36)), f"leo-monthly-trends-{FILE_VERSION_TAG}.csv")
 
 
 @app.get("/download/tracker.xlsx")
 def download_xlsx():
     return send_file(workbook(export_sheets()), mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                     as_attachment=True, download_name="global-leo-tracker-v1.2.xlsx")
+                     as_attachment=True, download_name=f"global-leo-tracker-{FILE_VERSION_TAG}.xlsx")
 
 
 @app.get("/health")
