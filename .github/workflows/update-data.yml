@@ -25,6 +25,8 @@ jobs:
         id: collect
         continue-on-error: true
         run: python updater/update_data.py
+      - name: Validate collected data before committing
+        run: python -m unittest discover -s tests -p test_data_integrity.py -v
       - name: Commit data and collection status
         run: |
           git config user.name "leo-tracker-bot"

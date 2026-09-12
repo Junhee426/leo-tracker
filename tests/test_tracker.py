@@ -253,7 +253,7 @@ class ApiTests(unittest.TestCase):
         self.client = app.app.test_client()
 
     def test_normal_routes(self):
-        routes = ["/", "/health", "/api/status", "/api/trends", "/api/changes", "/api/sources", "/api/launches", "/api/launch-coverage", "/api/roadmap-history", "/download/constellations.csv", "/download/trends.csv"]
+        routes = ["/", "/health", "/api/status", "/api/activity", "/api/trends", "/api/changes", "/api/sources", "/api/launches", "/api/launch-coverage", "/api/roadmap-history", "/download/constellations.csv", "/download/trends.csv"]
         routes += [f"/constellation/{r['id']}" for r in app.current_rows()]
         for route in routes:
             with self.subTest(route=route): self.assertEqual(self.client.get(route).status_code, 200)
@@ -262,6 +262,12 @@ class ApiTests(unittest.TestCase):
         for route in ["/api/trends?months=bad", "/api/trends?months=999", "/api/objects/starlink?per_page=1000", "/api/objects/starlink?presence=wrong"]:
             self.assertEqual(self.client.get(route).status_code, 400)
         self.assertEqual(self.client.get("/api/objects/unknown").status_code, 404)
+
+    def test_latest_change_is_visible_in_constellation_detail(self):
+        latest = self.client.get("/api/changes").json[0]
+        response = self.client.get("/api/constellation/" + latest["constellation_id"])
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(latest, response.json["changes"])
 
     def test_xlsx_has_shared_checks_and_date_precision(self):
         response = self.client.get("/download/tracker.xlsx")

@@ -8,10 +8,7 @@ on:
       - 'templates/**'
       - 'requirements*'
       - '.github/workflows/test.yml'
-      - 'data/plans.yaml'
-      - 'data/launches.json'
-      - 'data/sources.json'
-      - 'data/launch_coverage.json'
+      - 'data/**'
 permissions:
   contents: read
 jobs:

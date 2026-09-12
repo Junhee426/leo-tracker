@@ -6,7 +6,8 @@
     "field": "Tracked in orbit",
     "previous": "11131",
     "current": "11130",
-    "source_id": "celestrak_groups"
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
   },
   {
     "date": "2026-09-10",
