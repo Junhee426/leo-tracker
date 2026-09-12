@@ -1,7 +1,7 @@
 {
   "version": "1.2.0",
   "schema_version": 2,
-  "generated_at": "2026-09-04T22:36:06Z",
+  "generated_at": "2026-09-10T22:49:45Z",
   "update_mode": "live",
   "failures": [],
   "constellations": [
@@ -18,7 +18,7 @@
       "planned_satellites": 15000,
       "planned_label": "15,000 authorized",
       "note": "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure.",
-      "tracked_in_orbit": 11086,
+      "tracked_in_orbit": 11131,
       "tracked_source": "celestrak",
       "count_scope": "all_catalogued",
       "plan_metric": "authorized",
@@ -37,17 +37,17 @@
         "fcc_starlink_2026",
         "spacex_2026_prospectus"
       ],
-      "tracked_launched_this_year": 2056,
+      "tracked_launched_this_year": 2109,
       "tracking_year": 2026,
-      "avg_altitude_km": 464.7,
-      "avg_inclination_deg": 57.1,
-      "last_data_date": "2026-09-04",
+      "avg_altitude_km": 463.7,
+      "avg_inclination_deg": 57.2,
+      "last_data_date": "2026-09-10",
       "epoch_min": null,
       "epoch_max": null,
       "observation": {
         "status": "legacy",
-        "last_attempt_at": "2026-09-04T22:36:06Z",
-        "last_success_at": "2026-09-04T22:36:06Z",
+        "last_attempt_at": null,
+        "last_success_at": "2026-09-10T22:49:45Z",
         "error": null
       },
       "crosscheck_points": [
@@ -55,8 +55,8 @@
           "source_id": "celestrak_groups",
           "metric": "tracked",
           "scope": "all_catalogued",
-          "value": 11086,
-          "date": "2026-09-04",
+          "value": 11131,
+          "date": "2026-09-10",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -97,8 +97,8 @@
                 "source_id": "celestrak_groups",
                 "metric": "tracked",
                 "scope": "all_catalogued",
-                "value": 11086,
-                "date": "2026-09-04",
+                "value": 11131,
+                "date": "2026-09-10",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -185,13 +185,13 @@
       "tracking_year": 2026,
       "avg_altitude_km": 1197.4,
       "avg_inclination_deg": 87.9,
-      "last_data_date": "2026-09-04",
+      "last_data_date": "2026-09-10",
       "epoch_min": null,
       "epoch_max": null,
       "observation": {
         "status": "legacy",
-        "last_attempt_at": "2026-09-04T22:36:06Z",
-        "last_success_at": "2026-09-04T22:36:06Z",
+        "last_attempt_at": null,
+        "last_success_at": "2026-09-10T22:49:45Z",
         "error": null
       },
       "crosscheck_points": [
@@ -200,7 +200,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 651,
-          "date": "2026-09-04",
+          "date": "2026-09-10",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -232,7 +232,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 651,
-                "date": "2026-09-04",
+                "date": "2026-09-10",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -297,15 +297,15 @@
       ],
       "tracked_launched_this_year": 216,
       "tracking_year": 2026,
-      "avg_altitude_km": 614.3,
+      "avg_altitude_km": 617.2,
       "avg_inclination_deg": 51.9,
-      "last_data_date": "2026-09-04",
+      "last_data_date": "2026-09-10",
       "epoch_min": null,
       "epoch_max": null,
       "observation": {
         "status": "legacy",
-        "last_attempt_at": "2026-09-04T22:36:06Z",
-        "last_success_at": "2026-09-04T22:36:06Z",
+        "last_attempt_at": null,
+        "last_success_at": "2026-09-10T22:49:45Z",
         "error": null
       },
       "crosscheck_points": [
@@ -314,7 +314,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 391,
-          "date": "2026-09-04",
+          "date": "2026-09-10",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -356,7 +356,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 391,
-                "date": "2026-09-04",
+                "date": "2026-09-10",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -520,15 +520,15 @@
       ],
       "tracked_launched_this_year": 63,
       "tracking_year": 2026,
-      "avg_altitude_km": 1132.4,
+      "avg_altitude_km": 1133.5,
       "avg_inclination_deg": 61.1,
-      "last_data_date": "2026-09-04",
+      "last_data_date": "2026-09-10",
       "epoch_min": null,
       "epoch_max": null,
       "observation": {
         "status": "legacy",
-        "last_attempt_at": "2026-09-04T22:36:06Z",
-        "last_success_at": "2026-09-04T22:36:06Z",
+        "last_attempt_at": null,
+        "last_success_at": "2026-09-10T22:49:45Z",
         "error": null
       },
       "crosscheck_points": [
@@ -537,7 +537,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 199,
-          "date": "2026-09-04",
+          "date": "2026-09-10",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -569,7 +569,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 199,
-                "date": "2026-09-04",
+                "date": "2026-09-10",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -630,15 +630,15 @@
       ],
       "tracked_launched_this_year": 130,
       "tracking_year": 2026,
-      "avg_altitude_km": 1030.1,
+      "avg_altitude_km": 1032.3,
       "avg_inclination_deg": 89.0,
-      "last_data_date": "2026-09-04",
+      "last_data_date": "2026-09-10",
       "epoch_min": null,
       "epoch_max": null,
       "observation": {
         "status": "legacy",
-        "last_attempt_at": "2026-09-04T22:36:06Z",
-        "last_success_at": "2026-09-04T22:36:06Z",
+        "last_attempt_at": null,
+        "last_success_at": "2026-09-10T22:49:45Z",
         "error": null
       },
       "crosscheck_points": [
@@ -647,7 +647,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 238,
-          "date": "2026-09-04",
+          "date": "2026-09-10",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -689,7 +689,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 238,
-                "date": "2026-09-04",
+                "date": "2026-09-10",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false

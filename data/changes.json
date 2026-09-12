@@ -1,5 +1,35 @@
 [
   {
+    "date": "2026-09-10",
+    "constellation": "Starlink",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "11077",
+    "current": "11131",
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
+  },
+  {
+    "date": "2026-09-09",
+    "constellation": "Starlink",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "11079",
+    "current": "11077",
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
+  },
+  {
+    "date": "2026-09-08",
+    "constellation": "Starlink",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "11086",
+    "current": "11079",
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
+  },
+  {
     "date": "2026-09-04",
     "constellation": "Starlink",
     "type": "tracking_update",
@@ -143,6 +173,56 @@
     "previous_source": "manual_reference",
     "current_source": "celestrak",
     "note": "V1.1 참조값에서 카탈로그 집계로 전환. 실제 위성 증감을 의미하지 않습니다."
+  },
+  {
+    "date": "2026-08-24",
+    "constellation": "Starlink",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "9600",
+    "current": "10968",
+    "source_id": "celestrak_groups",
+    "constellation_id": "starlink"
+  },
+  {
+    "date": "2026-08-24",
+    "constellation": "Eutelsat OneWeb",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "600",
+    "current": "651",
+    "source_id": "celestrak_groups",
+    "constellation_id": "oneweb"
+  },
+  {
+    "date": "2026-08-24",
+    "constellation": "Amazon Leo",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "396",
+    "current": "391",
+    "source_id": "celestrak_groups",
+    "constellation_id": "amazon_leo"
+  },
+  {
+    "date": "2026-08-24",
+    "constellation": "Guowang / SatNet",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "186",
+    "current": "199",
+    "source_id": "celestrak_groups",
+    "constellation_id": "guowang"
+  },
+  {
+    "date": "2026-08-24",
+    "constellation": "Qianfan / Spacesail",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": "218",
+    "current": "238",
+    "source_id": "celestrak_groups",
+    "constellation_id": "qianfan"
   },
   {
     "date": "2026-08-07",
