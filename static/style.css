@@ -1,10 +1,12 @@
 :root {
-  --bg: #07111f;
-  --panel: #0d1a2b;
-  --panel2: #112238;
-  --line: #243953;
-  --text: #f2f7ff;
-  --muted: #93a8c1;
+  --bg: #0a1220;
+  --panel: #101c2e;
+  --panel2: #152840;
+  --line: #253754;
+  --text: #eef4fc;
+  --muted: #9db0c9;
+  --brand: #e6392e;
+  --brand-hover: #ff5c4c;
   --blue: #55b8ff;
   --cyan: #4ee2d2;
   --green: #55d98b;
@@ -15,8 +17,8 @@
 * { box-sizing: border-box; }
 html { color-scheme: dark; }
 body { margin: 0; font-family: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at 85% 0%, #102e4d 0, transparent 30%), var(--bg); color: var(--text); }
-a { color: var(--blue); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { color: var(--brand-hover); text-decoration: underline; }
 .topbar { height: 76px; display: flex; justify-content: space-between; align-items: center; padding: 0 4vw; border-bottom: 1px solid var(--line); background: rgba(7,17,31,.82); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 20; }
 .brand { display: flex; align-items: center; gap: 14px; color: var(--text); text-decoration: none; }
 .brand-mark { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid #3f6b93; border-radius: 12px; color: var(--cyan); font-size: 12px; font-weight: 800; letter-spacing: .08em; background: linear-gradient(145deg,#10253c,#0a1728); }
@@ -95,7 +97,8 @@ footer { width: min(1500px,94vw); margin: 0 auto; padding: 24px 0 40px; display:
 .top-actions { display:flex; align-items:center; gap:8px; }
 .download { display:inline-flex; align-items:center; justify-content:center; min-width:58px; padding:7px 11px; border-radius:9px; background:#1f6ea3; border:1px solid #3d87b8; color:#fff; font-size:11px; font-weight:750; }
 .download:hover { text-decoration:none; background:#287caf; }
-.download.ghost { background:transparent; color:var(--blue); border-color:var(--line); }
+.download.ghost { background:transparent; color:var(--brand); border-color:var(--line); }
+.download.ghost:hover { color:var(--brand-hover); }
 .clickable-row { cursor:pointer; }
 .detail-link { white-space:nowrap; font-size:11px; font-weight:700; }
 .compact-table { min-width:1050px; }
@@ -194,7 +197,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {o
 .coverage-item {display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;}
 .coverage-item small {font-size:.875rem;}
 .pagination {display:flex;gap:16px;justify-content:center;align-items:center;margin-top:16px;}
-.object-link {border:0;padding:0;background:none;color:var(--blue);text-decoration:underline;font:inherit;cursor:pointer;}
+.object-link {border:0;padding:0;background:none;color:var(--brand);text-decoration:underline;font:inherit;cursor:pointer;}
+.object-link:hover {color:var(--brand-hover);}
 #objectHistory {border-top:1px solid var(--line);margin-top:20px;padding-top:12px;}
 .xcheck-status.conflict {background:#fff0f0;color:#9e2b2f;}
 .xcheck-status.consistent {background:#e2f4ed;color:#176245;}
