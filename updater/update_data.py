@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
 import requests
 import yaml
 from tracker import SCHEMA_VERSION, VERSION
-from tracker.history import record_observations
+from tracker.history import prune_observations, record_observations
 from tracker.metrics import build_points, crosscheck, numeric, progress
 from tracker.storage import iso_time, load_json, parse_time, save_json, utc_now
 
@@ -235,6 +235,7 @@ def update(data_dir=DATA, fetcher=None, now=None, refresh_derived=False):
         if events:
             save_json(data_dir/"changes.json", [e for e in events if e["event_id"] not in known] + changes)
         save_json(data_dir/"snapshots"/f"{now.date().isoformat()}.json", result)
+        prune_observations(data_dir, now)
     save_json(data_dir/"current.json", result)
     return result
 
