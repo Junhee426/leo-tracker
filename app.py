@@ -10,7 +10,7 @@ from flask import Flask, Response, abort, jsonify, render_template, request, sen
 
 from tracker import VERSION
 from tracker.export import workbook
-from tracker.history import object_history, object_list, trend_data
+from tracker.history import MAX_HISTORY_DAYS, object_history, object_list, trend_data
 from tracker.insights import recent_activity
 from tracker.metrics import dated_value
 from tracker.storage import load_json as read_json, parse_time, utc_now
@@ -178,7 +178,8 @@ def objects(constellation_id):
 @app.get("/api/objects/<constellation_id>/<int:norad_id>")
 def object_detail(constellation_id, norad_id):
     require_constellation(constellation_id)
-    data = object_history(DATA_DIR, constellation_id, norad_id, bounded_int("days", 90, 1, 90))
+    data = object_history(DATA_DIR, constellation_id, norad_id,
+                           bounded_int("days", MAX_HISTORY_DAYS, 1, MAX_HISTORY_DAYS))
     if data is None:
         abort(404, description="수집된 NORAD 관측 이력이 없습니다.")
     return jsonify(data)
