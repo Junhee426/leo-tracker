@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import calendar
+import shutil
 from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
@@ -10,6 +11,14 @@ from tracker.storage import iso_time, load_json, parse_time, save_json, utc_now
 
 GROUPS = {"starlink": "STARLINK", "oneweb": "ONEWEB", "amazon_leo": "KUIPER",
           "guowang": "HULIANWANG", "qianfan": "QIANFAN"}
+
+# object_history() only ever serves up to this many days (app.py clamps the
+# `days` query parameter to the same bound). Daily archives older than this,
+# plus a safety margin, are never read by any endpoint and are safe to drop:
+# tracker/catalogs/<id>.json separately retains first_seen/last_seen/present
+# state forever, independent of the raw daily archives.
+MAX_HISTORY_DAYS = 90
+OBSERVATION_RETENTION_DAYS = MAX_HISTORY_DAYS + 10
 
 
 def record_observations(data_dir: Path, constellation_id, records, now):
@@ -40,6 +49,34 @@ def record_observations(data_dir: Path, constellation_id, records, now):
             "missing": None if first_batch else len(old_present - incoming)}
 
 
+def prune_observations(data_dir: Path, now=None, retention_days=OBSERVATION_RETENTION_DAYS):
+    """Delete daily observation archives older than the per-object history window.
+
+    `data/observations/<date>/<constellation>.json.gz` files accumulate forever
+    otherwise (one new file per constellation per successful collection day).
+    `object_history()` never looks further back than `MAX_HISTORY_DAYS`, and the
+    per-object catalog already keeps permanent first_seen/last_seen/present state,
+    so archives past the retention window are dead weight. Returns the removed
+    date-folder names for logging/testing.
+    """
+    root = data_dir / "observations"
+    if not root.exists():
+        return []
+    cutoff = (now or utc_now()).date() - timedelta(days=retention_days)
+    removed = []
+    for folder in sorted(root.glob("????-??-??")):
+        if not folder.is_dir():
+            continue
+        try:
+            day = date.fromisoformat(folder.name)
+        except ValueError:
+            continue
+        if day < cutoff:
+            shutil.rmtree(folder)
+            removed.append(folder.name)
+    return removed
+
+
 def object_list(data_dir, constellation_id, query="", presence="all", page=1, per_page=50):
     catalog = load_json(data_dir / "catalogs" / f"{constellation_id}.json", {"objects": {}})
     query = query.casefold()
@@ -53,7 +90,7 @@ def object_list(data_dir, constellation_id, query="", presence="all", page=1, pe
             "note": "관측 시작·미수록 시점은 발사·퇴역·재진입 시점을 의미하지 않습니다."}
 
 
-def object_history(data_dir, constellation_id, norad_id, days=90, now=None):
+def object_history(data_dir, constellation_id, norad_id, days=MAX_HISTORY_DAYS, now=None):
     catalog = load_json(data_dir / "catalogs" / f"{constellation_id}.json", {"objects": {}})
     record = catalog["objects"].get(str(norad_id))
     if not record:

@@ -14,7 +14,7 @@ from xml.etree import ElementTree
 
 import yaml
 import app
-from tracker.history import object_history, record_observations, trend_data
+from tracker.history import object_history, prune_observations, record_observations, trend_data
 from tracker.metrics import crosscheck, dated_value, progress
 from tracker.storage import iso_time, load_json, save_json
 from updater.update_data import ProviderUnavailable, normalize_records, update
@@ -88,6 +88,14 @@ class DataFixture(unittest.TestCase):
         self.assertEqual(len(catalog["objects"]), 20)
         history = object_history(self.data, "starlink", 100000, now=NOW)
         self.assertEqual(history["samples"][0]["observation"]["norad_cat_id"], 100000)
+
+    def test_collection_run_prunes_stale_observation_archives(self):
+        stale_day = (NOW - timedelta(days=200)).date().isoformat()
+        save_json(self.data/"observations"/stale_day/"starlink.json.gz", {"observed_at": stale_day+"T00:00:00Z", "records": []})
+        self.collect(lambda group: gp(20))
+        remaining = sorted(p.name for p in (self.data/"observations").iterdir())
+        self.assertNotIn(stale_day, remaining)
+        self.assertIn(NOW.date().isoformat(), remaining)
 
     def test_cached_run_makes_no_provider_request(self):
         self.collect(lambda group: gp(20))
@@ -246,6 +254,25 @@ class HistoryTests(unittest.TestCase):
         data = object_history(self.data, "starlink", 100000, now=NOW+timedelta(days=2))
         self.assertEqual([r["present"] for r in data["samples"]], [True, False, True])
         self.assertEqual(data["object"]["first_seen_at"], iso_time(NOW))
+
+    def make_observation_day(self, day):
+        save_json(self.data/"observations"/day/"starlink.json.gz", {"observed_at": day+"T00:00:00Z", "records": []})
+
+    def test_prune_removes_only_archives_past_the_history_window(self):
+        # NOW is 2026-09-05; default retention is 100 days, so the cutoff is 2026-05-28.
+        self.make_observation_day("2026-05-01")   # well past retention -> removed
+        self.make_observation_day("2026-05-27")   # one day before cutoff -> removed
+        self.make_observation_day("2026-05-28")   # exactly at cutoff -> kept
+        self.make_observation_day("2026-08-20")   # inside the 90-day API window -> kept
+        (self.data/"observations"/"not-a-date").mkdir(parents=True)
+        (self.data/"observations"/"stray.txt").write_text("ignore me")
+        removed = prune_observations(self.data, now=NOW)
+        self.assertEqual(sorted(removed), ["2026-05-01", "2026-05-27"])
+        remaining = sorted(p.name for p in (self.data/"observations").iterdir())
+        self.assertEqual(remaining, ["2026-05-28", "2026-08-20", "not-a-date", "stray.txt"])
+
+    def test_prune_is_a_noop_when_observations_directory_is_absent(self):
+        self.assertEqual(prune_observations(self.data, now=NOW), [])
 
 
 class ApiTests(unittest.TestCase):
