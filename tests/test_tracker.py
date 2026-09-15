@@ -28,6 +28,11 @@ def gp(n=2, now=NOW):
              "EPOCH": iso_time(now-timedelta(hours=1)), "MEAN_MOTION": 15.0, "INCLINATION": 42.0} for i in range(n)]
 
 
+def gp_ids(ids, now=NOW):
+    return [{"NORAD_CAT_ID": i, "OBJECT_NAME": f"TEST-{i}", "OBJECT_ID": f"2026-001{chr(65+i%26)}",
+             "EPOCH": iso_time(now-timedelta(hours=1)), "MEAN_MOTION": 15.0, "INCLINATION": 42.0} for i in ids]
+
+
 def claim(value=10, origin="a", day="2026-09-05", metric="tracked", qualifier="exact"):
     return {"source_id": origin, "origin_id": origin, "value": value, "date": day,
             "metric": metric, "scope": "all_catalogued", "qualifier": qualifier}
@@ -175,6 +180,28 @@ class DataFixture(unittest.TestCase):
         row = result["constellations"][0]
         self.assertEqual(row["observation"]["status"], "legacy")
         self.assertIsNone(row["observation"]["last_success_at"])
+
+    def test_composition_churn_with_unchanged_count_is_flagged_distinctly(self):
+        # Same total both times, but the members underneath it are not the same
+        # set: 5 objects drop out of the catalog while 5 different ones appear.
+        first_ids = list(range(100000, 100020))
+        self.collect(lambda group: gp_ids(first_ids))
+        second_ids = first_ids[5:] + list(range(200000, 200005))
+        later = NOW + timedelta(days=1)
+        self.collect(lambda group: gp_ids(second_ids, later), now=later)
+        events = load_json(self.data/"changes.json")
+        self.assertFalse(any(e["type"] == "tracking_update" for e in events))
+        event = next(e for e in events if e["type"] == "composition_change")
+        self.assertEqual(event["constellation_id"], "starlink")
+        self.assertEqual(event["previous"], 20)
+        self.assertEqual(event["current"], 20)
+        self.assertEqual(event["added"], 5)
+        self.assertEqual(event["missing"], 5)
+        # Must not be presented as a confirmed launch or retirement -- the event
+        # type itself is a neutral "composition_change", and the note explicitly
+        # disclaims interpreting the churn as either.
+        self.assertNotEqual(event["type"], "tracking_update")
+        self.assertIn("확인되지 않았습니다", event["note"])
 
     def test_partial_collection_keeps_other_successful_observations(self):
         other = dict(self.plan, id="oneweb", name="OneWeb", celestrak_group="ONEWEB")

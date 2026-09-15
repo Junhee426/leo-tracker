@@ -137,6 +137,20 @@ def detect_count_changes(previous, current):
         a, b = before.get("tracked_in_orbit"), row.get("tracked_in_orbit")
         source_changed = before.get("tracked_source") != row.get("tracked_source")
         if a == b and not source_changed:
+            membership = row["observation"].get("membership") or {}
+            added, missing = membership.get("added"), membership.get("missing")
+            # Same total, but objects were both gained and lost underneath it: the
+            # catalog's composition changed even though the count did not. This is
+            # not itself a launch or a retirement -- just flag that membership churned.
+            if added and missing:
+                events.append({"event_id": f"{current['generated_at']}:{row['id']}:composition_change",
+                               "date": current["generated_at"][:10], "observed_at": current["generated_at"],
+                               "constellation_id": row["id"], "constellation": row["name"], "type": "composition_change",
+                               "field": "Catalog composition", "previous": a, "current": b,
+                               "added": added, "missing": missing, "source_id": "celestrak_groups",
+                               "previous_source": before.get("tracked_source"), "current_source": row["tracked_source"],
+                               "previous_date": before.get("last_data_date"), "current_date": row.get("last_data_date"),
+                               "note": "추적 수는 동일하지만 카탈로그 구성원이 교체되었습니다. 발사·퇴역 여부는 확인되지 않았습니다."})
             continue
         event_type = "source_change" if source_changed else "tracking_update"
         events.append({"event_id": f"{current['generated_at']}:{row['id']}:{event_type}",
