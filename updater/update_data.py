@@ -109,7 +109,7 @@ def build_entry(plan, live, sources, observation):
     # The provider currently collects the whole group. Configuration alone must
     # not relabel those objects as a generation-specific cohort.
     ratio = progress({**plan, "count_scope": "all_catalogued"}, count)
-    points = build_points(plan, live, sources)
+    points = build_points(plan, live, sources, observation)
     source_ids = sorted(set(plan.get("source_ids", [])) | {p["source_id"] for p in points})
     return {**{key: plan.get(key) for key in ("id", "name", "operator", "country", "flag", "status", "orbit_label",
                                              "next_milestone", "target_service", "planned_satellites", "planned_label", "note")},
@@ -181,16 +181,18 @@ def update(data_dir=DATA, fetcher=None, now=None, refresh_derived=False):
     for plan in plans:
         old = old_by_id.get(plan["id"], {})
         live = previous_live(old)
+        # last_success_at is strictly "when was this count observed" and must never
+        # be inferred from last_data_date/epoch_max (the orbital elements' own
+        # epoch, tracked separately and carried through by previous_live()). A row
+        # saved before per-row observation timestamps existed keeps an unknown
+        # observation time rather than borrowing the epoch date as a stand-in;
+        # downstream comparisons then defer on it instead of guessing a match.
         last_success = old.get("observation", {}).get("last_success_at")
-        if not last_success and live:
-            # A legacy fallback row must not gain a new success timestamp.
-            old_stamp = previous.get("generated_at")
-            last_success = old_stamp if old_stamp and old_stamp[:10] == old.get("last_data_date") else old.get("last_data_date")
-        observation = {"status": "manual", "last_attempt_at": None, "last_success_at": last_success, "error": None}
+        observation = {"status": "legacy" if live and not last_success else "manual",
+                       "last_attempt_at": None, "last_success_at": last_success, "error": None}
         group = plan.get("celestrak_group")
         if group and refresh_derived:
-            observation = dict(old.get("observation") or {"status": "legacy" if live else "unavailable",
-                               "last_attempt_at": previous.get("generated_at"), "last_success_at": last_success, "error": None})
+            observation = dict(old.get("observation") or {**observation, "last_attempt_at": previous.get("generated_at")})
         elif group:
             observation["last_attempt_at"] = iso_time(now)
             last = parse_time(last_success)
