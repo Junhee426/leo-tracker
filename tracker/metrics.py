@@ -51,11 +51,20 @@ def dated_value(value):
             "date_start": None, "date_end": None}
 
 
-def build_points(plan, live, sources):
+def build_points(plan, live, sources, observation=None):
     points = []
     if live and live.get("tracked_in_orbit") is not None:
+        # The count's "as of" date is when it was actually observed (collected),
+        # never the orbital elements' own epoch (epoch_min/epoch_max, surfaced
+        # separately as last_data_date). Elements can lag the collection date by
+        # a day or more, so borrowing the epoch here would let two independent,
+        # differently-timed observations that happen to share a value look like
+        # a same-day match. An unknown observation time is left unknown rather
+        # than guessed, so the comparison below defers instead of matching.
+        observed_at = (observation or {}).get("last_success_at")
         points.append({"source_id": "celestrak_groups", "metric": "tracked", "scope": "all_catalogued",
-                       "value": live["tracked_in_orbit"], "date": live.get("last_data_date"), "qualifier": "exact"})
+                       "value": live["tracked_in_orbit"], "date": observed_at[:10] if observed_at else None,
+                       "qualifier": "exact"})
     reference = plan.get("manual_reference_count")
     if numeric(reference) and plan.get("manual_reference_source_id"):
         points.append({"source_id": plan["manual_reference_source_id"], "value": reference,
