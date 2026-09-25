@@ -41,7 +41,7 @@ function renderRoadmap(data) {
   $('#detailRoadmap').innerHTML=data.filter(r=>r.constellation_id===cid).map(r=>`<div class="mini-roadmap-item"><div><strong>${esc(r.milestone)}</strong><small>${esc(r.category)}</small></div>${trendBadge(r)}<div class="mini-compare"><span>${esc(r.baseline)}</span><b>→</b><span>${esc(r.current)}</span></div></div>`).join('')||'<div class="empty">공개된 비교 기준선이 없습니다.</div>';
 }
 function renderChanges(data) {
-  $('#detailChanges').innerHTML=data.filter(r=>r.constellation_id===cid).map(r=>`<div class="stack-item"><small>${esc(r.date)} · ${r.type==='source_change'?'집계 기준 변경':esc(r.type)}</small><strong>${esc(r.field)}</strong><p>${esc(r.previous??'—')} → ${esc(r.current??'—')}</p>${r.note?`<small>${esc(r.note)}</small>`:''}</div>`).join('')||'<div class="empty">변경 이력이 없습니다.</div>';
+  $('#detailChanges').innerHTML=data.filter(r=>r.constellation_id===cid).map(r=>`<div class="stack-item"><small>${esc(r.date)} · ${({source_change:'집계 기준 변경',composition_change:'구성 변경'})[r.type]||esc(r.type)}</small><strong>${esc(r.field)}</strong><p>${esc(r.previous??'—')} → ${esc(r.current??'—')}</p>${r.note?`<small>${esc(r.note)}</small>`:''}</div>`).join('')||'<div class="empty">변경 이력이 없습니다.</div>';
 }
 async function loadObjects() {
   const requestId=++objectRequest;

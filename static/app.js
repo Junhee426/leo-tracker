@@ -54,7 +54,7 @@ function renderRoadmap() {
 function renderChanges() {
   if(!state.changes) return;
   const byId=sourceMap();
-  $('#changeList').innerHTML=state.changes.map(r=>`<div class="change-item"><div class="change-date">${esc(r.date)}<br>${r.type==='source_change'?'집계 기준 변경':esc(r.type)}</div><div class="change-title"><strong>${esc(r.constellation)}</strong><small>${esc(r.field)}</small></div><div class="delta">${esc(r.previous??'—')} → <strong>${esc(r.current??'—')}</strong><br><small>${sourceLink(r.source_id,byId)}${r.note?' · '+esc(r.note):''}</small></div></div>`).join('')||'<div class="empty">변경 이력이 없습니다.</div>';
+  $('#changeList').innerHTML=state.changes.map(r=>`<div class="change-item"><div class="change-date">${esc(r.date)}<br>${({source_change:'집계 기준 변경',composition_change:'구성 변경'})[r.type]||esc(r.type)}</div><div class="change-title"><strong>${esc(r.constellation)}</strong><small>${esc(r.field)}</small></div><div class="delta">${esc(r.previous??'—')} → <strong>${esc(r.current??'—')}</strong><br><small>${sourceLink(r.source_id,byId)}${r.note?' · '+esc(r.note):''}</small></div></div>`).join('')||'<div class="empty">변경 이력이 없습니다.</div>';
 }
 function renderSources() {
   $('#sourceList').innerHTML=state.sources.map(r=>`<article class="source-card"><span class="tag ${esc(r.type)}">${esc(r.type)}</span><h4>${esc(r.title)}</h4><small>${esc(r.publisher)} · ${esc(r.date)}</small><p>${esc(r.note)}</p><a href="${safeUrl(r.url)}" target="_blank" rel="noopener">원문 보기 ↗</a></article>`).join('');
