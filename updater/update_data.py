@@ -109,7 +109,7 @@ def build_entry(plan, live, sources, observation):
     # The provider currently collects the whole group. Configuration alone must
     # not relabel those objects as a generation-specific cohort.
     ratio = progress({**plan, "count_scope": "all_catalogued"}, count)
-    points = build_points(plan, live, sources)
+    points = build_points(plan, live, sources, observation)
     source_ids = sorted(set(plan.get("source_ids", [])) | {p["source_id"] for p in points})
     return {**{key: plan.get(key) for key in ("id", "name", "operator", "country", "flag", "status", "orbit_label",
                                              "next_milestone", "target_service", "planned_satellites", "planned_label", "note")},
@@ -137,6 +137,20 @@ def detect_count_changes(previous, current):
         a, b = before.get("tracked_in_orbit"), row.get("tracked_in_orbit")
         source_changed = before.get("tracked_source") != row.get("tracked_source")
         if a == b and not source_changed:
+            membership = row["observation"].get("membership") or {}
+            added, missing = membership.get("added"), membership.get("missing")
+            # Same total, but objects were both gained and lost underneath it: the
+            # catalog's composition changed even though the count did not. This is
+            # not itself a launch or a retirement -- just flag that membership churned.
+            if added and missing:
+                events.append({"event_id": f"{current['generated_at']}:{row['id']}:composition_change",
+                               "date": current["generated_at"][:10], "observed_at": current["generated_at"],
+                               "constellation_id": row["id"], "constellation": row["name"], "type": "composition_change",
+                               "field": "Catalog composition", "previous": a, "current": b,
+                               "added": added, "missing": missing, "source_id": "celestrak_groups",
+                               "previous_source": before.get("tracked_source"), "current_source": row["tracked_source"],
+                               "previous_date": before.get("last_data_date"), "current_date": row.get("last_data_date"),
+                               "note": "추적 수는 동일하지만 카탈로그 구성원이 교체되었습니다. 발사·퇴역 여부는 확인되지 않았습니다."})
             continue
         event_type = "source_change" if source_changed else "tracking_update"
         events.append({"event_id": f"{current['generated_at']}:{row['id']}:{event_type}",
@@ -181,16 +195,18 @@ def update(data_dir=DATA, fetcher=None, now=None, refresh_derived=False):
     for plan in plans:
         old = old_by_id.get(plan["id"], {})
         live = previous_live(old)
+        # last_success_at is strictly "when was this count observed" and must never
+        # be inferred from last_data_date/epoch_max (the orbital elements' own
+        # epoch, tracked separately and carried through by previous_live()). A row
+        # saved before per-row observation timestamps existed keeps an unknown
+        # observation time rather than borrowing the epoch date as a stand-in;
+        # downstream comparisons then defer on it instead of guessing a match.
         last_success = old.get("observation", {}).get("last_success_at")
-        if not last_success and live:
-            # A legacy fallback row must not gain a new success timestamp.
-            old_stamp = previous.get("generated_at")
-            last_success = old_stamp if old_stamp and old_stamp[:10] == old.get("last_data_date") else old.get("last_data_date")
-        observation = {"status": "manual", "last_attempt_at": None, "last_success_at": last_success, "error": None}
+        observation = {"status": "legacy" if live and not last_success else "manual",
+                       "last_attempt_at": None, "last_success_at": last_success, "error": None}
         group = plan.get("celestrak_group")
         if group and refresh_derived:
-            observation = dict(old.get("observation") or {"status": "legacy" if live else "unavailable",
-                               "last_attempt_at": previous.get("generated_at"), "last_success_at": last_success, "error": None})
+            observation = dict(old.get("observation") or {**observation, "last_attempt_at": previous.get("generated_at")})
         elif group:
             observation["last_attempt_at"] = iso_time(now)
             last = parse_time(last_success)

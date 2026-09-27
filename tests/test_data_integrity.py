@@ -32,7 +32,13 @@ class DataIntegrityTests(unittest.TestCase):
                 for point in row["crosscheck_points"]:
                     if point.get("source_id") == "celestrak_groups" and point.get("metric") == "tracked":
                         self.assertEqual(point["value"], row["tracked_in_orbit"])
-                        self.assertEqual(point["date"], row["last_data_date"])
+                        # The crosscheck point's date is when the count was OBSERVED
+                        # (observation.last_success_at), never the orbital elements'
+                        # own epoch (last_data_date/epoch_max) -- those can diverge
+                        # when elements lag the collection day. They coincide in this
+                        # committed snapshot only because collection succeeded same-day.
+                        last_success_at = row.get("observation", {}).get("last_success_at")
+                        self.assertEqual(point["date"], last_success_at[:10] if last_success_at else None)
 
 
 if __name__ == "__main__":

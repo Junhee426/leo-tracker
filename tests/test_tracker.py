@@ -15,7 +15,7 @@ from xml.etree import ElementTree
 import yaml
 import app
 from tracker.history import object_history, prune_observations, record_observations, trend_data
-from tracker.metrics import crosscheck, dated_value, progress
+from tracker.metrics import build_points, crosscheck, dated_value, progress
 from tracker.storage import iso_time, load_json, save_json
 from updater.update_data import ProviderUnavailable, normalize_records, update
 
@@ -26,6 +26,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def gp(n=2, now=NOW):
     return [{"NORAD_CAT_ID": 100000+i, "OBJECT_NAME": f"TEST-{i}", "OBJECT_ID": f"2026-001{chr(65+i%26)}",
              "EPOCH": iso_time(now-timedelta(hours=1)), "MEAN_MOTION": 15.0, "INCLINATION": 42.0} for i in range(n)]
+
+
+def gp_ids(ids, now=NOW):
+    return [{"NORAD_CAT_ID": i, "OBJECT_NAME": f"TEST-{i}", "OBJECT_ID": f"2026-001{chr(65+i%26)}",
+             "EPOCH": iso_time(now-timedelta(hours=1)), "MEAN_MOTION": 15.0, "INCLINATION": 42.0} for i in ids]
 
 
 def claim(value=10, origin="a", day="2026-09-05", metric="tracked", qualifier="exact"):
@@ -151,6 +156,53 @@ class DataFixture(unittest.TestCase):
         result = self.collect(lambda group: gp(20))
         self.assertIsNone(result["constellations"][0]["deployment_pct"])
 
+    def test_legacy_row_without_observation_timestamp_is_not_guessed_from_epoch(self):
+        # Simulate data saved before per-row observation timestamps existed: a
+        # live count and an epoch-derived last_data_date, but no recorded
+        # observation.last_success_at at all.
+        self.old.pop("observation")
+        save_json(self.data/"current.json", {"generated_at": "2026-09-03T12:00:00Z", "update_mode": "live", "constellations": [self.old]})
+        result = self.collect(Mock(side_effect=ProviderUnavailable("offline")))
+        row = result["constellations"][0]
+        # A failed attempt must not invent an observation time from last_data_date/epoch.
+        self.assertIsNone(row["observation"]["last_success_at"])
+        self.assertEqual(row["observation"]["status"], "stale")
+        self.assertEqual(row["tracked_in_orbit"], 20)
+        # A later, genuinely successful fetch records the true collection time.
+        later = NOW + timedelta(days=1)
+        result2 = self.collect(lambda group: gp(20, later), now=later)
+        self.assertEqual(result2["constellations"][0]["observation"]["last_success_at"], iso_time(later))
+
+    def test_refresh_derived_leaves_unknown_observation_time_unknown(self):
+        self.old.pop("observation")
+        save_json(self.data/"current.json", {"generated_at": "2026-09-03T12:00:00Z", "update_mode": "live", "constellations": [self.old]})
+        result = self.collect(Mock(side_effect=AssertionError("must not fetch")), refresh_derived=True)
+        row = result["constellations"][0]
+        self.assertEqual(row["observation"]["status"], "legacy")
+        self.assertIsNone(row["observation"]["last_success_at"])
+
+    def test_composition_churn_with_unchanged_count_is_flagged_distinctly(self):
+        # Same total both times, but the members underneath it are not the same
+        # set: 5 objects drop out of the catalog while 5 different ones appear.
+        first_ids = list(range(100000, 100020))
+        self.collect(lambda group: gp_ids(first_ids))
+        second_ids = first_ids[5:] + list(range(200000, 200005))
+        later = NOW + timedelta(days=1)
+        self.collect(lambda group: gp_ids(second_ids, later), now=later)
+        events = load_json(self.data/"changes.json")
+        self.assertFalse(any(e["type"] == "tracking_update" for e in events))
+        event = next(e for e in events if e["type"] == "composition_change")
+        self.assertEqual(event["constellation_id"], "starlink")
+        self.assertEqual(event["previous"], 20)
+        self.assertEqual(event["current"], 20)
+        self.assertEqual(event["added"], 5)
+        self.assertEqual(event["missing"], 5)
+        # Must not be presented as a confirmed launch or retirement -- the event
+        # type itself is a neutral "composition_change", and the note explicitly
+        # disclaims interpreting the churn as either.
+        self.assertNotEqual(event["type"], "tracking_update")
+        self.assertIn("확인되지 않았습니다", event["note"])
+
     def test_partial_collection_keeps_other_successful_observations(self):
         other = dict(self.plan, id="oneweb", name="OneWeb", celestrak_group="ONEWEB")
         (self.data/"plans.yaml").write_text(yaml.safe_dump({"constellations": [self.plan, other]}))
@@ -210,6 +262,36 @@ class MetricsTests(unittest.TestCase):
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]["epoch"], newer["EPOCH"])
 
+    def test_crosscheck_date_is_the_observation_time_not_the_epoch(self):
+        # Counted on 9/14 (observation.last_success_at) using elements whose
+        # epoch is 9/13 (last_data_date) -- the crosscheck point must carry the
+        # observation date, never the epoch date.
+        live = {"tracked_in_orbit": 100, "last_data_date": "2026-09-13", "epoch_max": "2026-09-13T00:00:00Z"}
+        observation = {"status": "fresh", "last_success_at": "2026-09-14T23:00:00Z"}
+        points = build_points({}, live, {}, observation)
+        point = next(p for p in points if p["source_id"] == "celestrak_groups")
+        self.assertEqual(point["date"], "2026-09-14")
+        self.assertNotEqual(point["date"], live["last_data_date"])
+
+    def test_unknown_observation_time_is_not_guessed_from_epoch(self):
+        live = {"tracked_in_orbit": 100, "last_data_date": "2026-09-13"}
+        points = build_points({}, live, {}, None)
+        point = next(p for p in points if p["source_id"] == "celestrak_groups")
+        self.assertIsNone(point["date"])
+
+    def test_same_count_different_observation_day_is_not_a_false_match(self):
+        # A 9/14 observation (count=100, elements epoched 9/13) sharing a value
+        # with an independent 9/13 reference must not be reported as a same-day
+        # match: they are different observations that happen to share a count.
+        live = {"tracked_in_orbit": 100, "last_data_date": "2026-09-13"}
+        observation = {"status": "fresh", "last_success_at": "2026-09-14T23:00:00Z"}
+        plan = {"manual_reference_count": 100, "manual_reference_date": "2026-09-13",
+                "manual_reference_source_id": "operator", "manual_reference_metric": "tracked",
+                "manual_reference_scope": "all_catalogued"}
+        sources = {"celestrak_groups": {"origin_id": "18sds_gp"}, "operator": {"origin_id": "operator"}}
+        points = build_points(plan, live, sources, observation)
+        self.assertEqual(self.check_status(points), "different_dates")
+
     def test_invalid_elements_are_not_accepted(self):
         for field, value in [("MEAN_MOTION", float("nan")), ("MEAN_MOTION", 0), ("MEAN_MOTION", 1e-300), ("MEAN_MOTION", True), ("INCLINATION", 181), ("NORAD_CAT_ID", True), ("EPOCH", "bad")]:
             row = gp(1)[0]; row[field] = value
@@ -236,6 +318,20 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual(len(data["series"][0]["points"]), 2)
         self.assertEqual(data["monthly"][0]["net_change"], 72)
         self.assertFalse(data["monthly"][0]["complete_month"])
+
+    def test_trend_bucket_uses_observation_time_not_epoch(self):
+        # Elements epoched 9/13 (last_data_date) but genuinely collected 9/14
+        # (observation.last_success_at) must land in the 9/14 bucket, not 9/13 --
+        # otherwise it could silently overwrite or be conflated with an
+        # independent, real 9/13 observation.
+        payload = {"generated_at": "2026-09-14T23:00:00Z", "failures": [], "constellations": [
+            {"id": "starlink", "name": "Starlink", "tracked_source": "celestrak", "tracked_in_orbit": 100,
+             "last_data_date": "2026-09-13",
+             "observation": {"status": "fresh", "last_success_at": "2026-09-14T23:00:00Z"}}]}
+        save_json(self.data/"snapshots"/"2026-09-14.json", payload)
+        data = trend_data(self.data, now=datetime(2026, 9, 20, tzinfo=timezone.utc))
+        point = data["series"][0]["points"][0]
+        self.assertEqual(point["date"], "2026-09-14")
 
     def test_month_boundary_uses_last_preceding_observation(self):
         self.snapshot("2026-08-31", 100)
