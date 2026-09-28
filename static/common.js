@@ -42,7 +42,7 @@ window.LEO = (() => {
     const x=t=>pad+(t-times[0])/Math.max(86400000,times.at(-1)-times[0])*(width-pad*2);
     const y=v=>height-pad-(v-min)/(max-min)*(height-pad*2);
     let path='';
-    points.forEach((p,i)=>{path+=`${!i||times[i]-times[i-1]>1.5*86400000?'M':'L'}${x(times[i]).toFixed(2)},${y(p.value).toFixed(2)} `;});
+    points.forEach((p,i)=>{path+=`${!i||times[i]-times[i-1]>1.5*86400000||p.scope!==points[i-1].scope?'M':'L'}${x(times[i]).toFixed(2)},${y(p.value).toFixed(2)} `;});
     const ticks=[min,(min+max)/2,max].map(v=>`<line x1="${pad}" y1="${y(v)}" x2="${width-pad}" y2="${y(v)}" class="chart-grid"/><text x="${pad-8}" y="${y(v)+4}" text-anchor="end">${number(Math.round(v))}</text>`).join('');
     return `<svg class="trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="카탈로그 추적 수. ${esc(points[0].date)} ${number(points[0].value)}기부터 ${esc(points.at(-1).date)} ${number(points.at(-1).value)}기까지. 날짜 공백은 선을 끊어 표시합니다.">${ticks}<path d="${path}" class="chart-line"/>${points.map((p,i)=>`<circle cx="${x(times[i])}" cy="${y(p.value)}" r="3.5"><title>${esc(p.date)} · ${number(p.value)}기</title></circle>`).join('')}<text x="${pad}" y="${height-15}">${esc(points[0].date)}</text><text x="${width-pad}" y="${height-15}" text-anchor="end">${esc(points.at(-1).date)}</text></svg>`;
   }
@@ -52,7 +52,12 @@ window.LEO = (() => {
   }
   function activityTable(rows) {
     if (!rows.length) return '<p class="empty">비교할 위성망이 없습니다.</p>';
-    return `<div class="table-wrap"><table><thead><tr><th>위성망</th><th>실제 비교 기간 (UTC)</th><th class="num">첫 관측 → 마지막 관측</th><th class="num">순증감</th><th class="num">변화율</th><th>관측 범위</th></tr></thead><tbody>${rows.map(r=>`<tr><td><a href="/constellation/${encodeURIComponent(r.constellation_id)}">${esc(r.constellation)}</a></td><td>${esc(r.baseline_date||'—')} → ${esc(r.end_date||'—')}</td><td class="num">${number(r.start_count)} → ${number(r.end_count)}</td><td class="num ${r.net_change>0?'positive':r.net_change<0?'negative':''}">${r.net_change>0?'+':''}${number(r.net_change)}</td><td class="num">${r.change_pct>0?'+':''}${number(r.change_pct)}${r.change_pct==null?'':'%'}</td><td>${r.coverage==='complete'?'전체 기간':'일부 기간'} · ${number(r.observed_days)}/${number(r.expected_days)}일<br><small>관측 공백 ${number(r.missing_days)}일${r.comparison_status==='scope_changed'?' · 집계 범위 변경으로 비교 보류':r.comparison_status==='insufficient'?' · 비교 관측 부족':''}</small></td></tr>`).join('')}</tbody></table></div>`;
+    return `<div class="table-wrap"><table><thead><tr><th>위성망 / 최신성</th><th>실제 비교 기간 (UTC)</th><th class="num">첫 관측 → 마지막 관측</th><th class="num">순증감</th><th class="num">변화율</th><th class="num">일평균 순증감</th><th>관측 범위</th></tr></thead><tbody>${rows.map(r=>`<tr><td><a href="/constellation/${encodeURIComponent(r.constellation_id)}">${esc(r.constellation)}</a><br><span class="freshness ${r.freshness==='recent'?'recent':'old'}">${r.freshness==='recent'?'48시간 내 관측':r.freshness==='stale'?'48시간 초과':'관측 시각 없음'}</span><br><small>${dateTime(r.latest_observed_at)}</small></td><td>${esc(r.baseline_date||'—')} → ${esc(r.end_date||'—')}</td><td class="num">${number(r.start_count)} → ${number(r.end_count)}</td><td class="num ${r.net_change>0?'positive':r.net_change<0?'negative':''}">${r.net_change>0?'+':''}${number(r.net_change)}</td><td class="num">${r.change_pct>0?'+':''}${number(r.change_pct)}${r.change_pct==null?'':'%'}</td><td class="num">${r.daily_net_change>0?'+':''}${number(r.daily_net_change)}</td><td>${r.coverage==='complete'?'전체 기간':'일부 기간'} · ${number(r.observed_days)}/${number(r.expected_days)}일<br><small>관측 공백 ${number(r.missing_days)}일${r.comparison_status==='scope_changed'?' · 집계 범위 변경으로 비교 보류':r.comparison_status==='insufficient'?' · 비교 관측 부족':''}</small></td></tr>`).join('')}</tbody></table></div>`;
   }
-  return {esc,number,statusLabel,scopeLabel,qualityLabel,dateTime,safeUrl,fetchJSON,errorBox,sourceLink,trendBadge,crosschecks,lineChart,monthlyTable,activityTable};
+  function activitySummary(summary) {
+    if(!summary) return '';
+    const cards=[['비교 가능한 위성망',`${number(summary.comparable)} / ${number(summary.total)}`,'선택 기간에 비교 가능한 관측 보유'],['증가 / 감소',`${number(summary.increasing)} / ${number(summary.decreasing)}`,'위성망별 실제 비교 기간 기준'],['변동 없는 위성망',number(summary.unchanged),'관측 사이 순증감 0'],['최신 관측 확인 필요',number(summary.stale),'마지막 관측 이후 48시간 초과']];
+    return cards.map(([label,value,note])=>`<article class="insight-card"><span>${label}</span><strong>${value}</strong><small>${note}</small></article>`).join('');
+  }
+  return {esc,number,statusLabel,scopeLabel,qualityLabel,dateTime,safeUrl,fetchJSON,errorBox,sourceLink,trendBadge,crosschecks,lineChart,monthlyTable,activityTable,activitySummary};
 })();

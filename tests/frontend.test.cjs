@@ -128,3 +128,37 @@ test('a late activity response cannot overwrite a newer period selection',async(
   assert.match(el('#activityNote').textContent,/new period/);
   assert.doesNotMatch(el('#activityNote').textContent,/old period/);
 });
+
+test('activity filters distinguish unknown counts from zero and sort percentage',async()=>{
+  const rows=[{constellation:'Unknown',net_change:null,change_pct:null},
+    {constellation:'Flat',net_change:0,change_pct:0},
+    {constellation:'Large',net_change:100,change_pct:2},
+    {constellation:'Small',net_change:10,change_pct:20}];
+  const {context,el}=environment(()=>({rows,days:30,from:'a',through:'b',note:'',warnings:[]}));
+  loadScript(context,'app.js');
+  await context.loadActivity();
+  el('#activityDirection').value='flat';context.renderActivity();
+  assert.match(el('#activityTable').innerHTML,/Flat/);
+  assert.doesNotMatch(el('#activityTable').innerHTML,/Unknown/);
+  el('#activityDirection').value='up';el('#activitySort').value='change_pct';context.renderActivity();
+  const html=el('#activityTable').innerHTML;
+  assert.ok(html.indexOf('Small')<html.indexOf('Large'));
+  el('#activitySearch').value='large';context.renderActivity();
+  assert.doesNotMatch(el('#activityTable').innerHTML,/Small/);
+});
+
+test('chart breaks when the measurement scope changes',()=>{
+  const {context}=environment(()=>[]);
+  const html=context.LEO.lineChart([{date:'2026-09-01',value:100,scope:'all'},
+    {date:'2026-09-02',value:20,scope:'gen2'}]);
+  assert.equal((html.match(/<path d="([^"]*)"/)[1].match(/M/g)||[]).length,2);
+});
+
+test('trend failure clears the previous chart and hides the old download',async()=>{
+  const {context,el}=environment(()=>{throw new Error('outage');});
+  loadScript(context,'app.js');
+  el('#trendChart').innerHTML='old chart';
+  await context.loadTrends();
+  assert.equal(el('#trendChart').innerHTML,'');
+  assert.equal(el('#downloadTrends').hidden,true);
+});

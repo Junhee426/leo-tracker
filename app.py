@@ -262,6 +262,16 @@ def download_trends():
     return csv_response(trend_export_rows(cid, bounded_int("months", 12, 1, 36)), "leo-monthly-trends-v1.2.csv")
 
 
+@app.get("/download/activity.csv")
+def download_activity():
+    days = bounded_int("days", 30, 1, 90)
+    data = recent_activity(DATA_DIR, current_payload(), days)
+    keys = ["constellation", "baseline_date", "end_date", "start_count", "end_count",
+            "net_change", "change_pct", "daily_net_change", "observed_days", "expected_days",
+            "missing_days", "coverage", "comparison_status", "freshness", "latest_observed_at", "age_hours"]
+    return csv_response([keys] + [[r.get(k) for k in keys] for r in data["rows"]], f"leo-activity-{days}d.csv")
+
+
 @app.get("/download/tracker.xlsx")
 def download_xlsx():
     return send_file(workbook(export_sheets()), mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

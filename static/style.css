@@ -14,6 +14,20 @@
   --orange: #ff9f5a;
   --red: #ff7272;
 }
+[hidden] {display:none !important;}
+.insight-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:0 18px 18px;}
+.insight-grid:empty {display:none;}
+.insight-card {display:flex;flex-direction:column;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:18px;}
+.insight-card span {color:var(--muted);font-size:.875rem;}
+.insight-card strong {font-size:1.8rem;font-variant-numeric:tabular-nums;}
+.insight-card small {color:var(--muted);font-size:.8rem;}
+.activity-toolbar {padding:0 18px 18px;}
+.freshness {display:inline-block;font-size:.75rem;margin-top:6px;}
+.freshness.recent {color:var(--green);}
+.freshness.old {color:var(--yellow);}
+#activityTable table {min-width:1000px;}
+@media(max-width:900px){.insight-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:480px){.insight-grid{grid-template-columns:1fr;}.insight-card{gap:4px;padding:12px;}}
 * { box-sizing: border-box; }
 html { color-scheme: dark; }
 body { margin: 0; font-family: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at 85% 0%, #102e4d 0, transparent 30%), var(--bg); color: var(--text); }

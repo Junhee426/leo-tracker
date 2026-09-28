@@ -83,3 +83,54 @@ class ActivityTests(unittest.TestCase):
             self.assertEqual(len(client.get("/api/activity?days=7").json["rows"]), 2)
             for value in ("0", "91", "bad"):
                 self.assertEqual(client.get("/api/activity?days=" + value).status_code, 400)
+
+    def test_daily_change_uses_elapsed_time_not_sample_count(self):
+        self.point("2026-09-05", 100)
+        self.point("2026-09-09", 120)
+        data = self.report()
+        row = data["rows"][0]
+        self.assertEqual(row["daily_net_change"], 5)
+        self.assertEqual(row["freshness"], "stale")
+        self.assertEqual(data["summary"], {"total": 2, "comparable": 1, "increasing": 1,
+                                           "decreasing": 0, "unchanged": 0, "stale": 1})
+
+    def test_freshness_remains_visible_outside_selected_period(self):
+        self.point("2026-09-01", 100)
+        row = next(r for r in self.report()["rows"] if r["constellation_id"] == "test")
+        self.assertIsNone(row["net_change"])
+        self.assertEqual(row["freshness"], "stale")
+        self.assertTrue(row["latest_observed_at"].startswith("2026-09-01"))
+
+    def test_csv_matches_api_and_rejects_invalid_days(self):
+        import csv
+        import io
+        self.point("2026-09-05", 100)
+        self.point("2026-09-12", 114)
+        save_json(self.data / "current.json", self.current)
+        with patch.object(app, "DATA_DIR", self.data), patch("tracker.insights.utc_now", return_value=NOW):
+            client = app.app.test_client()
+            response = client.get("/download/activity.csv?days=7")
+            rows = list(csv.DictReader(io.StringIO(response.data.decode("utf-8-sig"))))
+            api = client.get("/api/activity?days=7").json
+            self.assertEqual(float(rows[0]["daily_net_change"]), api["rows"][0]["daily_net_change"])
+            self.assertEqual(rows[1]["net_change"], "")
+            self.assertEqual(client.get("/download/activity.csv?days=91").status_code, 400)
+
+    def test_malformed_rows_and_future_observations_are_skipped(self):
+        self.point("2026-09-05", 100)
+        self.point("2026-09-06", 999, observed="2026-09-07T12:00:00Z")
+        save_json(self.data / "snapshots" / "malformed.json", {
+            "generated_at": "2026-09-08T12:00:00Z", "constellations": [None, {"id": "test"}]})
+        save_json(self.data / "snapshots" / "bad-list.json", {"constellations": None})
+        data = self.report()
+        row = next(r for r in data["rows"] if r["constellation_id"] == "test")
+        self.assertEqual(row["observed_days"], 1)
+        self.assertEqual(len(data["warnings"]), 4)
+
+    def test_monthly_comparison_blocks_intermediate_scope_change(self):
+        from tracker.history import trend_data
+        self.point("2026-09-05", 100)
+        self.point("2026-09-07", 120, scope="gen2")
+        self.point("2026-09-12", 140)
+        data = trend_data(self.data, now=NOW)
+        self.assertIsNone(data["monthly"][0]["net_change"])

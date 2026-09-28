@@ -54,7 +54,9 @@ function renderRoadmap() {
 function renderChanges() {
   if(!state.changes) return;
   const byId=sourceMap();
-  $('#changeList').innerHTML=state.changes.map(r=>`<div class="change-item"><div class="change-date">${esc(r.date)}<br>${r.type==='source_change'?'집계 기준 변경':esc(r.type)}</div><div class="change-title"><strong>${esc(r.constellation)}</strong><small>${esc(r.field)}</small></div><div class="delta">${esc(r.previous??'—')} → <strong>${esc(r.current??'—')}</strong><br><small>${sourceLink(r.source_id,byId)}${r.note?' · '+esc(r.note):''}</small></div></div>`).join('')||'<div class="empty">변경 이력이 없습니다.</div>';
+  const q=$('#changeSearch').value.trim().toLowerCase(),type=$('#changeType').value||'all';
+  const rows=state.changes.filter(r=>(!q||`${r.constellation} ${r.field} ${r.note||''}`.toLowerCase().includes(q))&&(type==='all'||(type==='other'?!['tracking_update','source_change'].includes(r.type):r.type===type))).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  $('#changeList').innerHTML=rows.map(r=>`<div class="change-item"><div class="change-date">${esc(r.date)}<br>${({source_change:'집계 기준 변경',tracking_update:'추적 수량 변경'})[r.type]||esc(r.type)}</div><div class="change-title"><strong>${esc(r.constellation)}</strong><small>${esc(r.field)}</small></div><div class="delta">${esc(r.previous??'—')} → <strong>${esc(r.current??'—')}</strong><br><small>${sourceLink(r.source_id,byId)}${r.note?' · '+esc(r.note):''}</small></div></div>`).join('')||'<div class="empty">조건에 맞는 변경 이력이 없습니다.</div>';
 }
 function renderSources() {
   $('#sourceList').innerHTML=state.sources.map(r=>`<article class="source-card"><span class="tag ${esc(r.type)}">${esc(r.type)}</span><h4>${esc(r.title)}</h4><small>${esc(r.publisher)} · ${esc(r.date)}</small><p>${esc(r.note)}</p><a href="${safeUrl(r.url)}" target="_blank" rel="noopener">원문 보기 ↗</a></article>`).join('');
@@ -65,24 +67,45 @@ async function loadPart(key,url,render,errorId) {
 }
 let trendRequest=0;
 let activityRequest=0;
+let activityData=null;
+function renderActivity() {
+  if(!activityData) return;
+  const q=$('#activitySearch').value.trim().toLowerCase(),direction=$('#activityDirection').value||'all',sort=$('#activitySort').value||'net_change';
+  const rows=activityData.rows.filter(r=>(!q||r.constellation.toLowerCase().includes(q))&&(direction==='all'||(direction==='unknown'?r.net_change==null:r.net_change!=null&&(direction==='up'?r.net_change>0:direction==='down'?r.net_change<0:r.net_change===0))));
+  rows.sort((a,b)=>sort==='constellation'?a.constellation.localeCompare(b.constellation):a[sort]==null?(b[sort]==null?0:1):b[sort]==null?-1:b[sort]-a[sort]);
+  $('#activityTable').innerHTML=window.LEO.activityTable(rows);
+}
 async function loadActivity() {
   const requestId=++activityRequest;
+  activityData=null;
+  $('#activitySummary').innerHTML='';
+  $('#activityNote').textContent='선택 기간의 동향을 불러오는 중입니다.';
+  $('#downloadActivity').hidden=true;
   $('#activityTable').innerHTML='<p class="empty">최근 동향을 불러오는 중입니다.</p>';
   $('#activityError').innerHTML='';
   try {
     const data=await fetchJSON('/api/activity?days='+($('#activityDays').value||'30'));
     if(requestId!==activityRequest) return;
-    $('#activityTable').innerHTML=window.LEO.activityTable(data.rows);
+    activityData=data;
+    renderActivity();
+    $('#activitySummary').innerHTML=window.LEO.activitySummary(data.summary);
+    $('#downloadActivity').href='/download/activity.csv?days='+data.days;
+    $('#downloadActivity').hidden=false;
     $('#activityNote').textContent=`${data.from} ~ ${data.through} (UTC) · ${data.note}`+(data.warnings.length?' 일부 스냅샷을 읽지 못했습니다.':'');
   } catch {
     if(requestId!==activityRequest) return;
     $('#activityTable').innerHTML='';
+    $('#activityNote').textContent='동향을 불러오지 못했습니다. 다시 시도해 주세요.';
     errorBox($('#activityError'),loadActivity);
   }
 }
 async function loadTrends() {
   const requestId=++trendRequest,cid=$('#trendFilter').value,months=$('#trendMonths').value;
   const params=new URLSearchParams({constellation_id:cid,months});
+  $('#trendChart').innerHTML='<p class="empty">관측 추세를 불러오는 중입니다.</p>';
+  $('#monthlyTable').innerHTML='';
+  $('#trendError').innerHTML='';
+  $('#downloadTrends').hidden=true;
   try {
     const data=await fetchJSON('/api/trends?'+params);
     if(requestId!==trendRequest) return;
@@ -91,7 +114,8 @@ async function loadTrends() {
     $('#monthlyTable').innerHTML=monthlyTable(data.monthly);
     $('#trendNote').textContent=data.note+(data.warnings.length?' 일부 스냅샷을 읽지 못했습니다.':'');
     $('#downloadTrends').href='/download/trends.csv?'+params;
-  } catch { if(requestId===trendRequest) errorBox($('#trendError'),loadTrends); }
+    $('#downloadTrends').hidden=false;
+  } catch { if(requestId===trendRequest) { $('#trendChart').innerHTML=''; errorBox($('#trendError'),loadTrends); } }
 }
 async function loadStatus() {
   try {
@@ -116,6 +140,11 @@ async function init() {
 }
 $('#search').addEventListener('input',renderTable);
 $('#activityDays').addEventListener('change',loadActivity);
+$('#activitySearch').addEventListener('input',renderActivity);
+$('#activityDirection').addEventListener('change',renderActivity);
+$('#activitySort').addEventListener('change',renderActivity);
+$('#changeSearch').addEventListener('input',renderChanges);
+$('#changeType').addEventListener('change',renderChanges);
 $('#statusFilter').addEventListener('change',renderTable);
 $('#launchFilter').addEventListener('change',renderLaunches);
 $('#trendFilter').addEventListener('change',loadTrends);

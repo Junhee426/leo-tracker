@@ -153,7 +153,7 @@ def trend_data(data_dir, current=None, constellation_id=None, months=12, now=Non
     for path in sorted((data_dir / "snapshots").glob("*.json")):
         try:
             payload = load_json(path)
-            if isinstance(payload, dict):
+            if isinstance(payload, dict) and isinstance(payload.get("constellations"), list):
                 snapshots.append(payload)
             else:
                 warnings.append(f"{path.name}: snapshot 형식 오류")
@@ -167,12 +167,21 @@ def trend_data(data_dir, current=None, constellation_id=None, months=12, now=Non
         if not stamp or stamp.date() > today:
             continue
         for row in snapshot.get("constellations", []):
+            if not isinstance(row, dict) or not isinstance(row.get("id"), str) or not isinstance(row.get("name"), str):
+                warnings.append("snapshot: 위성망 식별 정보 오류")
+                continue
             cid = row.get("id")
+            if not isinstance(row.get("count_scope", "all_catalogued"), str):
+                warnings.append(f"{cid}: 집계 범위 형식 오류")
+                continue
             if constellation_id and cid != constellation_id:
                 continue
             if row.get("tracked_source") != "celestrak" or not numeric(row.get("tracked_in_orbit")):
                 continue
             observation = row.get("observation", {})
+            if not isinstance(observation, dict):
+                warnings.append(f"{cid}: observation 형식 오류")
+                continue
             if observation:
                 if observation.get("status") not in ("fresh", "cached", "legacy"):
                     continue
@@ -184,6 +193,9 @@ def trend_data(data_dir, current=None, constellation_id=None, months=12, now=Non
                 if any(str(f).startswith(GROUPS.get(cid, "__unknown__") + ":") for f in snapshot.get("failures", [])):
                     continue
                 observed, kind = stamp, "legacy_aggregate"
+            if observed > stamp or observed.date() > today or row["tracked_in_orbit"] < 0:
+                warnings.append(f"{cid}: 관측 시각 또는 수량 오류")
+                continue
             day = observed.date().isoformat()
             point = {"date": day, "observed_at": iso_time(observed), "value": row["tracked_in_orbit"],
                      "constellation_id": cid, "constellation": row["name"], "basis": kind,
@@ -207,7 +219,8 @@ def trend_data(data_dir, current=None, constellation_id=None, months=12, now=Non
             earlier = [p for p in points if p["date"] < first.isoformat()]
             baseline = earlier[-1] if earlier else in_month[0]
             endpoint = in_month[-1]
-            comparable = baseline["scope"] == endpoint["scope"] and baseline["date"] != endpoint["date"]
+            comparable = (len({p["scope"] for p in [baseline] + in_month}) == 1
+                          and baseline["date"] != endpoint["date"])
             complete = (baseline["date"] == (first-timedelta(days=1)).isoformat()
                         and endpoint["date"] == last.isoformat() and last < today
                         and len(in_month) == last.day)
