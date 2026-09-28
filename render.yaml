@@ -4,6 +4,6 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.lock
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --threads 4
     healthCheckPath: /health
     autoDeploy: true
