@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import gzip
 import io
 import json
 import tempfile
@@ -14,7 +15,7 @@ from xml.etree import ElementTree
 
 import yaml
 import app
-from tracker.history import object_history, prune_observations, record_observations, trend_data
+from tracker.history import archived_observation, object_history, prune_observations, record_observations, trend_data
 from tracker.metrics import crosscheck, dated_value, progress
 from tracker.storage import iso_time, load_json, save_json
 from updater.update_data import ProviderUnavailable, normalize_records, update
@@ -254,6 +255,23 @@ class HistoryTests(unittest.TestCase):
         data = object_history(self.data, "starlink", 100000, now=NOW+timedelta(days=2))
         self.assertEqual([r["present"] for r in data["samples"]], [True, False, True])
         self.assertEqual(data["object"]["first_seen_at"], iso_time(NOW))
+
+    def test_archive_lookup_decodes_only_the_requested_record(self):
+        records = [{"norad_cat_id": n, "object_name": f"SAT {{{n}}}", "object_id": "2026-001A",
+                    "epoch": "2026-09-05T11:00:00Z", "altitude_km": 550.0, "inclination_deg": 53.0}
+                   for n in (4471, 44714, 144714)]
+        path = self.data/"observations"/"2026-09-05"/"starlink.json.gz"
+        save_json(path, {"observed_at": "2026-09-05T12:00:00Z", "source_id": "celestrak_groups", "records": records})
+        for record in records:
+            self.assertEqual(archived_observation(path, record["norad_cat_id"]), ("2026-09-05T12:00:00Z", record))
+        self.assertEqual(archived_observation(path, 447), ("2026-09-05T12:00:00Z", None))
+        self.assertIsNone(archived_observation(self.data/"observations"/"2026-09-04"/"starlink.json.gz", 4471))
+        # Archives in any other JSON layout are still read correctly by the full parser.
+        loose = self.data/"loose.json.gz"
+        with gzip.open(loose, "wt", encoding="utf-8") as stream:
+            json.dump({"records": records[::-1], "observed_at": "2026-09-05T12:00:00Z"}, stream, indent=2)
+        self.assertEqual(archived_observation(loose, 44714), ("2026-09-05T12:00:00Z", records[1]))
+        self.assertEqual(archived_observation(loose, 447), ("2026-09-05T12:00:00Z", None))
 
     def make_observation_day(self, day):
         save_json(self.data/"observations"/day/"starlink.json.gz", {"observed_at": day+"T00:00:00Z", "records": []})

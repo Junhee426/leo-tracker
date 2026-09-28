@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import calendar
+import gzip
+import json
 import shutil
 from collections import defaultdict
 from datetime import date, timedelta
@@ -90,6 +92,35 @@ def object_list(data_dir, constellation_id, query="", presence="all", page=1, pe
             "note": "관측 시작·미수록 시점은 발사·퇴역·재진입 시점을 의미하지 않습니다."}
 
 
+_ARCHIVE_HEADER = '{"observed_at": '
+_RECORD_START = '{"norad_cat_id": '
+
+
+def archived_observation(path: Path, norad_id: int):
+    """Return (observed_at, record or None) from one daily archive, or None if it is absent.
+
+    A Starlink day is ~11k records (~1.9 MB of JSON), and object_history() reads up to
+    MAX_HISTORY_DAYS of them per request. Archives written by save_json() are compact JSON
+    whose records begin with norad_cat_id, so locate the one record and decode only it.
+    Any other layout falls back to parsing the whole file.
+    """
+    if not path.exists():
+        return None
+    text = gzip.decompress(path.read_bytes()).decode("utf-8")
+    decoder = json.JSONDecoder()
+    if text.startswith(_ARCHIVE_HEADER) and _RECORD_START in text:
+        observed_at = decoder.raw_decode(text, len(_ARCHIVE_HEADER))[0]
+        # The trailing comma keeps 4471 from matching 44714.
+        index = text.find(f"{_RECORD_START}{norad_id},")
+        record = decoder.raw_decode(text, index)[0] if index >= 0 else None
+        if isinstance(observed_at, str) and (record is None or record.get("norad_cat_id") == norad_id):
+            return observed_at, record
+    snapshot = json.loads(text)
+    if not snapshot:
+        return None
+    return snapshot["observed_at"], next((x for x in snapshot["records"] if x["norad_cat_id"] == norad_id), None)
+
+
 def object_history(data_dir, constellation_id, norad_id, days=MAX_HISTORY_DAYS, now=None):
     catalog = load_json(data_dir / "catalogs" / f"{constellation_id}.json", {"objects": {}})
     record = catalog["objects"].get(str(norad_id))
@@ -105,10 +136,10 @@ def object_history(data_dir, constellation_id, norad_id, days=MAX_HISTORY_DAYS, 
             continue
         if not cutoff <= day <= today:
             continue
-        snapshot = load_json(folder / f"{constellation_id}.json.gz")
-        if snapshot:
-            match = next((x for x in snapshot["records"] if x["norad_cat_id"] == norad_id), None)
-            samples.append({"date": day.isoformat(), "observed_at": snapshot["observed_at"],
+        found = archived_observation(folder / f"{constellation_id}.json.gz", norad_id)
+        if found:
+            observed_at, match = found
+            samples.append({"date": day.isoformat(), "observed_at": observed_at,
                             "present": match is not None, "observation": match})
     return {"constellation_id": constellation_id, "object": record, "days": days, "samples": samples,
             "note": "수집 성공일만 표시합니다. 미수록은 해당 카탈로그에서 찾지 못했다는 뜻입니다."}
