@@ -238,6 +238,18 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual(data["monthly"][0]["net_change"], 72)
         self.assertFalse(data["monthly"][0]["complete_month"])
 
+    def test_snapshot_cache_follows_rewritten_and_unreadable_files(self):
+        self.snapshot("2026-09-01", 100)
+        self.snapshot("2026-09-02", 110)
+        self.assertEqual(trend_data(self.data, now=NOW)["series"][0]["points"][-1]["value"], 110)
+        self.snapshot("2026-09-02", 1250)  # the same day collected again replaces the file
+        self.assertEqual(trend_data(self.data, now=NOW)["series"][0]["points"][-1]["value"], 1250)
+        (self.data/"snapshots"/"2026-09-02.json").write_text("broken")
+        for _ in range(2):  # read failures are reported every time, never cached
+            data = trend_data(self.data, now=NOW)
+            self.assertEqual(data["warnings"], ["2026-09-02.json: snapshot 읽기 실패"])
+            self.assertEqual([p["value"] for p in data["series"][0]["points"]], [100])
+
     def test_month_boundary_uses_last_preceding_observation(self):
         self.snapshot("2026-08-31", 100)
         self.snapshot("2026-09-02", 110)
