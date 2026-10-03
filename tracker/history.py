@@ -6,6 +6,7 @@ import json
 import shutil
 from collections import defaultdict
 from datetime import date, timedelta
+from functools import lru_cache
 from pathlib import Path
 
 from tracker.metrics import numeric
@@ -145,64 +146,98 @@ def object_history(data_dir, constellation_id, norad_id, days=MAX_HISTORY_DAYS, 
             "note": "수집 성공일만 표시합니다. 미수록은 해당 카탈로그에서 찾지 못했다는 뜻입니다."}
 
 
+def _snapshot_entries(snapshot):
+    """What one snapshot contributes to trend_data, independent of the request.
+
+    Returns (snapshot date or None, entries). Each entry is (constellation_id, warning, point);
+    a None id marks a warning reported whatever constellation is requested. Rows are checked in
+    the same order as before caching, so warnings keep their order and wording.
+    """
+    stamp = parse_time(snapshot.get("generated_at"))
+    if not stamp:
+        return None, ()
+    entries = []
+    for row in snapshot.get("constellations", []):
+        if not isinstance(row, dict) or not isinstance(row.get("id"), str) or not isinstance(row.get("name"), str):
+            entries.append((None, "snapshot: 위성망 식별 정보 오류", None))
+            continue
+        cid = row.get("id")
+        if not isinstance(row.get("count_scope", "all_catalogued"), str):
+            entries.append((None, f"{cid}: 집계 범위 형식 오류", None))
+            continue
+        if row.get("tracked_source") != "celestrak" or not numeric(row.get("tracked_in_orbit")):
+            continue
+        observation = row.get("observation", {})
+        if not isinstance(observation, dict):
+            entries.append((cid, f"{cid}: observation 형식 오류", None))
+            continue
+        if observation:
+            if observation.get("status") not in ("fresh", "cached", "legacy"):
+                continue
+            observed = parse_time(observation.get("last_success_at"))
+            if not observed:
+                continue
+            kind = "observed" if observation.get("status") != "legacy" else "legacy_aggregate"
+        else:
+            if any(str(f).startswith(GROUPS.get(cid, "__unknown__") + ":") for f in snapshot.get("failures", [])):
+                continue
+            observed, kind = stamp, "legacy_aggregate"
+        # Snapshots dated after `today` are skipped whole, so observed <= stamp also keeps it <= today.
+        if observed > stamp or row["tracked_in_orbit"] < 0:
+            entries.append((cid, f"{cid}: 관측 시각 또는 수량 오류", None))
+            continue
+        day = observed.date().isoformat()
+        entries.append((cid, None, {"date": day, "observed_at": iso_time(observed), "value": row["tracked_in_orbit"],
+                                    "constellation_id": cid, "constellation": row["name"], "basis": kind,
+                                    "metric": "tracked", "scope": row.get("count_scope", "all_catalogued")}))
+    return stamp.date(), tuple(entries)
+
+
+@lru_cache(maxsize=2048)
+def _snapshot_file_entries(path, mtime_ns, size, inode):
+    """Parse a daily snapshot once per file version (save_json replaces files atomically).
+
+    /api/trends and /api/activity read every snapshot on each request and one is added per day,
+    so re-parsing them all would grow by ~7 MB of JSON per request each year. Unreadable files
+    raise and are not cached; None marks a readable file with the wrong shape.
+    """
+    payload = load_json(Path(path))
+    if not isinstance(payload, dict) or not isinstance(payload.get("constellations"), list):
+        return None
+    return _snapshot_entries(payload)
+
+
 def trend_data(data_dir, current=None, constellation_id=None, months=12, now=None):
     today = (now or utc_now()).date()
     start_number = today.year * 12 + today.month - 1 - (months - 1)
     start = date(start_number // 12, start_number % 12 + 1, 1)
-    snapshots, warnings = [], []
+    contributions, warnings = [], []
     for path in sorted((data_dir / "snapshots").glob("*.json")):
         try:
-            payload = load_json(path)
-            if isinstance(payload, dict) and isinstance(payload.get("constellations"), list):
-                snapshots.append(payload)
-            else:
-                warnings.append(f"{path.name}: snapshot 형식 오류")
+            info = path.stat()
+            entries = _snapshot_file_entries(str(path), info.st_mtime_ns, info.st_size, info.st_ino)
         except (OSError, ValueError):
             warnings.append(f"{path.name}: snapshot 읽기 실패")
-    if current:
-        snapshots.append(current)
-    daily = defaultdict(dict)
-    for snapshot in snapshots:
-        stamp = parse_time(snapshot.get("generated_at"))
-        if not stamp or stamp.date() > today:
             continue
-        for row in snapshot.get("constellations", []):
-            if not isinstance(row, dict) or not isinstance(row.get("id"), str) or not isinstance(row.get("name"), str):
-                warnings.append("snapshot: 위성망 식별 정보 오류")
+        if entries is None:
+            warnings.append(f"{path.name}: snapshot 형식 오류")
+        else:
+            contributions.append(entries)
+    if current:
+        contributions.append(_snapshot_entries(current))
+    daily = defaultdict(dict)
+    for stamp_date, entries in contributions:
+        if stamp_date is None or stamp_date > today:
+            continue
+        for cid, warning, point in entries:
+            if cid is not None and constellation_id and cid != constellation_id:
                 continue
-            cid = row.get("id")
-            if not isinstance(row.get("count_scope", "all_catalogued"), str):
-                warnings.append(f"{cid}: 집계 범위 형식 오류")
+            if warning:
+                warnings.append(warning)
                 continue
-            if constellation_id and cid != constellation_id:
-                continue
-            if row.get("tracked_source") != "celestrak" or not numeric(row.get("tracked_in_orbit")):
-                continue
-            observation = row.get("observation", {})
-            if not isinstance(observation, dict):
-                warnings.append(f"{cid}: observation 형식 오류")
-                continue
-            if observation:
-                if observation.get("status") not in ("fresh", "cached", "legacy"):
-                    continue
-                observed = parse_time(observation.get("last_success_at"))
-                if not observed:
-                    continue
-                kind = "observed" if observation.get("status") != "legacy" else "legacy_aggregate"
-            else:
-                if any(str(f).startswith(GROUPS.get(cid, "__unknown__") + ":") for f in snapshot.get("failures", [])):
-                    continue
-                observed, kind = stamp, "legacy_aggregate"
-            if observed > stamp or observed.date() > today or row["tracked_in_orbit"] < 0:
-                warnings.append(f"{cid}: 관측 시각 또는 수량 오류")
-                continue
-            day = observed.date().isoformat()
-            point = {"date": day, "observed_at": iso_time(observed), "value": row["tracked_in_orbit"],
-                     "constellation_id": cid, "constellation": row["name"], "basis": kind,
-                     "metric": "tracked", "scope": row.get("count_scope", "all_catalogued")}
-            old = daily[cid].get(day)
+            old = daily[cid].get(point["date"])
             if not old or old["observed_at"] <= point["observed_at"]:
-                daily[cid][day] = point
+                daily[cid][point["date"]] = dict(point)  # cached entries are shared across requests
     series, monthly = [], []
     for cid, values in sorted(daily.items()):
         points = sorted(values.values(), key=lambda x: x["date"])

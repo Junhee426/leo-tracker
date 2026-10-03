@@ -143,7 +143,7 @@ progress_metric: tracked
 
 - `data/catalogs/<id>.json`: 지금까지 관측한 ID별 첫/마지막 관측, 최근 요소, 최근 카탈로그 수록 여부
 - `data/observations/YYYY-MM-DD/<id>.json.gz`: UTC 일자별 마지막 정상 수집의 개별 위성 목록
-- `data/snapshots/YYYY-MM-DD.json`: 위성망별 집계 스냅샷
+- `data/snapshots/YYYY-MM-DD.json`: 위성망별 집계 스냅샷. 추세·최근 동향 API는 요청마다 모든 스냅샷을 다시 읽지 않고 파일 버전(수정 시각·크기·inode)별로 한 번만 해석해 캐시합니다. 1년치(365개, 약 11 MB) 기준 요청당 약 100 ms가 3 ms로 줄어듭니다.
 
 같은 날 재수집하면 일별 파일은 마지막 정상 결과로 교체합니다. 모든 실행을 남기는
 고빈도 관측 저장소가 아닙니다. 성공한 관측만 개별 이력에 반영하고 수집 실패일을
