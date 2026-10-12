@@ -1,9 +1,15 @@
 {
   "version": "1.3.0",
   "schema_version": 2,
-  "generated_at": "2026-10-10T23:56:17Z",
-  "update_mode": "live",
-  "failures": [],
+  "generated_at": "2026-10-12T00:02:48Z",
+  "update_mode": "failed",
+  "failures": [
+    "STARLINK: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "ONEWEB: 상위 출처 요청 중단: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "KUIPER: 상위 출처 요청 중단: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "HULIANWANG: 상위 출처 요청 중단: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "QIANFAN: 상위 출처 요청 중단: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
+  ],
   "constellations": [
     {
       "id": "starlink",
@@ -45,17 +51,10 @@
       "epoch_min": "2026-09-21T05:49:13Z",
       "epoch_max": "2026-10-10T17:28:34Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-10T23:56:17Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-12T00:02:48Z",
         "last_success_at": "2026-10-10T23:56:17Z",
-        "error": null,
-        "membership": {
-          "known_objects": 11157,
-          "present_objects": 11102,
-          "first_batch": false,
-          "added": 0,
-          "missing": 1
-        }
+        "error": "503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -196,17 +195,10 @@
       "epoch_min": "2026-10-09T13:44:14Z",
       "epoch_max": "2026-10-10T16:00:01Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-10T23:56:17Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-12T00:02:48Z",
         "last_success_at": "2026-10-10T23:56:17Z",
-        "error": null,
-        "membership": {
-          "known_objects": 651,
-          "present_objects": 651,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -317,17 +309,10 @@
       "epoch_min": "2026-10-08T21:01:39Z",
       "epoch_max": "2026-10-10T15:52:40Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-10T23:56:17Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-12T00:02:48Z",
         "last_success_at": "2026-10-10T23:56:17Z",
-        "error": null,
-        "membership": {
-          "known_objects": 391,
-          "present_objects": 391,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -547,17 +532,10 @@
       "epoch_min": "2026-10-05T14:20:52Z",
       "epoch_max": "2026-10-10T15:42:05Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-10T23:56:17Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-12T00:02:48Z",
         "last_success_at": "2026-10-10T23:56:17Z",
-        "error": null,
-        "membership": {
-          "known_objects": 224,
-          "present_objects": 224,
-          "first_batch": false,
-          "added": 7,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -664,17 +642,10 @@
       "epoch_min": "2026-10-08T12:41:58Z",
       "epoch_max": "2026-10-10T15:44:49Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-10T23:56:17Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-12T00:02:48Z",
         "last_success_at": "2026-10-10T23:56:17Z",
-        "error": null,
-        "membership": {
-          "known_objects": 256,
-          "present_objects": 256,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 503 Server Error: Service Unavailable for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
