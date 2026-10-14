@@ -16,7 +16,10 @@ def recent_activity(data_dir, current, days=30, now=None):
         history = by_id.get(network["id"], [])
         latest = history[-1] if history else None
         observed = parse_time(latest["observed_at"]) if latest else parse_time(network.get("observation", {}).get("last_success_at"))
-        age = round(max(0, (now - observed).total_seconds() / 3600), 1) if observed else None
+        if observed and observed > now:
+            observed = None
+        elapsed_hours = (now - observed).total_seconds() / 3600 if observed else None
+        age = round(elapsed_hours, 1) if elapsed_hours is not None else None
         points = [p for p in history
                   if start.isoformat() <= p["date"] <= today.isoformat()]
         first, last = (points[0], points[-1]) if points else (None, None)
@@ -32,7 +35,7 @@ def recent_activity(data_dir, current, days=30, now=None):
                      "net_change": delta,
                      "daily_net_change": round(delta / span, 2) if comparable else None,
                      "age_hours": age,
-                     "freshness": "unavailable" if age is None else "stale" if age > 48 else "recent",
+                     "freshness": "unavailable" if elapsed_hours is None else "stale" if elapsed_hours > 48 else "recent",
                      "latest_observed_at": observed.isoformat() if observed else None,
                      "change_pct": round(delta / first["value"] * 100, 2)
                      if comparable and first["value"] else None,

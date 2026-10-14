@@ -22,7 +22,7 @@ def parse_time(value):
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
         return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed.astimezone(timezone.utc)
-    except ValueError:
+    except (ValueError, OverflowError):
         return None
 
 
