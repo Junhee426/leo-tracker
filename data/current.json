@@ -1,9 +1,15 @@
 {
   "version": "1.3.0",
   "schema_version": 2,
-  "generated_at": "2026-10-13T02:17:13Z",
-  "update_mode": "live",
-  "failures": [],
+  "generated_at": "2026-10-14T00:00:05Z",
+  "update_mode": "failed",
+  "failures": [
+    "STARLINK: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)",
+    "ONEWEB: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)",
+    "KUIPER: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)",
+    "HULIANWANG: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)",
+    "QIANFAN: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)"
+  ],
   "constellations": [
     {
       "id": "starlink",
@@ -45,17 +51,10 @@
       "epoch_min": "2026-09-21T05:49:13Z",
       "epoch_max": "2026-10-12T21:42:04Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-13T02:17:13Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-14T00:00:05Z",
         "last_success_at": "2026-10-13T02:17:13Z",
-        "error": null,
-        "membership": {
-          "known_objects": 11157,
-          "present_objects": 11098,
-          "first_batch": false,
-          "added": 0,
-          "missing": 4
-        }
+        "error": "HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)"
       },
       "crosscheck_points": [
         {
@@ -196,17 +195,10 @@
       "epoch_min": "2026-10-11T04:04:26Z",
       "epoch_max": "2026-10-12T08:05:54Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-13T02:17:13Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-14T00:00:05Z",
         "last_success_at": "2026-10-13T02:17:13Z",
-        "error": null,
-        "membership": {
-          "known_objects": 651,
-          "present_objects": 651,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)"
       },
       "crosscheck_points": [
         {
@@ -317,17 +309,10 @@
       "epoch_min": "2026-10-09T14:15:12Z",
       "epoch_max": "2026-10-12T08:00:27Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-13T02:17:13Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-14T00:00:05Z",
         "last_success_at": "2026-10-13T02:17:13Z",
-        "error": null,
-        "membership": {
-          "known_objects": 391,
-          "present_objects": 391,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)"
       },
       "crosscheck_points": [
         {
@@ -547,17 +532,10 @@
       "epoch_min": "2026-10-05T14:20:52Z",
       "epoch_max": "2026-10-12T07:58:11Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-13T02:17:13Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-14T00:00:05Z",
         "last_success_at": "2026-10-13T02:17:13Z",
-        "error": null,
-        "membership": {
-          "known_objects": 224,
-          "present_objects": 224,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)"
       },
       "crosscheck_points": [
         {
@@ -664,17 +642,10 @@
       "epoch_min": "2026-10-08T12:41:58Z",
       "epoch_max": "2026-10-12T08:02:04Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-13T02:17:13Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-14T00:00:05Z",
         "last_success_at": "2026-10-13T02:17:13Z",
-        "error": null,
-        "membership": {
-          "known_objects": 256,
-          "present_objects": 256,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Read timed out. (read timeout=30)"
       },
       "crosscheck_points": [
         {
