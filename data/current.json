@@ -1,7 +1,7 @@
 {
   "version": "1.3.0",
   "schema_version": 2,
-  "generated_at": "2026-10-14T12:26:09Z",
+  "generated_at": "2026-10-14T23:31:17Z",
   "update_mode": "live",
   "failures": [],
   "constellations": [
@@ -18,7 +18,7 @@
       "planned_satellites": 15000,
       "planned_label": "15,000 authorized",
       "note": "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure.",
-      "tracked_in_orbit": 11100,
+      "tracked_in_orbit": 11098,
       "tracked_source": "celestrak",
       "count_scope": "all_catalogued",
       "plan_metric": "authorized",
@@ -39,22 +39,22 @@
       ],
       "tracked_launched_this_year": 2137,
       "tracking_year": 2026,
-      "avg_altitude_km": 464.5,
+      "avg_altitude_km": 464.6,
       "avg_inclination_deg": 57.2,
       "last_data_date": "2026-10-14",
       "epoch_min": "2026-09-21T05:49:13Z",
-      "epoch_max": "2026-10-14T08:00:01Z",
+      "epoch_max": "2026-10-14T20:05:33Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-14T12:26:09Z",
-        "last_success_at": "2026-10-14T12:26:09Z",
+        "last_attempt_at": "2026-10-14T23:31:17Z",
+        "last_success_at": "2026-10-14T23:31:17Z",
         "error": null,
         "membership": {
           "known_objects": 11157,
-          "present_objects": 11100,
+          "present_objects": 11098,
           "first_batch": false,
-          "added": 2,
-          "missing": 0
+          "added": 0,
+          "missing": 2
         }
       },
       "crosscheck_points": [
@@ -62,7 +62,7 @@
           "source_id": "celestrak_groups",
           "metric": "tracked",
           "scope": "all_catalogued",
-          "value": 11100,
+          "value": 11098,
           "date": "2026-10-14",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
@@ -104,7 +104,7 @@
                 "source_id": "celestrak_groups",
                 "metric": "tracked",
                 "scope": "all_catalogued",
-                "value": 11100,
+                "value": 11098,
                 "date": "2026-10-14",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
@@ -197,8 +197,8 @@
       "epoch_max": "2026-10-14T08:00:01Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-14T12:26:09Z",
-        "last_success_at": "2026-10-14T12:26:09Z",
+        "last_attempt_at": "2026-10-14T23:31:17Z",
+        "last_success_at": "2026-10-14T23:31:17Z",
         "error": null,
         "membership": {
           "known_objects": 651,
@@ -318,8 +318,8 @@
       "epoch_max": "2026-10-14T07:37:07Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-14T12:26:09Z",
-        "last_success_at": "2026-10-14T12:26:09Z",
+        "last_attempt_at": "2026-10-14T23:31:17Z",
+        "last_success_at": "2026-10-14T23:31:17Z",
         "error": null,
         "membership": {
           "known_objects": 391,
@@ -548,8 +548,8 @@
       "epoch_max": "2026-10-14T07:50:04Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-14T12:26:09Z",
-        "last_success_at": "2026-10-14T12:26:09Z",
+        "last_attempt_at": "2026-10-14T23:31:17Z",
+        "last_success_at": "2026-10-14T23:31:17Z",
         "error": null,
         "membership": {
           "known_objects": 224,
@@ -665,8 +665,8 @@
       "epoch_max": "2026-10-14T07:54:44Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-14T12:26:09Z",
-        "last_success_at": "2026-10-14T12:26:09Z",
+        "last_attempt_at": "2026-10-14T23:31:17Z",
+        "last_success_at": "2026-10-14T23:31:17Z",
         "error": null,
         "membership": {
           "known_objects": 256,
