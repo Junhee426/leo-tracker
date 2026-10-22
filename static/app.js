@@ -1,17 +1,17 @@
 const {esc,number,statusLabel,scopeLabel,qualityLabel,dateTime,safeUrl,fetchJSON,errorBox,sourceLink,trendBadge,lineChart,monthlyTable}=window.LEO;
 const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
-const state={rows:[],sources:[],changes:null,launches:null,roadmap:null,coverage:null,sortKey:'tracked_in_orbit',sortDir:-1,quality:{rows:[]}};
+const state={rows:[],statusLoaded:false,sources:[],changes:null,launches:null,roadmap:null,coverage:null,sortKey:'tracked_in_orbit',sortDir:-1,quality:{rows:[]}};
 const sourceMap=()=>Object.fromEntries(state.sources.map(s=>[s.id,s]));
 
 function renderKPIs() {
-  $('#kpiNetworks').textContent=number(state.rows.length);
+  $('#kpiNetworks').textContent=number(state.statusLoaded?state.rows.length:null);
   const observed=state.rows.filter(r=>r.tracked_in_orbit!=null);
   $('#kpiOrbit').textContent=observed.length?number(observed.reduce((sum,r)=>sum+r.tracked_in_orbit,0)):'—';
-  $('#kpiOrbitNote').textContent=`관측값 보유 ${observed.length}/${state.rows.length}개 위성망`;
+  $('#kpiOrbitNote').textContent=state.statusLoaded?`관측값 보유 ${observed.length}/${state.rows.length}개 위성망`:'관측값 보유 위성망 합계';
   $('#kpiLaunches').textContent=number(state.launches?.length);
   $('#kpiDelays').textContent=state.roadmap?number(state.roadmap.filter(r=>r.trend==='delayed').length):'—';
-  $('#kpiActive').textContent=number(state.rows.filter(r=>['operating','operating_expanding','deploying'].includes(r.status)).length);
+  $('#kpiActive').textContent=number(state.statusLoaded?state.rows.filter(r=>['operating','operating_expanding','deploying'].includes(r.status)).length:null);
 }
 function renderQuality() {
   const mode={live:'수집 완료',cached:'저장값 사용',partial:'일부 수집 실패',failed:'전체 수집 실패',manual:'수동 자료',seed:'초기 자료'}[state.quality.update_mode]||'기존 스냅샷';
@@ -119,7 +119,7 @@ async function loadTrends() {
 }
 async function loadStatus() {
   try {
-    const data=await fetchJSON('/api/status'); state.rows=data.constellations; state.quality=data.quality;
+    const data=await fetchJSON('/api/status'); state.rows=data.constellations; state.quality=data.quality; state.statusLoaded=true;
     $('#overviewError').innerHTML=''; renderQuality(); renderKPIs(); renderTable();
     const options=state.rows.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
     $('#launchFilter').innerHTML='<option value="all">전체 위성망</option>'+options;

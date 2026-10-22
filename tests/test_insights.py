@@ -1,12 +1,13 @@
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
 import app
+from tracker.history import trend_data
 from tracker.insights import recent_activity
-from tracker.storage import save_json
+from tracker.storage import load_json, save_json
 
 NOW = datetime(2026, 9, 12, 12, tzinfo=timezone.utc)
 
@@ -128,9 +129,47 @@ class ActivityTests(unittest.TestCase):
         self.assertEqual(len(data["warnings"]), 4)
 
     def test_monthly_comparison_blocks_intermediate_scope_change(self):
-        from tracker.history import trend_data
         self.point("2026-09-05", 100)
         self.point("2026-09-07", 120, scope="gen2")
         self.point("2026-09-12", 140)
         data = trend_data(self.data, now=NOW)
         self.assertIsNone(data["monthly"][0]["net_change"])
+
+    def test_same_day_future_current_preserves_latest_valid_observation(self):
+        self.point("2026-09-05", 100)
+        self.point("2026-09-12", 120)
+        future = (NOW + timedelta(hours=3)).isoformat()
+        current = {"generated_at": future, "constellations": [{
+            "id": "test", "name": "Test", "tracked_source": "celestrak",
+            "tracked_in_orbit": 900,
+            "observation": {"status": "fresh", "last_success_at": future}}]}
+
+        trends = trend_data(self.data, current, now=NOW)
+        self.assertEqual([p["value"] for p in trends["series"][0]["points"]], [100, 120])
+        self.assertEqual(trends["monthly"][0]["net_change"], 20)
+        row = recent_activity(self.data, current, days=7, now=NOW)["rows"][0]
+        self.assertEqual((row["end_count"], row["net_change"], row["observed_days"]), (120, 20, 2))
+        self.assertEqual(row["latest_observed_at"], NOW.isoformat())
+        self.assertEqual((row["freshness"], row["age_hours"]), ("recent", 0))
+
+    def test_cached_future_snapshot_becomes_valid_at_its_exact_timestamp(self):
+        self.point("2026-09-11", 100)
+        future = NOW + timedelta(microseconds=1)
+        save_json(self.data / "snapshots" / "2026-09-12.json", {
+            "generated_at": future.isoformat(), "constellations": [{
+                "id": "test", "name": "Test", "tracked_source": "celestrak",
+                "tracked_in_orbit": 120,
+                "observation": {"status": "fresh", "last_success_at": future.isoformat()}}]})
+
+        with patch("tracker.history.load_json", wraps=load_json) as read:
+            before = trend_data(self.data, self.current, now=NOW)
+            self.assertEqual([p["value"] for p in before["series"][0]["points"]], [100])
+            row = recent_activity(self.data, self.current, now=NOW)["rows"][0]
+            self.assertEqual(row["observed_days"], 1)
+            self.assertIsNone(row["net_change"])
+            self.assertEqual(row["latest_observed_at"], "2026-09-11T12:00:00+00:00")
+
+            at_timestamp = trend_data(self.data, self.current, now=future)
+            self.assertEqual([p["value"] for p in at_timestamp["series"][0]["points"]], [100, 120])
+            self.assertEqual(at_timestamp["monthly"][0]["net_change"], 20)
+            self.assertEqual(read.call_count, 2)

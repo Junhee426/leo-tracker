@@ -149,7 +149,8 @@ def object_history(data_dir, constellation_id, norad_id, days=MAX_HISTORY_DAYS, 
 def _snapshot_entries(snapshot):
     """What one snapshot contributes to trend_data, independent of the request.
 
-    Returns (snapshot date or None, entries). Each entry is (constellation_id, warning, point);
+    Returns (snapshot date or None, entries). Each entry is
+    (constellation_id, warning, observed datetime, point);
     a None id marks a warning reported whatever constellation is requested. Rows are checked in
     the same order as before caching, so warnings keep their order and wording.
     """
@@ -159,17 +160,17 @@ def _snapshot_entries(snapshot):
     entries = []
     for row in snapshot.get("constellations", []):
         if not isinstance(row, dict) or not isinstance(row.get("id"), str) or not isinstance(row.get("name"), str):
-            entries.append((None, "snapshot: 위성망 식별 정보 오류", None))
+            entries.append((None, "snapshot: 위성망 식별 정보 오류", None, None))
             continue
         cid = row.get("id")
         if not isinstance(row.get("count_scope", "all_catalogued"), str):
-            entries.append((None, f"{cid}: 집계 범위 형식 오류", None))
+            entries.append((None, f"{cid}: 집계 범위 형식 오류", None, None))
             continue
         if row.get("tracked_source") != "celestrak" or not numeric(row.get("tracked_in_orbit")):
             continue
         observation = row.get("observation", {})
         if not isinstance(observation, dict):
-            entries.append((cid, f"{cid}: observation 형식 오류", None))
+            entries.append((cid, f"{cid}: observation 형식 오류", None, None))
             continue
         if observation:
             if observation.get("status") not in ("fresh", "cached", "legacy"):
@@ -182,12 +183,12 @@ def _snapshot_entries(snapshot):
             if any(str(f).startswith(GROUPS.get(cid, "__unknown__") + ":") for f in snapshot.get("failures", [])):
                 continue
             observed, kind = stamp, "legacy_aggregate"
-        # Snapshots dated after `today` are skipped whole, so observed <= stamp also keeps it <= today.
+        # Validate snapshot consistency here; request-time checks stay outside the file cache.
         if observed > stamp or row["tracked_in_orbit"] < 0:
-            entries.append((cid, f"{cid}: 관측 시각 또는 수량 오류", None))
+            entries.append((cid, f"{cid}: 관측 시각 또는 수량 오류", None, None))
             continue
         day = observed.date().isoformat()
-        entries.append((cid, None, {"date": day, "observed_at": iso_time(observed), "value": row["tracked_in_orbit"],
+        entries.append((cid, None, observed, {"date": day, "observed_at": iso_time(observed), "value": row["tracked_in_orbit"],
                                     "constellation_id": cid, "constellation": row["name"], "basis": kind,
                                     "metric": "tracked", "scope": row.get("count_scope", "all_catalogued")}))
     return stamp.date(), tuple(entries)
@@ -208,7 +209,8 @@ def _snapshot_file_entries(path, mtime_ns, size, inode):
 
 
 def trend_data(data_dir, current=None, constellation_id=None, months=12, now=None):
-    today = (now or utc_now()).date()
+    now = now or utc_now()
+    today = now.date()
     start_number = today.year * 12 + today.month - 1 - (months - 1)
     start = date(start_number // 12, start_number % 12 + 1, 1)
     contributions, warnings = [], []
@@ -229,11 +231,14 @@ def trend_data(data_dir, current=None, constellation_id=None, months=12, now=Non
     for stamp_date, entries in contributions:
         if stamp_date is None or stamp_date > today:
             continue
-        for cid, warning, point in entries:
+        for cid, warning, observed, point in entries:
             if cid is not None and constellation_id and cid != constellation_id:
                 continue
             if warning:
                 warnings.append(warning)
+                continue
+            # Recheck on each request so cached future observations become usable at their timestamp.
+            if observed > now:
                 continue
             old = daily[cid].get(point["date"])
             if not old or old["observed_at"] <= point["observed_at"]:

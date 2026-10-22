@@ -26,7 +26,28 @@ class DataFormatError(ValueError):
 
 
 def load_json(name, default):
-    return read_json(DATA_DIR / name, default)
+    data = read_json(DATA_DIR / name, default)
+    validate_finite_numbers(data, name)
+    return data
+
+
+def validate_finite_numbers(value, name):
+    # Python accepts NaN/Infinity in JSON, but browser JSON parsers reject them.
+    if isinstance(value, float) and not numeric(value):
+        raise DataFormatError(f"{name}: non-finite number")
+    if isinstance(value, dict):
+        for child in value.values():
+            validate_finite_numbers(child, name)
+    elif isinstance(value, list):
+        for child in value:
+            validate_finite_numbers(child, name)
+
+
+def validate_nonnegative_numbers(record, keys, name):
+    for key in keys:
+        value = record.get(key)
+        if value is not None and (not numeric(value) or value < 0):
+            raise DataFormatError(f"{name}: invalid {key}")
 
 
 def validate_records(values, name, required=()):
@@ -61,15 +82,25 @@ def current_payload():
     if not isinstance(data.get("failures", []), list):
         raise DataFormatError("current.json: invalid failures")
     for row in rows:
+        validate_nonnegative_numbers(row, (
+            "tracked_in_orbit", "planned_satellites", "reference_count",
+            "tracked_launched_this_year", "deployment_pct",
+        ), "current.json")
         for key in ("observation", "progress", "crosscheck"):
             if not isinstance(row.get(key, {}), dict):
                 raise DataFormatError(f"current.json: invalid {key}")
+        validate_nonnegative_numbers(row.get("progress", {}), ("pct",), "current.json progress")
+        observation_status = row.get("observation", {}).get("status", "unavailable")
+        if observation_status not in ("fresh", "cached", "legacy", "stale", "unavailable", "manual"):
+            raise DataFormatError("current.json: invalid observation status")
         source_ids = row.get("source_ids", [])
         if not isinstance(source_ids, list) or any(not isinstance(s, str) or not s.strip() for s in source_ids):
             raise DataFormatError("current.json: invalid source_ids")
         groups = validate_records(row.get("crosscheck", {}).get("groups", []), "current.json crosscheck", ("status",))
         for group in groups:
-            validate_records(group.get("points"), "current.json crosscheck points")
+            points = validate_records(group.get("points"), "current.json crosscheck points")
+            for point in points:
+                validate_nonnegative_numbers(point, ("value",), "current.json crosscheck points")
     if has_request_context():
         request.environ[cache_key] = data
     return data
@@ -131,7 +162,9 @@ def quality_data(data=None):
         elapsed_hours = (now-last).total_seconds()/3600 if last and last <= now else None
         age = round(elapsed_hours, 1) if elapsed_hours is not None else None
         state = observation.get("status", "unavailable")
-        if state not in ("manual", "unavailable") and (elapsed_hours is None or elapsed_hours > 48):
+        if state != "manual" and row.get("tracked_in_orbit") is None:
+            state = "unavailable"
+        elif state not in ("manual", "unavailable") and (elapsed_hours is None or elapsed_hours > 48):
             state = "stale"
         rows.append({**observation, "id": row["id"], "name": row["name"],
                      "status": state, "age_hours": age, "epoch_min": row.get("epoch_min"), "epoch_max": row.get("epoch_max")})

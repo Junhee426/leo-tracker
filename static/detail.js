@@ -61,6 +61,7 @@ async function loadHistory(norad) {
   const requestId=++historyRequest;
   $('#objectHistory').hidden=false;
   $('#objectHistoryTitle').textContent=`NORAD ${norad} · 최근 90일의 수집 성공일`;
+  $('#objectHistoryRows').innerHTML='<p class="empty">선택한 위성의 관측 이력을 불러오는 중입니다.</p>';
   try {
     const data=await fetchJSON(`/api/objects/${encodeURIComponent(cid)}/${encodeURIComponent(norad)}?days=90`);
     if(requestId!==historyRequest)return;

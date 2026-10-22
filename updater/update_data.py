@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import math
+import os
 import re
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 # Both `python updater/update_data.py` and `python -m updater.update_data` work.
@@ -14,7 +16,7 @@ if str(ROOT) not in sys.path:
 import requests
 import yaml
 from tracker import SCHEMA_VERSION, VERSION
-from tracker.history import prune_observations, record_observations
+from tracker.history import OBSERVATION_RETENTION_DAYS, prune_observations, record_observations
 from tracker.metrics import build_points, crosscheck, numeric, progress
 from tracker.storage import iso_time, load_json, parse_time, save_json, utc_now
 
@@ -170,6 +172,65 @@ def load_plans(data_dir):
     return plans
 
 
+def daily_snapshot(data_dir, result, now):
+    """Keep each network's last accepted observation when a same-day retry fails."""
+    previous = load_json(data_dir/"snapshots"/f"{now.date().isoformat()}.json", {})
+    old_by_id = {row["id"]: row for row in previous.get("constellations", [])}
+    rows = []
+    for row in result["constellations"]:
+        old = old_by_id.get(row["id"], {})
+        observation = old.get("observation", {})
+        observed = parse_time(observation.get("last_success_at"))
+        if (row["observation"]["status"] in ("stale", "unavailable")
+                and old.get("tracked_source") == "celestrak"
+                and numeric(old.get("tracked_in_orbit")) and old["tracked_in_orbit"] >= 0
+                and observation.get("status") in ("fresh", "cached", "legacy")
+                and observed and observed.date() == now.date() and observed <= now):
+            row = old
+        rows.append(row)
+    return {**result, "constellations": rows}
+
+
+def validate_saved_collection(data_dir, result, snapshot, now):
+    """Do not approve publication of mismatched aggregate and per-object files."""
+    if load_json(data_dir/"current.json") != result:
+        raise ValueError("Saved current.json differs from the completed collection")
+    if load_json(data_dir/"snapshots"/f"{now.date().isoformat()}.json") != snapshot:
+        raise ValueError("Saved daily snapshot differs from the completed collection")
+    snapshot_rows = {row["id"]: row for row in snapshot["constellations"]}
+    for row in result["constellations"]:
+        if row["tracked_source"] != "celestrak":
+            continue
+        cid, observation = row["id"], row["observation"]
+        saved_row = snapshot_rows[cid]
+        if (saved_row["tracked_in_orbit"] != row["tracked_in_orbit"]
+                or saved_row["observation"].get("last_success_at") != observation.get("last_success_at")):
+            raise ValueError(f"{cid}: daily snapshot disagrees with the last accepted observation")
+        catalog = load_json(data_dir/"catalogs"/f"{cid}.json")
+        if catalog is None and observation["status"] != "fresh":
+            continue  # Legacy aggregate observations may predate per-object collection.
+        if not catalog:
+            raise ValueError(f"{cid}: completed collection has no object catalog")
+        present = {key: value for key, value in catalog["objects"].items() if value.get("present")}
+        stamp = observation["last_success_at"]
+        if catalog.get("last_success_at") != stamp or len(present) != row["tracked_in_orbit"]:
+            raise ValueError(f"{cid}: current count/timestamp disagrees with object catalog")
+        observed = parse_time(stamp)
+        if not observed:
+            raise ValueError(f"{cid}: object catalog has no valid observation timestamp")
+        archive = load_json(data_dir/"observations"/observed.date().isoformat()/f"{cid}.json.gz")
+        if archive is None and observed.date() < now.date() - timedelta(days=OBSERVATION_RETENTION_DAYS):
+            continue  # Old daily archives are pruned, while catalogs remain permanent.
+        if not archive or archive.get("observed_at") != stamp:
+            raise ValueError(f"{cid}: daily archive disagrees with object catalog timestamp")
+        records = archive["records"]
+        if (len(records) != len(present)
+                or {str(record["norad_cat_id"]) for record in records} != set(present)
+                or any(any(present[str(record["norad_cat_id"])].get(key) != value
+                           for key, value in record.items()) for record in records)):
+            raise ValueError(f"{cid}: daily archive disagrees with present catalog objects")
+
+
 def update(data_dir=DATA, fetcher=None, now=None, refresh_derived=False):
     fetcher, now = fetcher or fetch_group, now or utc_now()
     plans = load_plans(data_dir)
@@ -207,17 +268,20 @@ def update(data_dir=DATA, fetcher=None, now=None, refresh_derived=False):
                     # Do not promote an ancient catalog as a fresh observation.
                     if (now-parse_time(candidate["epoch_max"])).total_seconds() > 7*86400:
                         raise ValueError("모든 궤도요소가 7일 이상 오래되어 저장 보류")
-                    membership = record_observations(data_dir, plan["id"], records, now)
-                    live = candidate
-                    observation.update(status="fresh", last_success_at=iso_time(now), membership=membership)
-                    successful += 1
-                    print(f"OK {group}: {len(records)} unique objects")
                 except (requests.RequestException, ProviderUnavailable, ValueError, TypeError) as exc:
                     if isinstance(exc, ProviderUnavailable):
                         provider_error = provider_error or str(exc)
                     failures.append(f"{group}: {exc}")
                     observation.update(status="stale" if live else "unavailable", error=str(exc))
                     print(f"WARN {group}: {exc}", file=sys.stderr)
+                else:
+                    # Persistence/programming failures must abort the run, rather than
+                    # being treated as a recoverable provider failure after partial writes.
+                    membership = record_observations(data_dir, plan["id"], records, now)
+                    live = candidate
+                    observation.update(status="fresh", last_success_at=iso_time(now), membership=membership)
+                    successful += 1
+                    print(f"OK {group}: {len(records)} unique objects")
         entries.append(build_entry(plan, live, sources, observation))
     if refresh_derived:
         mode = previous.get("update_mode", "seed")
@@ -234,9 +298,12 @@ def update(data_dir=DATA, fetcher=None, now=None, refresh_derived=False):
         known = {e.get("event_id") for e in changes}
         if events:
             save_json(data_dir/"changes.json", [e for e in events if e["event_id"] not in known] + changes)
-        save_json(data_dir/"snapshots"/f"{now.date().isoformat()}.json", result)
+        snapshot = daily_snapshot(data_dir, result, now)
+        save_json(data_dir/"snapshots"/f"{now.date().isoformat()}.json", snapshot)
         prune_observations(data_dir, now)
     save_json(data_dir/"current.json", result)
+    if not refresh_derived:
+        validate_saved_collection(data_dir, result, snapshot, now)
     return result
 
 
@@ -246,6 +313,9 @@ def main():
     args = parser.parse_args()
     result = update(refresh_derived=args.refresh_derived)
     print(f"Saved {len(result['constellations'])} constellations; mode={result['update_mode']}")
+    if not args.refresh_derived and (output_path := os.environ.get("GITHUB_OUTPUT")):
+        with Path(output_path).open("a", encoding="utf-8") as stream:
+            stream.write("collection_complete=true\n")
     return 0 if args.refresh_derived else 2 if result["update_mode"] == "failed" else 1 if result["update_mode"] == "partial" else 0
 
 

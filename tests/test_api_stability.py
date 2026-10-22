@@ -6,6 +6,7 @@ import json
 import tempfile
 import unittest
 import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -71,6 +72,84 @@ class ApiStabilityTests(unittest.TestCase):
         self.assert_unavailable("/api/status")
         self.assert_unavailable("/ready")
         self.assertEqual(self.client.get("/health").status_code, 200)
+
+    def test_invalid_current_metrics_are_rejected_before_api_and_export(self):
+        fields = ("tracked_in_orbit", "planned_satellites", "reference_count",
+                  "tracked_launched_this_year", "deployment_pct")
+        invalid = (float("nan"), float("inf"), -float("inf"), -1, True, "100", [], {}, 10**400)
+        for field in fields:
+            for value in invalid:
+                with self.subTest(field=field, value=value):
+                    payload = {"constellations": [dict(self.row, **{field: value})]}
+                    (self.data / "current.json").write_text(json.dumps(payload), encoding="utf-8")
+                    for route in ("/api/status", "/ready", "/download/constellations.csv"):
+                        self.assert_unavailable(route)
+        self.assertEqual(self.client.get("/health").status_code, 200)
+
+    def test_nonfinite_nested_numbers_and_overflowing_json_numbers_are_rejected(self):
+        for value in (float("nan"), float("inf"), -float("inf")):
+            with self.subTest(value=value):
+                payload = dict(self.payload, metadata={"nested": [value]})
+                (self.data / "current.json").write_text(json.dumps(payload), encoding="utf-8")
+                self.assert_unavailable("/api/status")
+        (self.data / "current.json").write_text(
+            json.dumps(self.payload)[:-1] + ', "metadata": 1e400}', encoding="utf-8")
+        self.assert_unavailable("/api/status")
+
+    def test_invalid_progress_and_crosscheck_values_are_rejected(self):
+        for value in (-1, True, "100"):
+            for field, nested in (
+                ("progress", {"pct": value}),
+                ("crosscheck", {"groups": [{"status": "single", "points": [{"value": value}]}]}),
+            ):
+                with self.subTest(field=field, value=value):
+                    save_json(self.data / "current.json", {
+                        "constellations": [dict(self.row, **{field: nested})],
+                    })
+                    self.assert_unavailable("/api/status")
+
+    def test_readiness_requires_a_count_for_automatically_observed_networks(self):
+        now = datetime(2026, 10, 22, 0, tzinfo=timezone.utc)
+        for status in ("fresh", "cached", "legacy"):
+            for missing in (False, True):
+                with self.subTest(status=status, missing=missing):
+                    row = dict(self.row, tracked_in_orbit=None, observation={
+                        "status": status, "last_success_at": now.isoformat(),
+                    })
+                    if missing:
+                        del row["tracked_in_orbit"]
+                    save_json(self.data / "current.json", {"constellations": [row]})
+                    with patch.object(app, "utc_now", return_value=now):
+                        response = self.client.get("/ready")
+                        self.assertEqual(response.status_code, 503)
+                        self.assertEqual(response.json["quality"]["rows"][0]["status"], "unavailable")
+                        status_response = self.client.get("/api/status")
+                        self.assertEqual(status_response.status_code, 200)
+                        self.assertIsNone(status_response.json["constellations"][0].get("tracked_in_orbit"))
+
+    def test_zero_counts_and_manual_unknown_counts_remain_valid(self):
+        now = datetime(2026, 10, 22, 0, tzinfo=timezone.utc)
+        for status, count in (("fresh", 0), ("cached", 0), ("manual", None)):
+            with self.subTest(status=status):
+                row = dict(self.row, tracked_in_orbit=count, observation={
+                    "status": status, "last_success_at": now.isoformat() if status != "manual" else None,
+                })
+                save_json(self.data / "current.json", {"constellations": [row]})
+                with patch.object(app, "utc_now", return_value=now):
+                    response = self.client.get("/ready")
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(response.json["quality"]["rows"][0]["status"], status)
+                    response = self.client.get("/api/status")
+                    self.assertEqual(response.json["constellations"][0]["tracked_in_orbit"], count)
+
+    def test_unknown_observation_status_cannot_report_ready(self):
+        for status in (None, [], "unknown"):
+            with self.subTest(status=status):
+                row = dict(self.row, tracked_in_orbit=100, observation={
+                    "status": status, "last_success_at": "2026-10-22T00:00:00Z",
+                })
+                save_json(self.data / "current.json", {"constellations": [row]})
+                self.assert_unavailable("/ready")
 
     def assert_isolated_section(self, key):
         response = self.client.get("/api/constellation/starlink")

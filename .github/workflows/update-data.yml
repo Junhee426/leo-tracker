@@ -26,8 +26,10 @@ jobs:
         continue-on-error: true
         run: python updater/update_data.py
       - name: Validate collected data before committing
+        if: steps.collect.outputs.collection_complete == 'true'
         run: python -m unittest discover -s tests -p test_data_integrity.py -v
       - name: Commit data and collection status
+        if: steps.collect.outputs.collection_complete == 'true'
         run: |
           git config user.name "leo-tracker-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -38,6 +40,12 @@ jobs:
           fi
       - name: Report incomplete collection
         if: steps.collect.outcome == 'failure'
+        env:
+          COLLECTION_COMPLETE: ${{ steps.collect.outputs.collection_complete }}
         run: |
-          echo "::error::Collection was incomplete. Previous valid observations and failure status have been preserved."
+          if [ "$COLLECTION_COMPLETE" = "true" ]; then
+            echo "::error::Collection was incomplete. Previous valid observations and failure status have been preserved."
+          else
+            echo "::error::Collection aborted before all files were saved and verified. No collection changes were committed."
+          fi
           exit 1

@@ -9,7 +9,7 @@ const launches=JSON.parse(fs.readFileSync(root+'/data/launches.json'));
 function environment(respond) {
   const elements=new Map();
   const el=selector=>{
-    if(!elements.has(selector)) elements.set(selector,{innerHTML:'',textContent:'',value:selector==='#statusFilter'||selector==='#launchFilter'?'all':selector==='#trendMonths'?'12':selector==='#trendFilter'?'starlink':'',dataset:{},hidden:true,addEventListener(){},querySelector(){return {onclick:null};}});
+    if(!elements.has(selector)) elements.set(selector,{innerHTML:'',textContent:'',value:selector==='#statusFilter'||selector==='#launchFilter'?'all':selector==='#trendMonths'?'12':selector==='#trendFilter'?'starlink':'',dataset:{},hidden:true,addEventListener(){},querySelector(child){return el(selector+' '+child);}});
     return elements.get(selector);
   };
   const context={console,Intl,URL,URLSearchParams,AbortController,setTimeout,clearTimeout,
@@ -55,6 +55,51 @@ test('unknown tracked counts are displayed as unavailable, not zero',async()=>{
   assert.equal(el('#kpiOrbit').textContent,'—');
 });
 
+test('status KPIs stay unavailable while loading and after failure, then recover on retry',async()=>{
+  let rejectStatus;
+  let statusResponse=new Promise((resolve,reject)=>{rejectStatus=reject;});
+  const {context,el}=environment(url=>{
+    if(url==='/api/status')return statusResponse;
+    if(url==='/api/launches')return launches;
+    if(url.startsWith('/api/trends'))return {series:[],monthly:[],warnings:[],note:''};
+    return [];
+  });
+  loadScript(context,'app.js');
+  const loading=context.loadStatus();
+  await context.loadPart('launches','/api/launches',context.renderLaunches,'launchError');
+  assert.equal(el('#kpiNetworks').textContent,'—');
+  assert.equal(el('#kpiActive').textContent,'—');
+  assert.equal(el('#kpiOrbit').textContent,'—');
+  assert.doesNotMatch(el('#kpiOrbitNote').textContent,/0\/0/);
+  assert.equal(el('#kpiLaunches').textContent,String(launches.length));
+
+  rejectStatus(new Error('status outage'));
+  await loading;
+  context.renderKPIs();
+  assert.equal(el('#kpiNetworks').textContent,'—');
+  assert.equal(el('#kpiActive').textContent,'—');
+  assert.match(el('#overviewError').innerHTML,/다시 시도/);
+
+  const payload=statusData();
+  statusResponse=Promise.resolve(payload);
+  await el('#overviewError button').onclick();
+  assert.equal(el('#overviewError').innerHTML,'');
+  assert.equal(el('#kpiNetworks').textContent,String(payload.constellations.length));
+  const active=payload.constellations.filter(r=>['operating','operating_expanding','deploying'].includes(r.status)).length;
+  assert.equal(el('#kpiActive').textContent,String(active));
+});
+
+test('a successfully loaded empty status reports zero networks',async()=>{
+  const payload=statusData();
+  payload.constellations=[];
+  payload.quality.rows=[];
+  const {context,el}=environment(url=>url==='/api/status'?payload:{series:[],monthly:[],warnings:[],note:''});
+  loadScript(context,'app.js');
+  await context.loadStatus();
+  assert.equal(el('#kpiNetworks').textContent,'0');
+  assert.equal(el('#kpiActive').textContent,'0');
+});
+
 test('crosscheck rendering keeps the server decision without recomputing confidence',()=>{
   const {context}=environment(()=>[]);
   const html=context.LEO.crosschecks({groups:[{metric_label:'배치 발표',scope:'reported',status:'same_origin',label:'동일 원천의 반복 발표',points:[{source_id:'amazon',value:396,date:'2026-07-02'},{source_id:'amazon',value:400,date:'2026-07-30',qualifier:'approx'}]}]},{});
@@ -85,6 +130,48 @@ test('detail remains usable if launch history fails and sources finish before pr
   assert.match(el('#detailName').textContent,/Starlink/);
   assert.match(el('#detailLaunchError').innerHTML,/다시 시도/);
   assert.match(el('#detailSources').innerHTML,/Test Source/);
+});
+
+test('switching NORAD history clears previous rows and ignores late responses',async()=>{
+  const pending=[];
+  const {context,el}=environment(url=>new Promise(resolve=>pending.push({url,resolve})));
+  loadScript(context,'detail.js');
+  const first=context.loadHistory(111);
+  pending[0].resolve({note:'history for 111',samples:[]});
+  await first;
+  assert.match(el('#objectHistoryRows').innerHTML,/history for 111/);
+
+  const second=context.loadHistory(222);
+  assert.match(el('#objectHistoryTitle').textContent,/NORAD 222/);
+  assert.match(el('#objectHistoryRows').innerHTML,/불러오는 중/);
+  assert.doesNotMatch(el('#objectHistoryRows').innerHTML,/history for 111/);
+  const third=context.loadHistory(333);
+  pending[2].resolve({note:'history for 333',samples:[]});
+  await third;
+  pending[1].resolve({note:'history for 222',samples:[]});
+  await second;
+  assert.match(el('#objectHistoryTitle').textContent,/NORAD 333/);
+  assert.match(el('#objectHistoryRows').innerHTML,/history for 333/);
+  assert.doesNotMatch(el('#objectHistoryRows').innerHTML,/history for 222/);
+});
+
+test('NORAD history failure retries the selected satellite with a loading state',async()=>{
+  const pending=[];
+  const {context,el}=environment(url=>new Promise((resolve,reject)=>pending.push({url,resolve,reject})));
+  loadScript(context,'detail.js');
+  const failed=context.loadHistory(222);
+  pending[0].reject(new Error('history outage'));
+  await failed;
+  assert.match(el('#objectHistoryRows').innerHTML,/다시 시도/);
+
+  const retry=el('#objectHistoryRows button').onclick();
+  assert.equal(pending[1].url,'/api/objects/starlink/222?days=90');
+  assert.match(el('#objectHistoryRows').innerHTML,/불러오는 중/);
+  assert.doesNotMatch(el('#objectHistoryRows').innerHTML,/다시 시도/);
+  pending[1].resolve({note:'recovered history for 222',samples:[]});
+  await retry;
+  assert.match(el('#objectHistoryTitle').textContent,/NORAD 222/);
+  assert.match(el('#objectHistoryRows').innerHTML,/recovered history for 222/);
 });
 
 test('untrusted HTML and URL schemes cannot become markup or script links',()=>{
