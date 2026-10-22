@@ -1,9 +1,15 @@
 {
   "version": "1.3.0",
   "schema_version": 2,
-  "generated_at": "2026-10-21T23:46:16Z",
-  "update_mode": "live",
-  "failures": [],
+  "generated_at": "2026-10-22T23:43:30Z",
+  "update_mode": "failed",
+  "failures": [
+    "STARLINK: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "ONEWEB: 상위 출처 요청 중단: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "KUIPER: 상위 출처 요청 중단: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "HULIANWANG: 상위 출처 요청 중단: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "QIANFAN: 상위 출처 요청 중단: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
+  ],
   "constellations": [
     {
       "id": "starlink",
@@ -45,17 +51,10 @@
       "epoch_min": "2026-10-19T01:37:36Z",
       "epoch_max": "2026-10-21T14:15:30Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-21T23:46:16Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-22T23:43:30Z",
         "last_success_at": "2026-10-21T23:46:16Z",
-        "error": null,
-        "membership": {
-          "known_objects": 11184,
-          "present_objects": 11121,
-          "first_batch": false,
-          "added": 0,
-          "missing": 1
-        }
+        "error": "403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -196,17 +195,10 @@
       "epoch_min": "2026-10-20T09:40:58Z",
       "epoch_max": "2026-10-21T08:11:27Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-21T23:46:16Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-22T23:43:30Z",
         "last_success_at": "2026-10-21T23:46:16Z",
-        "error": null,
-        "membership": {
-          "known_objects": 651,
-          "present_objects": 651,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -317,17 +309,10 @@
       "epoch_min": "2026-10-20T07:15:06Z",
       "epoch_max": "2026-10-21T08:10:32Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-21T23:46:16Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-22T23:43:30Z",
         "last_success_at": "2026-10-21T23:46:16Z",
-        "error": null,
-        "membership": {
-          "known_objects": 391,
-          "present_objects": 391,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -547,17 +532,10 @@
       "epoch_min": "2026-10-19T18:15:33Z",
       "epoch_max": "2026-10-21T08:11:28Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-21T23:46:16Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-22T23:43:30Z",
         "last_success_at": "2026-10-21T23:46:16Z",
-        "error": null,
-        "membership": {
-          "known_objects": 226,
-          "present_objects": 226,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -664,17 +642,10 @@
       "epoch_min": "2026-10-20T19:29:15Z",
       "epoch_max": "2026-10-21T08:11:06Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-10-21T23:46:16Z",
+        "status": "stale",
+        "last_attempt_at": "2026-10-22T23:43:30Z",
         "last_success_at": "2026-10-21T23:46:16Z",
-        "error": null,
-        "membership": {
-          "known_objects": 256,
-          "present_objects": 256,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 403 Client Error: Forbidden for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
