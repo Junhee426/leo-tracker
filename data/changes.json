@@ -1,5 +1,21 @@
 [
   {
+    "event_id": "2026-10-24T22:45:51Z:starlink:tracking_update",
+    "date": "2026-10-24",
+    "observed_at": "2026-10-24T22:45:51Z",
+    "constellation_id": "starlink",
+    "constellation": "Starlink",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": 11115,
+    "current": 11114,
+    "source_id": "celestrak_groups",
+    "previous_source": "celestrak",
+    "current_source": "celestrak",
+    "previous_date": "2026-10-23",
+    "current_date": "2026-10-24"
+  },
+  {
     "event_id": "2026-10-23T23:36:40Z:starlink:tracking_update",
     "date": "2026-10-23",
     "observed_at": "2026-10-23T23:36:40Z",
