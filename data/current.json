@@ -1,7 +1,7 @@
 {
   "version": "1.3.0",
   "schema_version": 2,
-  "generated_at": "2026-10-31T00:12:50Z",
+  "generated_at": "2026-10-31T23:49:39Z",
   "update_mode": "live",
   "failures": [],
   "constellations": [
@@ -39,22 +39,22 @@
       ],
       "tracked_launched_this_year": 2218,
       "tracking_year": 2026,
-      "avg_altitude_km": 461.1,
+      "avg_altitude_km": 461.0,
       "avg_inclination_deg": 57.3,
-      "last_data_date": "2026-10-30",
-      "epoch_min": "2026-10-21T18:53:24Z",
-      "epoch_max": "2026-10-30T22:00:01Z",
+      "last_data_date": "2026-10-31",
+      "epoch_min": "2026-10-28T05:14:11Z",
+      "epoch_max": "2026-10-31T19:32:39Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-31T00:12:50Z",
-        "last_success_at": "2026-10-31T00:12:50Z",
+        "last_attempt_at": "2026-10-31T23:49:39Z",
+        "last_success_at": "2026-10-31T23:49:39Z",
         "error": null,
         "membership": {
           "known_objects": 11238,
           "present_objects": 11157,
           "first_batch": false,
-          "added": 27,
-          "missing": 1
+          "added": 0,
+          "missing": 0
         }
       },
       "crosscheck_points": [
@@ -63,7 +63,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 11157,
-          "date": "2026-10-30",
+          "date": "2026-10-31",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -105,7 +105,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 11157,
-                "date": "2026-10-30",
+                "date": "2026-10-31",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -192,13 +192,13 @@
       "tracking_year": 2026,
       "avg_altitude_km": 1197.4,
       "avg_inclination_deg": 87.9,
-      "last_data_date": "2026-10-30",
-      "epoch_min": "2026-10-29T09:46:40Z",
-      "epoch_max": "2026-10-30T22:00:01Z",
+      "last_data_date": "2026-10-31",
+      "epoch_min": "2026-10-30T17:55:14Z",
+      "epoch_max": "2026-10-31T14:00:01Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-31T00:12:50Z",
-        "last_success_at": "2026-10-31T00:12:50Z",
+        "last_attempt_at": "2026-10-31T23:49:39Z",
+        "last_success_at": "2026-10-31T23:49:39Z",
         "error": null,
         "membership": {
           "known_objects": 651,
@@ -214,7 +214,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 651,
-          "date": "2026-10-30",
+          "date": "2026-10-31",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -246,7 +246,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 651,
-                "date": "2026-10-30",
+                "date": "2026-10-31",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -313,13 +313,13 @@
       "tracking_year": 2026,
       "avg_altitude_km": 626.8,
       "avg_inclination_deg": 51.9,
-      "last_data_date": "2026-10-30",
-      "epoch_min": "2026-10-28T23:30:22Z",
-      "epoch_max": "2026-10-30T20:41:27Z",
+      "last_data_date": "2026-10-31",
+      "epoch_min": "2026-10-29T03:42:03Z",
+      "epoch_max": "2026-10-31T11:38:47Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-31T00:12:50Z",
-        "last_success_at": "2026-10-31T00:12:50Z",
+        "last_attempt_at": "2026-10-31T23:49:39Z",
+        "last_success_at": "2026-10-31T23:49:39Z",
         "error": null,
         "membership": {
           "known_objects": 391,
@@ -335,7 +335,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 391,
-          "date": "2026-10-30",
+          "date": "2026-10-31",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -377,7 +377,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 391,
-                "date": "2026-10-30",
+                "date": "2026-10-31",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -541,15 +541,15 @@
       ],
       "tracked_launched_this_year": 99,
       "tracking_year": 2026,
-      "avg_altitude_km": 1126.9,
+      "avg_altitude_km": 1127.0,
       "avg_inclination_deg": 59.4,
-      "last_data_date": "2026-10-30",
+      "last_data_date": "2026-10-31",
       "epoch_min": "2026-10-27T12:18:50Z",
-      "epoch_max": "2026-10-30T19:55:58Z",
+      "epoch_max": "2026-10-31T12:17:00Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-31T00:12:50Z",
-        "last_success_at": "2026-10-31T00:12:50Z",
+        "last_attempt_at": "2026-10-31T23:49:39Z",
+        "last_success_at": "2026-10-31T23:49:39Z",
         "error": null,
         "membership": {
           "known_objects": 235,
@@ -565,7 +565,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 235,
-          "date": "2026-10-30",
+          "date": "2026-10-31",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -597,7 +597,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 235,
-                "date": "2026-10-30",
+                "date": "2026-10-31",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -658,15 +658,15 @@
       ],
       "tracked_launched_this_year": 148,
       "tracking_year": 2026,
-      "avg_altitude_km": 1032.9,
+      "avg_altitude_km": 1033.4,
       "avg_inclination_deg": 89.0,
-      "last_data_date": "2026-10-30",
-      "epoch_min": "2026-10-25T14:45:03Z",
-      "epoch_max": "2026-10-30T20:38:00Z",
+      "last_data_date": "2026-10-31",
+      "epoch_min": "2026-10-27T21:40:58Z",
+      "epoch_max": "2026-10-31T11:59:25Z",
       "observation": {
         "status": "fresh",
-        "last_attempt_at": "2026-10-31T00:12:50Z",
-        "last_success_at": "2026-10-31T00:12:50Z",
+        "last_attempt_at": "2026-10-31T23:49:39Z",
+        "last_success_at": "2026-10-31T23:49:39Z",
         "error": null,
         "membership": {
           "known_objects": 256,
@@ -682,7 +682,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 256,
-          "date": "2026-10-30",
+          "date": "2026-10-31",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -724,7 +724,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 256,
-                "date": "2026-10-30",
+                "date": "2026-10-31",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
