@@ -1,9 +1,15 @@
 {
   "version": "1.3.0",
   "schema_version": 2,
-  "generated_at": "2026-11-01T23:59:40Z",
-  "update_mode": "live",
-  "failures": [],
+  "generated_at": "2026-11-03T02:41:54Z",
+  "update_mode": "failed",
+  "failures": [
+    "STARLINK: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))",
+    "ONEWEB: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))",
+    "KUIPER: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))",
+    "HULIANWANG: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))",
+    "QIANFAN: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
+  ],
   "constellations": [
     {
       "id": "starlink",
@@ -45,17 +51,10 @@
       "epoch_min": "2026-10-28T05:14:11Z",
       "epoch_max": "2026-11-01T16:17:49Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-01T23:59:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-03T02:41:54Z",
         "last_success_at": "2026-11-01T23:59:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 11238,
-          "present_objects": 11156,
-          "first_batch": false,
-          "added": 0,
-          "missing": 1
-        }
+        "error": "HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
       },
       "crosscheck_points": [
         {
@@ -196,17 +195,10 @@
       "epoch_min": "2026-10-30T19:55:10Z",
       "epoch_max": "2026-11-01T14:00:01Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-01T23:59:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-03T02:41:54Z",
         "last_success_at": "2026-11-01T23:59:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 651,
-          "present_objects": 651,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
       },
       "crosscheck_points": [
         {
@@ -317,17 +309,10 @@
       "epoch_min": "2026-10-31T00:48:27Z",
       "epoch_max": "2026-11-01T12:44:01Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-01T23:59:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-03T02:41:54Z",
         "last_success_at": "2026-11-01T23:59:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 391,
-          "present_objects": 391,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
       },
       "crosscheck_points": [
         {
@@ -547,17 +532,10 @@
       "epoch_min": "2026-10-27T12:18:50Z",
       "epoch_max": "2026-11-01T12:37:54Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-01T23:59:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-03T02:41:54Z",
         "last_success_at": "2026-11-01T23:59:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 235,
-          "present_objects": 235,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
       },
       "crosscheck_points": [
         {
@@ -664,17 +642,10 @@
       "epoch_min": "2026-10-27T21:40:58Z",
       "epoch_max": "2026-11-01T12:54:41Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-01T23:59:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-03T02:41:54Z",
         "last_success_at": "2026-11-01T23:59:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 256,
-          "present_objects": 256,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
       },
       "crosscheck_points": [
         {
