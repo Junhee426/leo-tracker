@@ -1,15 +1,9 @@
 {
   "version": "1.3.0",
   "schema_version": 2,
-  "generated_at": "2026-11-03T02:41:54Z",
-  "update_mode": "failed",
-  "failures": [
-    "STARLINK: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))",
-    "ONEWEB: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))",
-    "KUIPER: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))",
-    "HULIANWANG: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))",
-    "QIANFAN: 상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
-  ],
+  "generated_at": "2026-11-04T00:56:56Z",
+  "update_mode": "live",
+  "failures": [],
   "constellations": [
     {
       "id": "starlink",
@@ -24,7 +18,7 @@
       "planned_satellites": 15000,
       "planned_label": "15,000 authorized",
       "note": "Tracked count is refreshed from CelesTrak; 9,600 was SpaceX's March 31, 2026 reference figure.",
-      "tracked_in_orbit": 11156,
+      "tracked_in_orbit": 11155,
       "tracked_source": "celestrak",
       "count_scope": "all_catalogued",
       "plan_metric": "authorized",
@@ -45,24 +39,31 @@
       ],
       "tracked_launched_this_year": 2218,
       "tracking_year": 2026,
-      "avg_altitude_km": 460.9,
+      "avg_altitude_km": 460.7,
       "avg_inclination_deg": 57.3,
-      "last_data_date": "2026-11-01",
-      "epoch_min": "2026-10-28T05:14:11Z",
-      "epoch_max": "2026-11-01T16:17:49Z",
+      "last_data_date": "2026-11-03",
+      "epoch_min": "2026-11-01T14:20:17Z",
+      "epoch_max": "2026-11-03T22:21:12Z",
       "observation": {
-        "status": "stale",
-        "last_attempt_at": "2026-11-03T02:41:54Z",
-        "last_success_at": "2026-11-01T23:59:40Z",
-        "error": "HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
+        "status": "fresh",
+        "last_attempt_at": "2026-11-04T00:56:56Z",
+        "last_success_at": "2026-11-04T00:56:56Z",
+        "error": null,
+        "membership": {
+          "known_objects": 11238,
+          "present_objects": 11155,
+          "first_batch": false,
+          "added": 1,
+          "missing": 2
+        }
       },
       "crosscheck_points": [
         {
           "source_id": "celestrak_groups",
           "metric": "tracked",
           "scope": "all_catalogued",
-          "value": 11156,
-          "date": "2026-11-01",
+          "value": 11155,
+          "date": "2026-11-03",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -103,8 +104,8 @@
                 "source_id": "celestrak_groups",
                 "metric": "tracked",
                 "scope": "all_catalogued",
-                "value": 11156,
-                "date": "2026-11-01",
+                "value": 11155,
+                "date": "2026-11-03",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -191,14 +192,21 @@
       "tracking_year": 2026,
       "avg_altitude_km": 1197.4,
       "avg_inclination_deg": 87.9,
-      "last_data_date": "2026-11-01",
-      "epoch_min": "2026-10-30T19:55:10Z",
-      "epoch_max": "2026-11-01T14:00:01Z",
+      "last_data_date": "2026-11-03",
+      "epoch_min": "2026-11-03T03:47:06Z",
+      "epoch_max": "2026-11-03T22:00:01Z",
       "observation": {
-        "status": "stale",
-        "last_attempt_at": "2026-11-03T02:41:54Z",
-        "last_success_at": "2026-11-01T23:59:40Z",
-        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
+        "status": "fresh",
+        "last_attempt_at": "2026-11-04T00:56:56Z",
+        "last_success_at": "2026-11-04T00:56:56Z",
+        "error": null,
+        "membership": {
+          "known_objects": 651,
+          "present_objects": 651,
+          "first_batch": false,
+          "added": 0,
+          "missing": 0
+        }
       },
       "crosscheck_points": [
         {
@@ -206,7 +214,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 651,
-          "date": "2026-11-01",
+          "date": "2026-11-03",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -238,7 +246,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 651,
-                "date": "2026-11-01",
+                "date": "2026-11-03",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -303,16 +311,23 @@
       ],
       "tracked_launched_this_year": 216,
       "tracking_year": 2026,
-      "avg_altitude_km": 626.8,
+      "avg_altitude_km": 626.9,
       "avg_inclination_deg": 51.9,
-      "last_data_date": "2026-11-01",
-      "epoch_min": "2026-10-31T00:48:27Z",
-      "epoch_max": "2026-11-01T12:44:01Z",
+      "last_data_date": "2026-11-03",
+      "epoch_min": "2026-11-02T15:44:14Z",
+      "epoch_max": "2026-11-03T20:40:15Z",
       "observation": {
-        "status": "stale",
-        "last_attempt_at": "2026-11-03T02:41:54Z",
-        "last_success_at": "2026-11-01T23:59:40Z",
-        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
+        "status": "fresh",
+        "last_attempt_at": "2026-11-04T00:56:56Z",
+        "last_success_at": "2026-11-04T00:56:56Z",
+        "error": null,
+        "membership": {
+          "known_objects": 391,
+          "present_objects": 391,
+          "first_batch": false,
+          "added": 0,
+          "missing": 0
+        }
       },
       "crosscheck_points": [
         {
@@ -320,7 +335,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 391,
-          "date": "2026-11-01",
+          "date": "2026-11-03",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -362,7 +377,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 391,
-                "date": "2026-11-01",
+                "date": "2026-11-03",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -526,16 +541,23 @@
       ],
       "tracked_launched_this_year": 99,
       "tracking_year": 2026,
-      "avg_altitude_km": 1127.9,
+      "avg_altitude_km": 1128.4,
       "avg_inclination_deg": 59.4,
-      "last_data_date": "2026-11-01",
-      "epoch_min": "2026-10-27T12:18:50Z",
-      "epoch_max": "2026-11-01T12:37:54Z",
+      "last_data_date": "2026-11-03",
+      "epoch_min": "2026-10-29T13:16:14Z",
+      "epoch_max": "2026-11-03T20:43:43Z",
       "observation": {
-        "status": "stale",
-        "last_attempt_at": "2026-11-03T02:41:54Z",
-        "last_success_at": "2026-11-01T23:59:40Z",
-        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
+        "status": "fresh",
+        "last_attempt_at": "2026-11-04T00:56:56Z",
+        "last_success_at": "2026-11-04T00:56:56Z",
+        "error": null,
+        "membership": {
+          "known_objects": 235,
+          "present_objects": 235,
+          "first_batch": false,
+          "added": 0,
+          "missing": 0
+        }
       },
       "crosscheck_points": [
         {
@@ -543,7 +565,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 235,
-          "date": "2026-11-01",
+          "date": "2026-11-03",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -575,7 +597,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 235,
-                "date": "2026-11-01",
+                "date": "2026-11-03",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
@@ -636,16 +658,23 @@
       ],
       "tracked_launched_this_year": 148,
       "tracking_year": 2026,
-      "avg_altitude_km": 1033.7,
+      "avg_altitude_km": 1034.4,
       "avg_inclination_deg": 89.0,
-      "last_data_date": "2026-11-01",
-      "epoch_min": "2026-10-27T21:40:58Z",
-      "epoch_max": "2026-11-01T12:54:41Z",
+      "last_data_date": "2026-11-03",
+      "epoch_min": "2026-10-27T22:15:24Z",
+      "epoch_max": "2026-11-03T20:51:52Z",
       "observation": {
-        "status": "stale",
-        "last_attempt_at": "2026-11-03T02:41:54Z",
-        "last_success_at": "2026-11-01T23:59:40Z",
-        "error": "상위 출처 요청 중단: HTTPSConnectionPool(host='celestrak.org', port=443): Max retries exceeded with url: /NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON (Caused by ConnectTimeoutError(<HTTPSConnection(host='celestrak.org', port=443) at 0x7f2442f36870>, 'Connection to celestrak.org timed out. (connect timeout=10)'))"
+        "status": "fresh",
+        "last_attempt_at": "2026-11-04T00:56:56Z",
+        "last_success_at": "2026-11-04T00:56:56Z",
+        "error": null,
+        "membership": {
+          "known_objects": 256,
+          "present_objects": 256,
+          "first_batch": false,
+          "added": 0,
+          "missing": 0
+        }
       },
       "crosscheck_points": [
         {
@@ -653,7 +682,7 @@
           "metric": "tracked",
           "scope": "all_catalogued",
           "value": 256,
-          "date": "2026-11-01",
+          "date": "2026-11-03",
           "qualifier": "exact",
           "origin_id": "18sds_gp",
           "approx": false
@@ -695,7 +724,7 @@
                 "metric": "tracked",
                 "scope": "all_catalogued",
                 "value": 256,
-                "date": "2026-11-01",
+                "date": "2026-11-03",
                 "qualifier": "exact",
                 "origin_id": "18sds_gp",
                 "approx": false
