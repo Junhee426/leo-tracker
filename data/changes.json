@@ -1,5 +1,37 @@
 [
   {
+    "event_id": "2026-11-12T02:02:08Z:starlink:tracking_update",
+    "date": "2026-11-12",
+    "observed_at": "2026-11-12T02:02:08Z",
+    "constellation_id": "starlink",
+    "constellation": "Starlink",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": 11199,
+    "current": 11195,
+    "source_id": "celestrak_groups",
+    "previous_source": "celestrak",
+    "current_source": "celestrak",
+    "previous_date": "2026-11-10",
+    "current_date": "2026-11-11"
+  },
+  {
+    "event_id": "2026-11-12T02:02:08Z:guowang:tracking_update",
+    "date": "2026-11-12",
+    "observed_at": "2026-11-12T02:02:08Z",
+    "constellation_id": "guowang",
+    "constellation": "Guowang / SatNet",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": 244,
+    "current": 240,
+    "source_id": "celestrak_groups",
+    "previous_source": "celestrak",
+    "current_source": "celestrak",
+    "previous_date": "2026-11-10",
+    "current_date": "2026-11-11"
+  },
+  {
     "event_id": "2026-11-11T00:56:06Z:starlink:tracking_update",
     "date": "2026-11-11",
     "observed_at": "2026-11-11T00:56:06Z",
