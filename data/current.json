@@ -1,9 +1,15 @@
 {
   "version": "1.3.0",
   "schema_version": 2,
-  "generated_at": "2026-11-20T01:55:40Z",
-  "update_mode": "live",
-  "failures": [],
+  "generated_at": "2026-11-21T01:50:48Z",
+  "update_mode": "failed",
+  "failures": [
+    "STARLINK: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "ONEWEB: 상위 출처 요청 중단: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "KUIPER: 상위 출처 요청 중단: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "HULIANWANG: 상위 출처 요청 중단: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON",
+    "QIANFAN: 상위 출처 요청 중단: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
+  ],
   "constellations": [
     {
       "id": "starlink",
@@ -45,17 +51,10 @@
       "epoch_min": "2026-11-13T20:20:02Z",
       "epoch_max": "2026-11-19T19:34:48Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-20T01:55:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-21T01:50:48Z",
         "last_success_at": "2026-11-20T01:55:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 11318,
-          "present_objects": 11205,
-          "first_batch": false,
-          "added": 0,
-          "missing": 3
-        }
+        "error": "500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -196,17 +195,10 @@
       "epoch_min": "2026-11-18T12:16:05Z",
       "epoch_max": "2026-11-19T16:00:03Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-20T01:55:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-21T01:50:48Z",
         "last_success_at": "2026-11-20T01:55:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 651,
-          "present_objects": 651,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -317,17 +309,10 @@
       "epoch_min": "2026-11-16T15:31:15Z",
       "epoch_max": "2026-11-19T18:14:58Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-20T01:55:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-21T01:50:48Z",
         "last_success_at": "2026-11-20T01:55:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 391,
-          "present_objects": 391,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -547,17 +532,10 @@
       "epoch_min": "2026-11-17T17:43:40Z",
       "epoch_max": "2026-11-19T18:26:50Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-20T01:55:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-21T01:50:48Z",
         "last_success_at": "2026-11-20T01:55:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 245,
-          "present_objects": 240,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
@@ -664,17 +642,10 @@
       "epoch_min": "2026-11-15T14:18:55Z",
       "epoch_max": "2026-11-19T19:28:11Z",
       "observation": {
-        "status": "fresh",
-        "last_attempt_at": "2026-11-20T01:55:40Z",
+        "status": "stale",
+        "last_attempt_at": "2026-11-21T01:50:48Z",
         "last_success_at": "2026-11-20T01:55:40Z",
-        "error": null,
-        "membership": {
-          "known_objects": 275,
-          "present_objects": 275,
-          "first_batch": false,
-          "added": 0,
-          "missing": 0
-        }
+        "error": "상위 출처 요청 중단: 500 Server Error: Internal Server Error for url: https://celestrak.org/NORAD/elements/gp.php?GROUP=STARLINK&FORMAT=JSON"
       },
       "crosscheck_points": [
         {
