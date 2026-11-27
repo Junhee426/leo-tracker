@@ -1,5 +1,37 @@
 [
   {
+    "event_id": "2026-11-27T03:19:43Z:starlink:tracking_update",
+    "date": "2026-11-27",
+    "observed_at": "2026-11-27T03:19:43Z",
+    "constellation_id": "starlink",
+    "constellation": "Starlink",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": 11194,
+    "current": 11189,
+    "source_id": "celestrak_groups",
+    "previous_source": "celestrak",
+    "current_source": "celestrak",
+    "previous_date": "2026-11-26",
+    "current_date": "2026-11-27"
+  },
+  {
+    "event_id": "2026-11-27T03:19:43Z:amazon_leo:tracking_update",
+    "date": "2026-11-27",
+    "observed_at": "2026-11-27T03:19:43Z",
+    "constellation_id": "amazon_leo",
+    "constellation": "Amazon Leo",
+    "type": "tracking_update",
+    "field": "Tracked in orbit",
+    "previous": 391,
+    "current": 427,
+    "source_id": "celestrak_groups",
+    "previous_source": "celestrak",
+    "current_source": "celestrak",
+    "previous_date": "2026-11-25",
+    "current_date": "2026-11-26"
+  },
+  {
     "event_id": "2026-11-26T03:15:23Z:starlink:tracking_update",
     "date": "2026-11-26",
     "observed_at": "2026-11-26T03:15:23Z",
